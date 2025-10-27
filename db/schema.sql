@@ -12,7 +12,10 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS organizations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'business' CHECK (type IN ('business', 'personal')),
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free', 'pro')),
+  invite_code TEXT UNIQUE, -- 個人向けの参加コード
+  is_open BOOLEAN DEFAULT false, -- オープン参加可能か
   max_members INTEGER NOT NULL DEFAULT 10,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -24,13 +27,25 @@ CREATE TABLE IF NOT EXISTS organizations (
 -- ========================================
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY, -- auth.users.idを参照（外部キーは設定しない）
-  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
   avatar_color TEXT NOT NULL DEFAULT 'from-lime-400 to-green-500',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ========================================
+-- User Organizations (ユーザー所属組織)
+-- 複数組織への参加をサポート
+-- ========================================
+CREATE TABLE IF NOT EXISTS user_organizations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
+  is_active BOOLEAN DEFAULT true, -- 現在アクティブな組織か
+  joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, organization_id)
 );
 
 -- ========================================
@@ -54,9 +69,11 @@ CREATE TABLE IF NOT EXISTS user_status (
 -- ========================================
 -- Indexes
 -- ========================================
-CREATE INDEX IF NOT EXISTS idx_users_organization ON users(organization_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_user_organizations_user ON user_organizations(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_organizations_org ON user_organizations(organization_id);
 CREATE INDEX IF NOT EXISTS idx_user_status_user ON user_status(user_id);
+CREATE INDEX IF NOT EXISTS idx_organizations_invite_code ON organizations(invite_code);
 
 -- ========================================
 -- Functions
@@ -87,7 +104,8 @@ CREATE TRIGGER update_user_status_updated_at BEFORE UPDATE ON user_status
 -- ========================================
 -- コメント
 -- ========================================
-COMMENT ON TABLE organizations IS '組織（チーム）テーブル';
+COMMENT ON TABLE organizations IS '組織（チーム）テーブル - 法人向けと個人向けをサポート';
 COMMENT ON TABLE users IS 'ユーザーテーブル';
+COMMENT ON TABLE user_organizations IS 'ユーザー所属組織テーブル - 複数組織への参加をサポート';
 COMMENT ON TABLE user_status IS 'ユーザーステータステーブル';
 

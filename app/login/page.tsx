@@ -51,13 +51,13 @@ export default function LoginPage() {
           <div className="inline-block">
             <div className="flex items-center gap-4 mb-2">
               <div className="w-16 h-16 bg-lime-400 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.6)] relative overflow-visible">
-                <span className="text-4xl">🦑</span>
+                <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
                 {/* インク飛び散り */}
                 <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-70 ink-splash"></div>
                 <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip"></div>
               </div>
               <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(191,255,0,0.5)] splatoon-glow">
-                在籍管理ツール
+                InkLink
               </h1>
             </div>
             <p className="text-gray-400 text-sm">話しかけやすさを可視化</p>

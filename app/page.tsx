@@ -3,43 +3,106 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { StatusPanel } from '@/components/StatusPanel'
-import type { PresenceStatus, CustomStatus } from '@/types/status'
-
-// 型を再エクスポート（後方互換性のため）
-export type { PresenceStatus, CustomStatus }
-
-const DEFAULT_CUSTOM_STATUS: CustomStatus = {
-  label: 'カスタム',
-  icon: 'ri-edit-line',
-}
-
-const AUTO_CHANGE_HOUR = 17
-const CHECK_INTERVAL_MS = 60 * 1000 // 1分
+import { CustomStatusModal } from '@/components/CustomStatusModal'
+import { getStatusConfig } from '@/constants/statusOptions'
+import { CustomStatus } from '@/types/status'
 
 export default function Home() {
   const router = useRouter()
-  const [currentStatus, setCurrentStatus] = useState<PresenceStatus>('available')
+  const [isLoading, setIsLoading] = useState(true)
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [currentStatus, setCurrentStatus] = useState<any>('available')
   const [customStatus1, setCustomStatus1] = useState<CustomStatus>({
-    ...DEFAULT_CUSTOM_STATUS,
     label: 'カスタム1',
+    icon: 'ri-edit-line',
   })
   const [customStatus2, setCustomStatus2] = useState<CustomStatus>({
-    ...DEFAULT_CUSTOM_STATUS,
     label: 'カスタム2',
+    icon: 'ri-edit-line',
   })
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
 
+  // 初期データ取得
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // ユーザープロフィール取得
+        const profileRes = await fetch('/api/auth/me')
+        const profileData = await profileRes.json()
+
+        if (!profileData.user || !profileData.user.currentOrganization) {
+          // ログインしていないか、組織に所属していない場合はランディングページへ
+          router.push('/landing')
+          return
+        }
+
+        setUserProfile(profileData.user)
+
+        // ステータス取得
+        const statusRes = await fetch('/api/status')
+        const statusData = await statusRes.json()
+
+        if (statusData.status) {
+          setCurrentStatus(statusData.status.status)
+          setCustomStatus1({
+            label: statusData.status.custom1_label || 'カスタム1',
+            icon: statusData.status.custom1_icon || 'ri-edit-line',
+          })
+          setCustomStatus2({
+            label: statusData.status.custom2_label || 'カスタム2',
+            icon: statusData.status.custom2_icon || 'ri-edit-line',
+          })
+        }
+
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Failed to fetch data:', error)
+        router.push('/landing')
+      }
+    }
+
+    fetchData()
+  }, [router])
+
+  // ステータス変更
+  const handleStatusChange = useCallback(async (newStatus: any) => {
+    setCurrentStatus(newStatus)
+    await fetch('/api/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    })
+  }, [])
+
+  // カスタムステータス保存
+  const handleCustomSave = useCallback(async (type: 'custom1' | 'custom2', label: string, icon: string) => {
+    const newCustomStatus = { label, icon }
+    if (type === 'custom1') {
+      setCustomStatus1(newCustomStatus)
+    } else {
+      setCustomStatus2(newCustomStatus)
+    }
+    setShowCustomModal(null)
+
+    await fetch('/api/status/custom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, label, icon }),
+    })
+  }, [])
+
   // 定時自動切り替え（17:00になったら「定時で帰りたい」に）
   useEffect(() => {
+    const AUTO_CHANGE_HOUR = 17
+    const CHECK_INTERVAL_MS = 60 * 1000 // 1分
 
-    const checkTime = () => {
+    const checkTime = async () => {
       const now = new Date()
       const hours = now.getHours()
       const minutes = now.getMinutes()
 
-      // 17:00になったら自動で「定時で帰りたい」に
       if (hours === AUTO_CHANGE_HOUR && minutes === 0 && currentStatus !== 'going-home') {
-        setCurrentStatus('going-home')
+        await handleStatusChange('going-home')
       }
     }
 
@@ -47,78 +110,108 @@ export default function Home() {
     checkTime() // 初回実行
 
     return () => clearInterval(interval)
-  }, [currentStatus])
+  }, [currentStatus, handleStatusChange])
 
-  // ステータス変更ハンドラー
-  const handleStatusChange = useCallback((status: PresenceStatus) => {
-    setCurrentStatus(status)
-    // TODO: バックエンドに送信
-  }, [])
+  // 組織切り替え
+  const handleOrgSwitch = async (orgId: string) => {
+    try {
+      await fetch('/api/organization/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organizationId: orgId }),
+      })
+      router.refresh()
+      window.location.reload() // 全体をリロード
+    } catch (error) {
+      console.error('Failed to switch organization:', error)
+    }
+  }
 
-  // カスタムステータス編集開始ハンドラー
-  const handleCustomEdit = useCallback((customId: 'custom1' | 'custom2') => {
-    setShowCustomModal(customId)
-  }, [])
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center text-lime-400 text-2xl splatoon-glow">
+        Loading InkLink...
+      </div>
+    )
+  }
 
-  // カスタムステータス保存ハンドラー
-  const handleCustomSave = useCallback((label: string, icon: string) => {
-    setShowCustomModal((current) => {
-      if (current === 'custom1') {
-        setCustomStatus1({ label, icon })
-      } else if (current === 'custom2') {
-        setCustomStatus2({ label, icon })
-      }
-      return null
-    })
-  }, [])
-
-  // モーダルを閉じるハンドラー
-  const handleCloseModal = useCallback(() => {
-    setShowCustomModal(null)
-  }, [])
+  const statusConfig = getStatusConfig(currentStatus)
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-950 via-gray-900 to-black">
       {/* ヘッダー */}
       <header className="px-4 py-3 sm:py-4 flex items-center justify-between flex-shrink-0 overflow-visible">
-        <h1 className="text-lg sm:text-xl font-bold text-white drop-shadow-[0_2px_8px_rgba(191,255,0,0.5)]">
-          在籍管理
-        </h1>
-        <button
-          onClick={() => router.push('/team')}
-          className="relative px-5 py-2.5 sm:px-6 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold rounded-xl transition-all active:scale-95 text-sm sm:text-base shadow-[0_0_25px_rgba(191,255,0,0.6)] hover:shadow-[0_0_35px_rgba(191,255,0,0.8)] overflow-visible group"
-        >
-          {/* インク飛び散りエフェクト - 強化版 */}
-          <div className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-lime-300 opacity-70 ink-splash"></div>
-          <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-lime-500 opacity-60 ink-drip"></div>
-          <div className="absolute top-0 -right-4 w-3 h-3 rounded-full bg-yellow-300 opacity-50 ink-pulse"></div>
-          <div className="absolute -top-2 left-1/4 w-3 h-3 rounded-full bg-lime-200 opacity-40 ink-float"></div>
-          <div className="absolute bottom-0 right-1/3 w-2 h-2 rounded-full bg-lime-400 opacity-50 ink-drip" style={{ animationDelay: '0.3s' }}></div>
-          <div className="absolute top-1 -left-1 w-2 h-2 rounded-full bg-yellow-400 opacity-60 ink-pulse" style={{ animationDelay: '0.5s' }}></div>
-          <div className="absolute -bottom-1 right-1/4 w-1.5 h-1.5 rounded-full bg-lime-500 opacity-40 ink-splash" style={{ animationDelay: '0.2s' }}></div>
-          <div className="absolute top-1/2 -right-2 w-1.5 h-1.5 rounded-full bg-yellow-300 opacity-50 ink-float" style={{ animationDelay: '0.4s' }}></div>
-          
-          <span className="relative z-10 flex items-center splatoon-glow">
-            <i className="ri-group-line mr-1.5"></i>
-            チームを見る
-          </span>
-        </button>
+        <div className="flex items-center gap-3">
+          <div className={`w-12 h-12 sm:w-14 sm:h-14 ${statusConfig.bgColor} rounded-2xl flex items-center justify-center shadow-lg relative overflow-visible ${statusConfig.glow}`}>
+            <i className={`${statusConfig.icon} text-3xl sm:text-4xl text-gray-900`}></i>
+            {/* インク飛び散り */}
+            <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${statusConfig.inkLight} opacity-70 ink-splash`}></div>
+            <div className={`absolute -bottom-1 -left-1 w-3 h-3 rounded-full ${statusConfig.inkMedium} opacity-60 ink-drip`}></div>
+          </div>
+          <div>
+            <div className="text-white text-base sm:text-lg font-bold">{userProfile?.name}</div>
+            {/* 組織切り替えドロップダウン */}
+            {userProfile?.organizations && userProfile.organizations.length > 1 ? (
+              <select
+                value={userProfile.currentOrganization?.id || ''}
+                onChange={(e) => handleOrgSwitch(e.target.value)}
+                className="text-sm sm:text-base text-gray-400 bg-transparent border border-gray-700 rounded px-2 py-1 hover:border-lime-400 transition-colors cursor-pointer"
+              >
+                {userProfile.organizations.map((org: any) => (
+                  <option key={org.id} value={org.id} className="bg-gray-800">
+                    {org.name} {org.isActive && '(現在)'}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="text-sm sm:text-base text-gray-400">{userProfile?.currentOrganization?.name}</div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          {userProfile?.currentOrganization?.role === 'admin' && (
+            <button
+              onClick={() => router.push('/settings')}
+              className="relative w-10 h-10 sm:w-12 sm:h-12 bg-cyan-400 hover:bg-cyan-300 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]"
+              title="組織設定"
+            >
+              <i className="ri-settings-3-line text-xl sm:text-2xl text-gray-900"></i>
+            </button>
+          )}
+          <button
+            onClick={() => router.push('/team')}
+            className="relative px-4 sm:px-6 py-2 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm sm:text-base rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)] hover:shadow-[0_0_40px_rgba(191,255,0,0.7)] overflow-visible group"
+          >
+            {/* インク飛び散り */}
+            <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
+            <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
+            <span className="relative z-10 flex items-center gap-2">
+              <i className="ri-group-line"></i>
+              <span className="hidden sm:inline">チームを見る</span>
+            </span>
+          </button>
+        </div>
       </header>
 
-      {/* メインコンテンツ */}
-      <main className="flex-1 px-2 py-2 overflow-visible">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-visible">
         <StatusPanel
           currentStatus={currentStatus}
+          onStatusChange={handleStatusChange}
           customStatus1={customStatus1}
           customStatus2={customStatus2}
-          onStatusChange={handleStatusChange}
-          onCustomEdit={handleCustomEdit}
-          showCustomModal={showCustomModal}
-          onCloseCustomModal={handleCloseModal}
-          onCustomSave={handleCustomSave}
+          onCustomClick={(type) => setShowCustomModal(type)}
         />
       </main>
+
+      {showCustomModal && (
+        <CustomStatusModal
+          isOpen={!!showCustomModal}
+          onClose={() => setShowCustomModal(null)}
+          onSave={(label, icon) => handleCustomSave(showCustomModal, label, icon)}
+          currentStatus={showCustomModal === 'custom1' ? customStatus1 : customStatus2}
+        />
+      )}
     </div>
   )
 }
-

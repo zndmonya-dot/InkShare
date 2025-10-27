@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function SignupPage() {
+export default function BusinessSignupPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [teamName, setTeamName] = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -25,10 +25,10 @@ export default function SignupPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch('/api/auth/signup/business', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, teamName }),
+        body: JSON.stringify({ email, password, name, companyName }),
       })
 
       const data = await response.json()
@@ -47,11 +47,11 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden relative">
       {/* 背景のインク飛び散りエフェクト */}
-      <div className="absolute top-10 right-20 w-72 h-72 bg-cyan-400 opacity-10 rounded-full blur-3xl ink-float"></div>
-      <div className="absolute bottom-10 left-10 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl ink-pulse"></div>
-      <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-lime-400 opacity-10 rounded-full blur-3xl ink-drip"></div>
+      <div className="absolute top-20 right-20 w-96 h-96 bg-cyan-400 opacity-10 rounded-full blur-3xl ink-float"></div>
+      <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-500 opacity-10 rounded-full blur-3xl ink-pulse"></div>
+      <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl ink-drip"></div>
 
       <div className="relative w-full max-w-md">
         {/* ロゴ */}
@@ -68,7 +68,7 @@ export default function SignupPage() {
                 InkLink
               </h1>
             </div>
-            <p className="text-gray-400 text-sm">チームを作成して始めよう</p>
+            <p className="text-cyan-400 text-sm font-bold">法人向けアカウント作成</p>
           </div>
         </div>
 
@@ -79,7 +79,8 @@ export default function SignupPage() {
           <div className="absolute -bottom-3 -left-3 w-6 h-6 rounded-full bg-orange-300 opacity-40 blur-sm ink-drip"></div>
 
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            アカウント作成
+            <i className="ri-building-line mr-2"></i>
+            法人アカウント作成
           </h2>
 
           {error && (
@@ -90,11 +91,28 @@ export default function SignupPage() {
           )}
 
           <form onSubmit={handleSignup} className="space-y-4">
-            {/* 名前 */}
+            {/* 会社名 */}
+            <div>
+              <label className="block text-sm font-bold text-cyan-400 mb-2">
+                <i className="ri-building-line mr-1"></i>
+                会社名・組織名
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                required
+                placeholder="株式会社サンプル"
+                disabled={isLoading}
+                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
+              />
+            </div>
+
+            {/* 担当者名 */}
             <div>
               <label className="block text-sm font-bold text-cyan-400 mb-2">
                 <i className="ri-user-line mr-1"></i>
-                あなたの名前
+                担当者名
               </label>
               <input
                 type="text"
@@ -102,23 +120,6 @@ export default function SignupPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="山田太郎"
-                disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
-              />
-            </div>
-
-            {/* チーム名 */}
-            <div>
-              <label className="block text-sm font-bold text-cyan-400 mb-2">
-                <i className="ri-team-line mr-1"></i>
-                チーム名
-              </label>
-              <input
-                type="text"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                required
-                placeholder="株式会社サンプル"
                 disabled={isLoading}
                 className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
               />
@@ -135,7 +136,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="your@email.com"
+                placeholder="your@company.com"
                 disabled={isLoading}
                 className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
               />
@@ -145,82 +146,56 @@ export default function SignupPage() {
             <div>
               <label className="block text-sm font-bold text-cyan-400 mb-2">
                 <i className="ri-lock-password-line mr-1"></i>
-                パスワード
+                パスワード (8文字以上)
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="8文字以上"
-                minLength={8}
+                placeholder="••••••••"
                 disabled={isLoading}
                 className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
               />
-              <p className="text-xs text-gray-400 mt-1">
-                8文字以上で設定してください
-              </p>
             </div>
 
             {/* サインアップボタン */}
             <button
               type="submit"
+              className="w-full py-3 rounded-xl text-black font-bold text-lg bg-cyan-400 hover:bg-cyan-300 transition-all active:scale-95 relative overflow-hidden group"
               disabled={isLoading}
-              className="relative w-full py-4 bg-cyan-400 hover:bg-cyan-300 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:shadow-[0_0_40px_rgba(34,211,238,0.7)] overflow-visible group mt-6"
             >
-              {!isLoading && (
-                <>
-                  {/* ボタンのインク飛び散り */}
-                  <div className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-cyan-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
-                  <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-blue-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
-                  <div className="absolute top-1 -right-2 w-3 h-3 rounded-full bg-cyan-200 opacity-50 ink-pulse"></div>
-                </>
-              )}
-              <span className="relative z-10">
+              <span className="relative z-10 flex items-center justify-center">
                 {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <i className="ri-loader-4-line animate-spin"></i>
-                    作成中...
-                  </span>
+                  <>
+                    <i className="ri-loader-4-line animate-spin mr-2"></i>
+                    アカウント作成中...
+                  </>
                 ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <i className="ri-user-add-line"></i>
-                    アカウントを作成
-                  </span>
+                  <>
+                    <i className="ri-building-line mr-2"></i>
+                    法人アカウントを作成
+                  </>
                 )}
               </span>
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-cyan-300 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 w-full h-full bg-cyan-300 opacity-20 blur-xl animate-ink-pulse group-hover:opacity-0"></div>
             </button>
           </form>
 
-          {/* 利用規約 */}
-          <p className="mt-4 text-xs text-gray-400 text-center">
-            サインアップすることで、利用規約に同意したことになります
-          </p>
-
-          {/* ログインへのリンク */}
-          <div className="mt-6 text-center pt-6 border-t border-gray-700">
-            <p className="text-gray-400 text-sm mb-2">
-              すでにアカウントをお持ちの方は
-            </p>
-            <Link
-              href="/login"
-              className="inline-block px-6 py-2 bg-white/10 hover:bg-white/20 text-cyan-400 font-bold rounded-xl transition-all border-2 border-cyan-400/30 hover:border-cyan-400/50"
-            >
-              <i className="ri-login-box-line mr-1"></i>
-              ログイン
-            </Link>
+          {/* ログインリンク */}
+          <div className="mt-6 text-center text-sm space-y-2">
+            <div>
+              <Link href="/signup/personal" className="text-lime-300 hover:underline">
+                個人向けアカウント作成はこちら
+              </Link>
+            </div>
+            <div>
+              <Link href="/login" className="text-gray-400 hover:underline">
+                すでにアカウントをお持ちですか？ ログイン
+              </Link>
+            </div>
           </div>
-        </div>
-
-        {/* 戻るリンク */}
-        <div className="mt-6 text-center">
-          <Link
-            href="/"
-            className="text-gray-400 hover:text-white transition-colors text-sm inline-flex items-center gap-1"
-          >
-            <i className="ri-arrow-left-line"></i>
-            トップに戻る
-          </Link>
         </div>
       </div>
     </div>
