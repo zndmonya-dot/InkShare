@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signUp } from '@/lib/auth'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -26,7 +25,18 @@ export default function SignupPage() {
     setError('')
 
     try {
-      await signUp(email, password, name, teamName)
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name, teamName }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'サインアップに失敗しました')
+      }
+
       router.push('/')
       router.refresh()
     } catch (err: any) {

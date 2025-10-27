@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { signIn } from '@/lib/auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,7 +17,18 @@ export default function LoginPage() {
     setError('')
 
     try {
-      await signIn(email, password)
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'ログインに失敗しました')
+      }
+
       router.push('/')
       router.refresh()
     } catch (err: any) {
