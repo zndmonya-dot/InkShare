@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS organizations (
 
 -- ========================================
 -- Users (ユーザー)
+-- Supabase auth.usersと連携
 -- ========================================
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY, -- auth.users.idを参照（外部キーは設定しない）
   organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
   email TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
   name TEXT NOT NULL,
   role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('admin', 'member')),
   avatar_color TEXT NOT NULL DEFAULT 'from-lime-400 to-green-500',
