@@ -1,0 +1,22 @@
+{
+  "name": "在籍管理ツール - 話しかけやすさの可視化",
+  "short_name": "在籍管理",
+  "description": "「話しかけて良いかどうか」を可視化するエンジニア向けコミュニケーション支援ツール",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#BFFF00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "lang": "ja",
+  "dir": "ltr"
+}
+
