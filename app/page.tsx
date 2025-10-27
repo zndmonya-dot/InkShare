@@ -30,9 +30,15 @@ export default function Home() {
         const profileRes = await fetch('/api/auth/me')
         const profileData = await profileRes.json()
 
-        if (!profileData.user || !profileData.user.currentOrganization) {
-          // ログインしていないか、組織に所属していない場合はランディングページへ
+        if (!profileData.user) {
+          // ログインしていない場合はランディングページへ
           router.push('/landing')
+          return
+        }
+
+        if (!profileData.user.currentOrganization) {
+          // 組織に所属していない場合はオンボーディングページへ
+          router.push('/onboarding')
           return
         }
 

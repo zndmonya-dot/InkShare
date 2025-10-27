@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { signIn } from '@/lib/auth'
+import { createServerClient } from '@supabase/ssr'
+import { getUserProfile } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +14,80 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = await signIn(email, password)
+    // レスポンスオブジェクトを先に作成
+    let response: NextResponse
 
-    return NextResponse.json({ user }, { status: 200 })
+    // サーバーサイドでSupabaseクライアントを作成し、Cookieを設定
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return request.cookies.get(name)?.value
+          },
+          set(name: string, value: string, options: any) {
+            request.cookies.set({
+              name,
+              value,
+              ...options,
+            })
+          },
+          remove(name: string, options: any) {
+            request.cookies.set({
+              name,
+              value: '',
+              ...options,
+              maxAge: 0,
+            })
+          },
+        },
+      }
+    )
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    if (error || !data.user) {
+      return NextResponse.json(
+        { error: error?.message || 'ログインに失敗しました' },
+        { status: 401 }
+      )
+    }
+    
+    // ユーザーのプロフィール情報を取得して組織参加状況を確認
+    const profile = await getUserProfile(data.user.id)
+    const hasOrganization = profile ? (profile.organizations.length > 0) : false
+
+    // レスポンスを作成してCookieを設定
+    response = NextResponse.json({ user: data.user, hasOrganization }, { status: 200 })
+
+    // SupabaseのセッションCookieを設定
+    if (data.session) {
+      response.cookies.set({
+        name: 'sb-access-token',
+        value: data.session.access_token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7日
+        path: '/',
+      })
+      
+      response.cookies.set({
+        name: 'sb-refresh-token',
+        value: data.session.refresh_token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7日
+        path: '/',
+      })
+    }
+
+    return response
   } catch (error: any) {
     console.error('Signin error:', error)
     return NextResponse.json(

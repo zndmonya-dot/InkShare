@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentUser, getUserProfile } from '@/lib/auth'
+import { getServerUser } from '@/lib/auth-server'
+import { getUserProfile } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const cookieHeader = request.headers.get('cookie') || ''
+    const user = await getServerUser(cookieHeader)
 
     if (!user) {
       return NextResponse.json({ user: null }, { status: 200 })
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     const profile = await getUserProfile(user.id)
 
-    return NextResponse.json({ user, profile }, { status: 200 })
+    return NextResponse.json({ user: profile }, { status: 200 })
   } catch (error: any) {
     console.error('Get user error:', error)
     return NextResponse.json(

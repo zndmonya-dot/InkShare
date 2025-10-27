@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getCurrentUser, getUserProfile } from '@/lib/auth'
+import { getServerUser } from '@/lib/auth-server'
+import { getUserProfile } from '@/lib/auth'
 import { queryOne, query } from '@/lib/db'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const user = await getCurrentUser()
+    const cookieHeader = request.headers.get('cookie') || ''
+    const user = await getServerUser(cookieHeader)
     if (!user) {
       return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 })
     }

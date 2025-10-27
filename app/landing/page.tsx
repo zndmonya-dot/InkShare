@@ -105,8 +105,8 @@ export default function LandingPage() {
                 href="/signup/personal"
                 className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-lime-400 hover:bg-lime-300 transition-all active:scale-95 text-center"
               >
-                <i className="ri-group-line mr-2"></i>
-                グループを作成
+                <i className="ri-user-add-line mr-2"></i>
+                個人アカウント作成
               </Link>
             </div>
           </div>

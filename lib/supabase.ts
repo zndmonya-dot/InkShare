@@ -11,7 +11,33 @@ export function createClient() {
 
   return createBrowserClient(
     supabaseUrl || '',
-    supabaseKey || ''
+    supabaseKey || '',
+    {
+      cookies: {
+        get(name: string) {
+          if (typeof document === 'undefined') return undefined
+          const cookie = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith(`${name}=`))
+          return cookie ? decodeURIComponent(cookie.split('=')[1]) : undefined
+        },
+        set(name: string, value: string, options: any) {
+          if (typeof document === 'undefined') return
+          let cookie = `${name}=${encodeURIComponent(value)}`
+          if (options?.maxAge) {
+            cookie += `; max-age=${options.maxAge}`
+          }
+          if (options?.path) {
+            cookie += `; path=${options.path}`
+          }
+          document.cookie = cookie
+        },
+        remove(name: string, options: any) {
+          if (typeof document === 'undefined') return
+          document.cookie = `${name}=; path=${options?.path || '/'}; max-age=0`
+        },
+      },
+    }
   )
 }
 

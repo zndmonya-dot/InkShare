@@ -78,3 +78,8 @@ export const CUSTOM_STATUS_COLORS = {
   },
 } as const
 
+// ステータスIDから設定を取得するヘルパー関数
+export function getStatusConfig(status: PresenceStatus): StatusOption | undefined {
+  return STATUS_OPTIONS.find(option => option.status === status)
+}
+

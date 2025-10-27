@@ -135,8 +135,8 @@ export async function signUpBusiness(email: string, password: string, name: stri
   return authData.user
 }
 
-// 個人向けサインアップ（グループを作成）
-export async function signUpPersonal(email: string, password: string, name: string, groupName: string) {
+// 個人向けサインアップ（アカウントのみ作成、グループなし）
+export async function signUpPersonal(email: string, password: string, name: string) {
   const supabase = createClient()
 
   // 1. Supabase Authでユーザー作成
@@ -148,16 +148,11 @@ export async function signUpPersonal(email: string, password: string, name: stri
   if (authError) throw authError
   if (!authData.user) throw new Error('ユーザーの作成に失敗しました')
 
-  // 2. 個人向け組織を作成（参加コード生成）
-  const inviteCode = generateInviteCode()
-  const orgResult = await queryOne<{ id: string }>(
-    'INSERT INTO organizations (name, type, plan, invite_code, is_open) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-    [groupName, 'personal', 'free', inviteCode, true]
-  )
+  // メール確認が必要かどうかを判定
+  // session が null の場合は、メール確認が必要
+  const needsEmailConfirmation = !authData.session
 
-  if (!orgResult) throw new Error('グループの作成に失敗しました')
-
-  // 3. アバターカラーをランダムに選択
+  // 2. アバターカラーをランダムに選択
   const avatarColors = [
     'from-lime-400 to-green-500',
     'from-cyan-400 to-blue-500',
@@ -167,26 +162,22 @@ export async function signUpPersonal(email: string, password: string, name: stri
   ]
   const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
 
-  // 4. ユーザー情報をDBに保存
+  // 3. ユーザー情報をDBに保存（グループなし）
   await query(
     `INSERT INTO users (id, email, name, avatar_color) VALUES ($1, $2, $3, $4)`,
     [authData.user.id, email, name, randomColor]
   )
 
-  // 5. ユーザーを組織に紐づけ（管理者として）
-  await query(
-    `INSERT INTO user_organizations (user_id, organization_id, role, is_active)
-     VALUES ($1, $2, $3, $4)`,
-    [authData.user.id, orgResult.id, 'admin', true]
-  )
-
-  // 6. 初期ステータスを作成
+  // 4. 初期ステータスを作成
   await query(
     'INSERT INTO user_status (user_id, status) VALUES ($1, $2)',
     [authData.user.id, 'available']
   )
 
-  return { user: authData.user, inviteCode }
+  return {
+    user: authData.user,
+    needsEmailConfirmation
+  }
 }
 
 // 参加コードで既存グループに参加
@@ -253,10 +244,11 @@ export async function signOut() {
   if (error) throw error
 }
 
-// 現在のユーザーを取得
+// 現在のユーザーを取得（クライアントサイド用）
 export async function getCurrentUser() {
   const supabase = createClient()
   const { data } = await supabase.auth.getUser()
   return data.user
 }
+
 

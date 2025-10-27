@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+import { getUserProfile } from '@/lib/auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -17,23 +19,31 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+      const supabase = createClient()
+      
+      // クライアント側でSupabaseにサインイン
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'ログインに失敗しました')
+      if (signInError || !data.user) {
+        throw new Error(signInError?.message || 'ログインに失敗しました')
       }
 
-      router.push('/')
+      // ユーザーのプロフィール情報を取得して組織参加状況を確認
+      const profile = await getUserProfile(data.user.id)
+      const hasOrganization = profile ? (profile.organizations.length > 0) : false
+
+      // グループに参加していない場合はオンボーディング画面へ
+      if (!hasOrganization) {
+        router.push('/onboarding')
+      } else {
+        router.push('/')
+      }
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました')
-    } finally {
       setIsLoading(false)
     }
   }

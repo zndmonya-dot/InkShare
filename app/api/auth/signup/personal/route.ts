@@ -3,9 +3,16 @@ import { signUpPersonal } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name, groupName } = await request.json()
-    const { user, inviteCode } = await signUpPersonal(email, password, name, groupName)
-    return NextResponse.json({ user, inviteCode }, { status: 200 })
+    const { email, password, name } = await request.json()
+    const result = await signUpPersonal(email, password, name)
+    
+    // メール確認が必要かどうかを判定
+    const needsEmailConfirmation = result.needsEmailConfirmation || false
+    
+    return NextResponse.json({ 
+      user: result.user,
+      needsEmailConfirmation 
+    }, { status: 200 })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }

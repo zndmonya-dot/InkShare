@@ -3,18 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { signUpPersonal } from '@/lib/auth'
 
 export default function PersonalSignupPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [groupName, setGroupName] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showInviteCode, setShowInviteCode] = useState(false)
-  const [generatedInviteCode, setGeneratedInviteCode] = useState('')
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,63 +25,22 @@ export default function PersonalSignupPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/signup/personal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, groupName }),
-      })
+      // クライアント側で直接サインアップ
+      const result = await signUpPersonal(email, password, name)
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'サインアップに失敗しました')
+      // メール確認が必要な場合の処理
+      if (result.needsEmailConfirmation) {
+        // メール確認待ち画面へ
+        router.push('/signup/confirm-email')
+      } else {
+        // オンボーディング画面へ（グループ作成 or 参加）
+        router.push('/onboarding')
       }
-
-      // 招待コードを表示
-      setGeneratedInviteCode(data.inviteCode)
-      setShowInviteCode(true)
+      router.refresh()
     } catch (err: any) {
       setError(err.message || 'サインアップに失敗しました')
       setIsLoading(false)
     }
-  }
-
-  const handleContinue = () => {
-    router.push('/')
-    router.refresh()
-  }
-
-  if (showInviteCode) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6">
-        <div className="relative w-full max-w-md bg-gray-800/60 border-2 border-lime-400/30 rounded-2xl p-8 backdrop-blur-sm">
-          <div className="text-center">
-            <div className="mb-6">
-              <i className="ri-check-line text-6xl text-lime-400"></i>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              グループが作成されました！
-            </h2>
-            <p className="text-gray-400 mb-6">
-              友達を招待するには、以下のコードを共有してください
-            </p>
-            <div className="bg-gray-900/80 border-2 border-lime-400 rounded-xl p-6 mb-6">
-              <div className="text-sm text-lime-400 mb-2">招待コード</div>
-              <div className="text-4xl font-bold text-white tracking-widest">
-                {generatedInviteCode}
-              </div>
-            </div>
-            <button
-              onClick={handleContinue}
-              className="w-full py-3 rounded-xl text-black font-bold text-lg bg-lime-400 hover:bg-lime-300 transition-all active:scale-95"
-            >
-              <i className="ri-arrow-right-line mr-2"></i>
-              InkLinkを始める
-            </button>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -120,8 +76,8 @@ export default function PersonalSignupPage() {
           <div className="absolute -bottom-3 -left-3 w-6 h-6 rounded-full bg-yellow-300 opacity-40 blur-sm ink-drip"></div>
 
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            <i className="ri-group-line mr-2"></i>
-            グループを作成
+            <i className="ri-user-line mr-2"></i>
+            個人アカウントを作成
           </h2>
 
           {error && (
@@ -132,23 +88,6 @@ export default function PersonalSignupPage() {
           )}
 
           <form onSubmit={handleSignup} className="space-y-4">
-            {/* グループ名 */}
-            <div>
-              <label className="block text-sm font-bold text-lime-400 mb-2">
-                <i className="ri-group-line mr-1"></i>
-                グループ名
-              </label>
-              <input
-                type="text"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                required
-                placeholder="友達の勉強会"
-                disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-lime-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
-              />
-            </div>
-
             {/* あなたの名前 */}
             <div>
               <label className="block text-sm font-bold text-lime-400 mb-2">
@@ -210,12 +149,12 @@ export default function PersonalSignupPage() {
                 {isLoading ? (
                   <>
                     <i className="ri-loader-4-line animate-spin mr-2"></i>
-                    グループ作成中...
+                    アカウント作成中...
                   </>
                 ) : (
                   <>
-                    <i className="ri-group-line mr-2"></i>
-                    グループを作成
+                    <i className="ri-user-add-line mr-2"></i>
+                    個人アカウントを作成
                   </>
                 )}
               </span>

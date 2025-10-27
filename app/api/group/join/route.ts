@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
-import { getCurrentUser, joinGroupByCode } from '@/lib/auth'
+import { getServerUser } from '@/lib/auth-server'
+import { joinGroupByCode } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser()
+    const cookieHeader = request.headers.get('cookie') || ''
+    const user = await getServerUser(cookieHeader)
     if (!user) {
       return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 })
     }
