@@ -34,9 +34,9 @@ export async function POST(request: Request) {
       .from('users')
       .select('id')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
-    if (userCheckError || !existingUser) {
+    if (!existingUser) {
       console.error('User not found in users table:', user.id, userCheckError)
       return NextResponse.json({ 
         error: 'ユーザー情報が見つかりません。再度ログインしてください' 

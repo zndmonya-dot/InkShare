@@ -1,5 +1,4 @@
 import { createClient } from './supabase'
-import { query, queryOne } from './db'
 
 export interface UserProfile {
   id: string
@@ -31,9 +30,9 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     .from('users')
     .select('id, email, name, avatar_color')
     .eq('id', userId)
-    .single()
+    .maybeSingle()
 
-  if (userError || !user) {
+  if (!user) {
     console.error('User fetch error:', userError)
     return null
   }
@@ -81,8 +80,11 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 // 法人向けサインアップ（管理者が組織を作成）
+// 注: この関数は現在使用されていません。サインアップは /api/auth/signup を使用してください。
 export async function signUpBusiness(email: string, password: string, name: string, companyName: string) {
   const supabase = createClient()
+  const { getSupabaseAdmin } = await import('./db')
+  const supabaseAdmin = getSupabaseAdmin()
 
   // 1. Supabase Authでユーザー作成
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -94,12 +96,17 @@ export async function signUpBusiness(email: string, password: string, name: stri
   if (!authData.user) throw new Error('ユーザーの作成に失敗しました')
 
   // 2. 法人組織を作成
-  const orgResult = await queryOne<{ id: string }>(
-    'INSERT INTO organizations (name, type, plan) VALUES ($1, $2, $3) RETURNING id',
-    [companyName, 'business', 'free']
-  )
+  const { data: orgResult, error: orgError } = await supabaseAdmin
+    .from('organizations')
+    .insert({
+      name: companyName,
+      type: 'business',
+      plan: 'free'
+    })
+    .select('id')
+    .single()
 
-  if (!orgResult) throw new Error('組織の作成に失敗しました')
+  if (orgError || !orgResult) throw new Error('組織の作成に失敗しました')
 
   // 3. アバターカラーをランダムに選択
   const avatarColors = [
@@ -112,23 +119,38 @@ export async function signUpBusiness(email: string, password: string, name: stri
   const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
 
   // 4. ユーザー情報をDBに保存
-  await query(
-    `INSERT INTO users (id, email, name, avatar_color) VALUES ($1, $2, $3, $4)`,
-    [authData.user.id, email, name, randomColor]
-  )
+  const { error: userError } = await supabaseAdmin
+    .from('users')
+    .insert({
+      id: authData.user.id,
+      email,
+      name,
+      avatar_color: randomColor
+    })
+
+  if (userError) throw userError
 
   // 5. ユーザーを組織に紐づけ（管理者として）
-  await query(
-    `INSERT INTO user_organizations (user_id, organization_id, role, is_active)
-     VALUES ($1, $2, $3, $4)`,
-    [authData.user.id, orgResult.id, 'admin', true]
-  )
+  const { error: linkError } = await supabaseAdmin
+    .from('user_organizations')
+    .insert({
+      user_id: authData.user.id,
+      organization_id: orgResult.id,
+      role: 'admin',
+      is_active: true
+    })
+
+  if (linkError) throw linkError
 
   // 6. 初期ステータスを作成
-  await query(
-    'INSERT INTO user_status (user_id, status) VALUES ($1, $2)',
-    [authData.user.id, 'available']
-  )
+  const { error: statusError } = await supabaseAdmin
+    .from('user_status')
+    .insert({
+      user_id: authData.user.id,
+      status: 'available'
+    })
+
+  if (statusError) throw statusError
 
   return authData.user
 }
@@ -191,34 +213,46 @@ export async function signUpPersonal(email: string, password: string, name: stri
 
 // 参加コードで既存グループに参加
 export async function joinGroupByCode(userId: string, inviteCode: string) {
-  // 組織を検索
-  const org = await queryOne<{ id: string; name: string; type: string }>(
-    'SELECT id, name, type FROM organizations WHERE invite_code = $1 AND type = $2',
-    [inviteCode, 'personal']
-  )
+  const { getSupabaseAdmin } = await import('./db')
+  const supabase = getSupabaseAdmin()
 
-  if (!org) throw new Error('招待コードが無効です')
+  // 組織を検索
+  const { data: org, error: orgError } = await supabase
+    .from('organizations')
+    .select('id, name, type')
+    .eq('invite_code', inviteCode)
+    .eq('type', 'personal')
+    .maybeSingle()
+
+  if (orgError || !org) throw new Error('招待コードが無効です')
 
   // すでに参加しているかチェック
-  const existing = await queryOne(
-    'SELECT id FROM user_organizations WHERE user_id = $1 AND organization_id = $2',
-    [userId, org.id]
-  )
+  const { data: existing } = await supabase
+    .from('user_organizations')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('organization_id', org.id)
+    .maybeSingle()
 
   if (existing) throw new Error('すでにこのグループに参加しています')
 
   // 現在のアクティブな組織を非アクティブに
-  await query(
-    'UPDATE user_organizations SET is_active = false WHERE user_id = $1',
-    [userId]
-  )
+  await supabase
+    .from('user_organizations')
+    .update({ is_active: false })
+    .eq('user_id', userId)
 
   // グループに参加
-  await query(
-    `INSERT INTO user_organizations (user_id, organization_id, role, is_active)
-     VALUES ($1, $2, $3, $4)`,
-    [userId, org.id, 'member', true]
-  )
+  const { error: joinError } = await supabase
+    .from('user_organizations')
+    .insert({
+      user_id: userId,
+      organization_id: org.id,
+      role: 'member',
+      is_active: true
+    })
+
+  if (joinError) throw new Error('グループへの参加に失敗しました')
 
   return org
 }
