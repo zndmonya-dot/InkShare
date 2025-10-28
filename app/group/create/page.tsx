@@ -77,8 +77,8 @@ export default function CreateGroupPage() {
   }
 
   const handleContinue = () => {
-    router.push('/')
-    router.refresh()
+    // グループ作成後は強制リロードしてから遷移
+    window.location.href = '/'
   }
 
   // 認証チェック中はローディング表示
