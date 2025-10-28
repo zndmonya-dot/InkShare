@@ -103,7 +103,7 @@ export default function AccountSettingsPage() {
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      <div className="max-w-2xl mx-auto relative">
+      <div className="max-w-2xl mx-auto relative z-10">
         {/* ヘッダー */}
         <div className="flex items-center gap-4 mb-8">
           <button

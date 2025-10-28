@@ -62,7 +62,7 @@ export default function SignupPage() {
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-magenta ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md z-10">
         {/* ロゴ */}
         <div className="text-center mb-8">
           <div className="inline-block">
