@@ -87,7 +87,9 @@ export default function LoginPage() {
                 required
                 placeholder="your@email.com"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                autoComplete="email"
+                className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                style={{ fontSize: '16px' }}
               />
             </div>
 
@@ -104,7 +106,9 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                autoComplete="current-password"
+                className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                style={{ fontSize: '16px' }}
               />
             </div>
 

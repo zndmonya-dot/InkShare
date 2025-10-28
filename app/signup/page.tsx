@@ -104,7 +104,9 @@ export default function SignupPage() {
                 required
                 placeholder="山田太郎"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                autoComplete="name"
+                className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                style={{ fontSize: '16px' }}
               />
             </div>
 
@@ -121,7 +123,9 @@ export default function SignupPage() {
                 required
                 placeholder="your@email.com"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                autoComplete="email"
+                className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                style={{ fontSize: '16px' }}
               />
             </div>
 
@@ -139,7 +143,9 @@ export default function SignupPage() {
                 placeholder="8文字以上"
                 minLength={8}
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                autoComplete="new-password"
+                className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
+                style={{ fontSize: '16px' }}
               />
               <p className="text-xs text-white/50 mt-1">
                 8文字以上で設定してください

@@ -129,8 +129,10 @@ export default function AccountSettingsPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all mb-4"
+              autoComplete="name"
+              className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all mb-4"
               placeholder="表示名"
+              style={{ fontSize: '16px' }}
             />
             <button
               type="submit"
@@ -241,22 +243,28 @@ export default function AccountSettingsPage() {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
+              autoComplete="current-password"
+              className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
               placeholder="現在のパスワード"
+              style={{ fontSize: '16px' }}
             />
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
+              autoComplete="new-password"
+              className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
               placeholder="新しいパスワード"
+              style={{ fontSize: '16px' }}
             />
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
+              autoComplete="new-password"
+              className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all"
               placeholder="新しいパスワード（確認）"
+              style={{ fontSize: '16px' }}
             />
             <button
               type="submit"
