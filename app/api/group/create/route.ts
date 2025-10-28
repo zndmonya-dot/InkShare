@@ -14,36 +14,36 @@ function generateInviteCode(): string {
 
 export async function POST(request: Request) {
   try {
-    // デバッグ：全てのヘッダーを表示
-    console.log('📨 Request headers:')
-    request.headers.forEach((value, key) => {
-      console.log(`  ${key}: ${value}`)
-    })
-    
-    // リクエストからクッキーを取得
     const cookieHeader = request.headers.get('cookie') || ''
-    console.log('🍪 Raw cookie header:', cookieHeader)
-    
     const user = await getServerUser(cookieHeader)
+    
     if (!user) {
       return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 })
     }
 
-    const { groupName } = await request.json()
+    const { groupName, type } = await request.json()
 
     if (!groupName) {
-      return NextResponse.json({ error: 'グループ名を入力してください' }, { status: 400 })
+      return NextResponse.json({ error: '名前を入力してください' }, { status: 400 })
     }
 
-    // グループ（個人向け組織）を作成
-    const inviteCode = generateInviteCode()
+    const organizationType = type === 'business' ? 'business' : 'personal'
+    const isPersonal = organizationType === 'personal'
+
+    // 組織を作成
+    let inviteCode: string | null = null
+    if (isPersonal) {
+      // 個人グループは招待コードを生成
+      inviteCode = generateInviteCode()
+    }
+
     const orgResult = await queryOne<{ id: string }>(
       'INSERT INTO organizations (name, type, plan, invite_code, is_open) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [groupName, 'personal', 'free', inviteCode, true]
+      [groupName, organizationType, 'free', inviteCode, isPersonal]
     )
 
     if (!orgResult) {
-      return NextResponse.json({ error: 'グループの作成に失敗しました' }, { status: 500 })
+      return NextResponse.json({ error: '作成に失敗しました' }, { status: 500 })
     }
 
     // 現在のアクティブな組織を非アクティブに
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       [user.id]
     )
 
-    // ユーザーをグループに紐づけ（管理者として）
+    // ユーザーを組織に紐づけ（管理者として）
     await query(
       `INSERT INTO user_organizations (user_id, organization_id, role, is_active)
        VALUES ($1, $2, $3, $4)`,
@@ -61,10 +61,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ 
       organizationId: orgResult.id,
-      inviteCode 
+      inviteCode: inviteCode 
     }, { status: 200 })
   } catch (error: any) {
-    console.error('Group creation error:', error)
+    console.error('Organization creation error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

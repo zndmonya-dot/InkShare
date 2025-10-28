@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
+import { query } from '@/lib/db'
 
 export default function SignupPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [teamName, setTeamName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -25,23 +26,52 @@ export default function SignupPage() {
     setError('')
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, teamName }),
+      const supabase = createClient()
+
+      // 1. Supabase Authでユーザー作成
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
       })
 
-      const data = await response.json()
+      if (authError) throw authError
+      if (!authData.user) throw new Error('ユーザーの作成に失敗しました')
 
-      if (!response.ok) {
-        throw new Error(data.error || 'サインアップに失敗しました')
+      // メール確認が必要かどうかを判定
+      const needsEmailConfirmation = !authData.session
+
+      // 2. アバターカラーをランダムに選択
+      const avatarColors = [
+        'from-lime-400 to-green-500',
+        'from-cyan-400 to-blue-500',
+        'from-orange-400 to-yellow-500',
+        'from-rose-400 to-pink-500',
+        'from-purple-400 to-indigo-500',
+      ]
+      const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
+
+      // 3. ユーザー情報をDBに保存（組織なし）
+      await query(
+        `INSERT INTO users (id, email, name, avatar_color) VALUES ($1, $2, $3, $4)`,
+        [authData.user.id, email, name, randomColor]
+      )
+
+      // 4. 初期ステータスを作成
+      await query(
+        'INSERT INTO user_status (user_id, status) VALUES ($1, $2)',
+        [authData.user.id, 'available']
+      )
+
+      // メール確認が必要な場合は確認待ち画面へ
+      if (needsEmailConfirmation) {
+        router.push('/signup/confirm-email')
+      } else {
+        // オンボーディング画面へ
+        router.push('/onboarding')
       }
-
-      router.push('/')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'サインアップに失敗しました')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -68,7 +98,7 @@ export default function SignupPage() {
                 InkLink
               </h1>
             </div>
-            <p className="text-gray-400 text-sm">チームを作成して始めよう</p>
+            <p className="text-gray-400 text-sm">アカウントを作成して始めよう</p>
           </div>
         </div>
 
@@ -102,23 +132,6 @@ export default function SignupPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="山田太郎"
-                disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
-              />
-            </div>
-
-            {/* チーム名 */}
-            <div>
-              <label className="block text-sm font-bold text-cyan-400 mb-2">
-                <i className="ri-team-line mr-1"></i>
-                チーム名
-              </label>
-              <input
-                type="text"
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                required
-                placeholder="株式会社サンプル"
                 disabled={isLoading}
                 className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
               />

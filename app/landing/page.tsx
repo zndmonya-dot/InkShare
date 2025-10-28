@@ -69,46 +69,23 @@ export default function LandingPage() {
         </div>
 
         {/* CTA */}
-        <div className="space-y-8">
-          {/* プラン選択 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* 法人向けプラン */}
-            <div className="bg-gray-800/60 border-2 border-cyan-400/40 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-cyan-400 transition-all">
-              <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-cyan-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-              <div className="mb-4">
-                <i className="ri-building-line text-5xl text-cyan-400"></i>
-              </div>
-              <h3 className="text-cyan-400 font-bold text-2xl mb-2">法人向け</h3>
-              <p className="text-gray-400 text-sm mb-6">
-                組織全体でセキュアに管理。管理者による招待制で安心。
-              </p>
-              <Link
-                href="/signup/business"
-                className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-cyan-400 hover:bg-cyan-300 transition-all active:scale-95 text-center"
-              >
-                <i className="ri-building-line mr-2"></i>
-                法人アカウント作成
-              </Link>
-            </div>
-
-            {/* 個人向けプラン */}
-            <div className="bg-gray-800/60 border-2 border-lime-400/40 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-lime-400 transition-all">
-              <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-lime-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-              <div className="mb-4">
-                <i className="ri-group-line text-5xl text-lime-400"></i>
-              </div>
-              <h3 className="text-lime-400 font-bold text-2xl mb-2">個人向け</h3>
-              <p className="text-gray-400 text-sm mb-6">
-                友達や勉強会で気軽に使える。参加コードで簡単に招待。
-              </p>
-              <Link
-                href="/signup/personal"
-                className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-lime-400 hover:bg-lime-300 transition-all active:scale-95 text-center"
-              >
-                <i className="ri-user-add-line mr-2"></i>
-                個人アカウント作成
-              </Link>
-            </div>
+        <div className="space-y-6">
+          {/* サインアップボタン */}
+          <div className="text-center">
+            <Link
+              href="/signup"
+              className="inline-block px-16 py-5 bg-lime-400 hover:bg-lime-300 text-black font-bold text-2xl rounded-2xl transition-all active:scale-95 shadow-[0_0_40px_rgba(191,255,0,0.6)] hover:shadow-[0_0_50px_rgba(191,255,0,0.8)] relative group"
+            >
+              <div className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
+              <div className="absolute -bottom-2 -left-2 w-5 h-5 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
+              <span className="flex items-center gap-3 relative z-10">
+                <i className="ri-user-add-line"></i>
+                無料で始める
+              </span>
+            </Link>
+            <p className="text-gray-400 text-sm mt-4">
+              個人グループも法人組織も作成できます
+            </p>
           </div>
 
           {/* ログインボタン */}

@@ -40,42 +40,61 @@ export default function OnboardingPage() {
         </div>
 
         {/* アクション選択 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* グループを作成 */}
-          <div className="bg-gray-800/60 border-2 border-lime-400/40 rounded-2xl p-8 backdrop-blur-sm relative overflow-visible group hover:border-lime-400 transition-all">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 個人グループを作成 */}
+          <div className="bg-gray-800/60 border-2 border-lime-400/40 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-lime-400 transition-all">
             <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-lime-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-            <div className="text-center mb-6">
-              <i className="ri-group-line text-6xl text-lime-400 mb-4 block"></i>
-              <h3 className="text-lime-400 font-bold text-2xl mb-2">グループを作成</h3>
-              <p className="text-gray-400 text-sm">
-                新しいグループを作って、友達を招待しましょう
+            <div className="text-center mb-4">
+              <i className="ri-group-line text-5xl text-lime-400 mb-3 block"></i>
+              <h3 className="text-lime-400 font-bold text-xl mb-2">個人グループ作成</h3>
+              <p className="text-gray-400 text-xs">
+                友達や勉強会で使える気軽なグループ
               </p>
             </div>
             <Link
-              href="/group/create"
-              className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-lime-400 hover:bg-lime-300 transition-all active:scale-95 text-center"
+              href="/group/create?type=personal"
+              className="block w-full py-2.5 rounded-xl text-black font-bold text-base bg-lime-400 hover:bg-lime-300 transition-all active:scale-95 text-center"
             >
-              <i className="ri-add-line mr-2"></i>
-              グループを作成
+              <i className="ri-add-line mr-1"></i>
+              作成する
             </Link>
           </div>
 
-          {/* グループに参加 */}
-          <div className="bg-gray-800/60 border-2 border-cyan-400/40 rounded-2xl p-8 backdrop-blur-sm relative overflow-visible group hover:border-cyan-400 transition-all">
+          {/* 法人組織を作成 */}
+          <div className="bg-gray-800/60 border-2 border-cyan-400/40 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-cyan-400 transition-all">
             <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-cyan-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-            <div className="text-center mb-6">
-              <i className="ri-key-line text-6xl text-cyan-400 mb-4 block"></i>
-              <h3 className="text-cyan-400 font-bold text-2xl mb-2">グループに参加</h3>
-              <p className="text-gray-400 text-sm">
-                招待コードを使って、既存のグループに参加しましょう
+            <div className="text-center mb-4">
+              <i className="ri-building-line text-5xl text-cyan-400 mb-3 block"></i>
+              <h3 className="text-cyan-400 font-bold text-xl mb-2">法人組織作成</h3>
+              <p className="text-gray-400 text-xs">
+                会社やチームで使える組織（管理者として）
+              </p>
+            </div>
+            <Link
+              href="/group/create?type=business"
+              className="block w-full py-2.5 rounded-xl text-black font-bold text-base bg-cyan-400 hover:bg-cyan-300 transition-all active:scale-95 text-center"
+            >
+              <i className="ri-add-line mr-1"></i>
+              作成する
+            </Link>
+          </div>
+
+          {/* 招待コードで参加 */}
+          <div className="bg-gray-800/60 border-2 border-orange-400/40 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-orange-400 transition-all">
+            <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-orange-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
+            <div className="text-center mb-4">
+              <i className="ri-key-line text-5xl text-orange-400 mb-3 block"></i>
+              <h3 className="text-orange-400 font-bold text-xl mb-2">招待で参加</h3>
+              <p className="text-gray-400 text-xs">
+                既存のグループや組織に参加する
               </p>
             </div>
             <Link
               href="/join"
-              className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-cyan-400 hover:bg-cyan-300 transition-all active:scale-95 text-center"
+              className="block w-full py-2.5 rounded-xl text-black font-bold text-base bg-orange-400 hover:bg-orange-300 transition-all active:scale-95 text-center"
             >
-              <i className="ri-login-box-line mr-2"></i>
-              招待コードで参加
+              <i className="ri-login-box-line mr-1"></i>
+              参加する
             </Link>
           </div>
         </div>
