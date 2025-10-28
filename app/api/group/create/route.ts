@@ -28,6 +28,20 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseAdmin()
+
+    // ユーザーがusersテーブルに存在するか確認
+    const { data: existingUser, error: userCheckError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+
+    if (userCheckError || !existingUser) {
+      console.error('User not found in users table:', user.id, userCheckError)
+      return NextResponse.json({ 
+        error: 'ユーザー情報が見つかりません。再度ログインしてください' 
+      }, { status: 400 })
+    }
     const organizationType = type === 'business' ? 'business' : 'personal'
     const isPersonal = organizationType === 'personal'
 
