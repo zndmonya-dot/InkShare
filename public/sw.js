@@ -42,6 +42,18 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
+  // Next.js開発用リクエストをバイパス
+  if (
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/__nextjs') ||
+    url.pathname.includes('webpack-hmr') ||
+    url.protocol === 'chrome-extension:' ||
+    url.protocol === 'ws:' ||
+    url.protocol === 'wss:'
+  ) {
+    return
+  }
+
   // API リクエスト: Network First
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
