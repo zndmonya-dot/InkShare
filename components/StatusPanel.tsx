@@ -3,7 +3,6 @@
 import { useCallback } from 'react'
 import type { PresenceStatus, CustomStatus } from '@/types/status'
 import { StatusButton } from './StatusButton'
-import { CustomStatusModal } from './CustomStatusModal'
 import { STATUS_OPTIONS, CUSTOM_STATUS_COLORS } from '@/constants/statusOptions'
 
 interface StatusPanelProps {
@@ -11,10 +10,7 @@ interface StatusPanelProps {
   customStatus1: CustomStatus
   customStatus2: CustomStatus
   onStatusChange: (status: PresenceStatus) => void
-  onCustomEdit: (customId: 'custom1' | 'custom2') => void
-  showCustomModal: 'custom1' | 'custom2' | null
-  onCloseCustomModal: () => void
-  onCustomSave: (label: string, icon: string) => void
+  onCustomClick: (customId: 'custom1' | 'custom2') => void
 }
 
 export function StatusPanel({
@@ -22,10 +18,7 @@ export function StatusPanel({
   customStatus1,
   customStatus2,
   onStatusChange,
-  onCustomEdit,
-  showCustomModal,
-  onCloseCustomModal,
-  onCustomSave,
+  onCustomClick,
 }: StatusPanelProps) {
   // カスタムボタンのクリックハンドラーを生成
   const createCustomHandlers = useCallback(
@@ -36,21 +29,19 @@ export function StatusPanel({
       },
       onDoubleClick: (e: React.MouseEvent) => {
         e.stopPropagation()
-        onCustomEdit(customId)
+        onCustomClick(customId)
       },
     }),
-    [onStatusChange, onCustomEdit]
+    [onStatusChange, onCustomClick]
   )
 
   const custom1Handlers = createCustomHandlers('custom1')
   const custom2Handlers = createCustomHandlers('custom2')
 
-  const currentCustomStatus = showCustomModal === 'custom1' ? customStatus1 : customStatus2
-
   return (
-    <div className="w-full h-full overflow-visible">
+    <div className="w-full h-full overflow-visible relative">
       {/* ステータスボタングリッド */}
-      <div className="grid grid-cols-2 auto-rows-fr gap-2 sm:gap-3 md:gap-4 h-full overflow-visible">
+      <div className="grid grid-cols-2 auto-rows-fr gap-3 sm:gap-4 md:gap-5 h-full overflow-visible max-w-4xl mx-auto">
         {STATUS_OPTIONS.map((option) => (
           <StatusButton
             key={option.status}
@@ -89,14 +80,6 @@ export function StatusPanel({
           />
         </div>
       </div>
-
-      {/* カスタムステータス編集モーダル */}
-      <CustomStatusModal
-        isOpen={showCustomModal !== null}
-        currentStatus={currentCustomStatus}
-        onClose={onCloseCustomModal}
-        onSave={onCustomSave}
-      />
     </div>
   )
 }

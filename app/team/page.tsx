@@ -146,52 +146,39 @@ export default function TeamPage() {
     : members.filter(m => m.status === filterStatus)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark overflow-hidden relative">
+      {/* 背景のインク - スクロール防止版 */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+      </div>
+
       {/* ヘッダー */}
-      <header className="p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-black/50 backdrop-blur-lg z-10 overflow-visible">
+      <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
         <button
           onClick={() => router.back()}
-          className="relative px-4 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-black rounded-xl transition-all active:scale-95 text-sm font-bold shadow-[0_0_20px_rgba(34,211,238,0.5)] overflow-visible group"
+          className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20"
         >
-          {/* インク飛び散りエフェクト - 強化版 */}
-          <div className="absolute -top-2 -left-3 w-4 h-4 rounded-full bg-cyan-300 opacity-60 ink-splash"></div>
-          <div className="absolute -bottom-2 -right-2 w-3 h-3 rounded-full bg-cyan-500 opacity-50 ink-drip"></div>
-          <div className="absolute top-0 right-0 w-2 h-2 rounded-full bg-blue-300 opacity-40 ink-pulse"></div>
-          <div className="absolute -top-1 right-1/3 w-2 h-2 rounded-full bg-cyan-200 opacity-50 ink-float"></div>
-          <div className="absolute bottom-1 -left-1 w-1.5 h-1.5 rounded-full bg-blue-400 opacity-60 ink-drip" style={{ animationDelay: '0.2s' }}></div>
-          
-          <span className="relative z-10 splatoon-glow">
-            <i className="ri-arrow-left-line mr-1"></i>
-            戻る
-          </span>
+          <i className="ri-arrow-left-line mr-1"></i>
+          戻る
         </button>
-        <h1 className="text-xl font-bold text-white drop-shadow-[0_2px_8px_rgba(34,211,238,0.5)]">チーム状況</h1>
+        <h1 className="text-xl font-bold text-white">チーム状況</h1>
         <div className="w-16" /> {/* スペーサー */}
       </header>
 
-      {/* フィルター */}
-      <div className="sticky top-[73px] bg-black/50 backdrop-blur-lg z-10 p-4 border-b border-white/10 overflow-visible">
-        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-hide overflow-y-visible">
+      {/* フィルター - クリーン版 */}
+      <div className="relative sticky top-[73px] bg-white/5 backdrop-blur-sm z-10 p-4 border-b border-white/10">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => setFilterStatus('all')}
-            className={`relative px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all overflow-visible ${
+            className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
               filterStatus === 'all' 
-                ? 'bg-white text-black scale-105 shadow-[0_0_20px_rgba(255,255,255,0.4)]' 
-                : 'bg-white/10 text-white hover:bg-white/20'
+                ? 'bg-white/20 text-white border border-white/30' 
+                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
             }`}
           >
-            {filterStatus === 'all' && (
-              <>
-                <div className="absolute -top-2 -right-2 w-3 h-3 rounded-full bg-gray-300 opacity-60 ink-splash"></div>
-                <div className="absolute -bottom-2 -left-2 w-2 h-2 rounded-full bg-gray-400 opacity-50 ink-drip"></div>
-                <div className="absolute top-0 -right-1 w-1.5 h-1.5 rounded-full bg-white opacity-70 ink-pulse"></div>
-                <div className="absolute -bottom-1 right-1/4 w-1 h-1 rounded-full bg-gray-300 opacity-50 ink-float"></div>
-              </>
-            )}
-            <span className="relative z-10">
-              <i className="ri-group-line text-lg mr-1.5"></i>
-              全員
-            </span>
+            <i className="ri-group-line mr-1.5"></i>
+            全員
           </button>
           {Object.entries(statusConfig).filter(([key]) => !key.startsWith('custom')).map(([key, config]) => {
             const status = key as PresenceStatus
@@ -200,28 +187,14 @@ export default function TeamPage() {
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
-                className={`relative px-5 py-3 rounded-xl font-bold text-sm whitespace-nowrap transition-all overflow-visible ${
+                className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                   isActive
-                    ? `${config.bgColor} text-black scale-105 shadow-[0_0_20px] ${config.glow}`
-                    : 'bg-white/10 text-white hover:bg-white/20'
+                    ? `${config.bgColor} text-splat-dark border border-splat-dark/20`
+                    : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
                 }`}
               >
-                {isActive && (
-                  <>
-                    {/* カラフルなインク飛び散り */}
-                    <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${config.inkLight} opacity-70 ink-splash`}></div>
-                    <div className={`absolute -bottom-2 -left-2 w-3 h-3 rounded-full ${config.inkMedium} opacity-60 ink-drip`}></div>
-                    <div className={`absolute top-0 left-1/4 w-2 h-2 rounded-full ${config.inkDark} opacity-50 ink-pulse`}></div>
-                    <div className={`absolute -top-1 -left-1 w-2.5 h-2.5 rounded-full ${config.inkLight} opacity-65 ink-float`}></div>
-                    <div className={`absolute bottom-0 -right-1 w-1.5 h-1.5 rounded-full ${config.inkMedium} opacity-75 ink-drip`} style={{ animationDelay: '0.2s' }}></div>
-                    <div className={`absolute -bottom-1 right-1/3 w-2 h-2 rounded-full ${config.inkDark} opacity-55 ink-splash`} style={{ animationDelay: '0.4s' }}></div>
-                    <div className={`absolute top-1 -right-1 w-1 h-1 rounded-full ${config.inkLight} opacity-80 ink-pulse`} style={{ animationDelay: '0.1s' }}></div>
-                  </>
-                )}
-                <span className="relative z-10">
-                  <i className={`${config.icon} text-lg mr-1.5`}></i>
-                  {config.label}
-                </span>
+                <i className={`${config.icon} mr-1.5`}></i>
+                {config.label}
               </button>
             )
           })}
@@ -243,31 +216,21 @@ export default function TeamPage() {
                 <button
                   key={member.id}
                   onClick={() => setSelectedMember(member)}
-                  className="relative bg-gray-800/60 border-2 border-gray-700/50 rounded-2xl p-4 hover:border-white/30 transition-all hover:scale-105 active:scale-95 group overflow-visible"
+                  className="relative bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/20 transition-all hover:scale-105 active:scale-95"
                 >
-                  {/* ホバー時のカラフルなインク飛び散りエフェクト - 強化版 */}
-                  <div className={`absolute -top-3 -right-3 w-5 h-5 rounded-full ${config.inkLight} opacity-0 group-hover:opacity-70 transition-all duration-300 blur-md group-hover:ink-splash`}></div>
-                  <div className={`absolute -bottom-3 -left-3 w-4 h-4 rounded-full ${config.inkMedium} opacity-0 group-hover:opacity-60 transition-all duration-300 blur-sm group-hover:ink-drip`}></div>
-                  <div className={`absolute top-0 right-1/4 w-3 h-3 rounded-full ${config.inkDark} opacity-0 group-hover:opacity-55 transition-all duration-300 group-hover:ink-pulse`}></div>
-                  <div className={`absolute -top-2 -left-2 w-3 h-3 rounded-full ${config.inkLight} opacity-0 group-hover:opacity-65 transition-all duration-300 group-hover:ink-float`}></div>
-                  <div className={`absolute bottom-1 -right-2 w-2 h-2 rounded-full ${config.inkMedium} opacity-0 group-hover:opacity-75 transition-all duration-300 group-hover:ink-splash`}></div>
-                  <div className={`absolute -bottom-1 right-1/3 w-2 h-2 rounded-full ${config.inkDark} opacity-0 group-hover:opacity-50 transition-all duration-300 group-hover:ink-pulse`}></div>
-                  <div className={`absolute top-1 -left-1 w-1.5 h-1.5 rounded-full ${config.inkLight} opacity-0 group-hover:opacity-80 transition-all duration-300 group-hover:ink-drip`}></div>
-                  <div className={`absolute -top-1 right-1/4 w-1 h-1 rounded-full ${config.inkMedium} opacity-0 group-hover:opacity-70 transition-all duration-300 group-hover:ink-float`}></div>
-                  
                   {/* アバター */}
-                  <div className={`relative z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${member.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-[0_0_15px] ${config.glow} group-hover:shadow-[0_0_25px] transition-shadow`}>
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${member.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg`}>
                     <span className="text-white font-bold text-xl sm:text-2xl">
                       {member.name.charAt(0)}
                     </span>
                   </div>
                   
                   {/* 名前 */}
-                  <div className="relative z-10 text-white font-bold text-sm sm:text-base mb-2 truncate">{member.name}</div>
+                  <div className="text-white font-medium text-sm sm:text-base mb-2 truncate">{member.name}</div>
                   
                   {/* ステータス */}
-                  <div className="relative z-10 flex items-center justify-center gap-1.5 mb-1">
-                    <i className={`${config.icon} ${config.color} text-base sm:text-lg`}></i>
+                  <div className="flex items-center justify-center gap-1.5">
+                    <i className={`${config.icon} ${config.color} text-base`}></i>
                     <span className={`${config.color} text-xs sm:text-sm font-medium`}>
                       {config.label}
                     </span>
@@ -282,11 +245,11 @@ export default function TeamPage() {
       {/* メンバー詳細モーダル */}
       {selectedMember && (
         <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
           onClick={() => setSelectedMember(null)}
         >
           <div
-            className="bg-gradient-to-br from-gray-900 to-black border-2 border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* アバター＆ステータス */}
@@ -324,7 +287,7 @@ export default function TeamPage() {
                     alert(`${selectedMember.name}さんに「助けに行きます」通知を送信しました！`)
                     setSelectedMember(null)
                   }}
-                  className="w-full py-4 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
                 >
                   <i className="ri-emotion-happy-line text-2xl"></i>
                   <span>助けに行きます</span>
@@ -338,7 +301,7 @@ export default function TeamPage() {
                     alert(`${selectedMember.name}さんに「ランチ行きましょう」通知を送信しました！`)
                     setSelectedMember(null)
                   }}
-                  className="w-full py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
                 >
                   <i className="ri-restaurant-line text-2xl"></i>
                   <span>ランチ行きましょう</span>
@@ -352,7 +315,7 @@ export default function TeamPage() {
                     alert(`${selectedMember.name}さんに「雑談しましょう」通知を送信しました！`)
                     setSelectedMember(null)
                   }}
-                  className="w-full py-4 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
                 >
                   <i className="ri-message-3-line text-2xl"></i>
                   <span>雑談しましょう</span>
@@ -366,7 +329,7 @@ export default function TeamPage() {
                     alert(`${selectedMember.name}さんに「話しかけたい」通知を送信しました！`)
                     setSelectedMember(null)
                   }}
-                  className="w-full py-4 bg-cyan-500 hover:bg-cyan-400 text-white font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
                 >
                   <i className="ri-chat-3-line text-2xl"></i>
                   <span>話しかける</span>
@@ -377,7 +340,7 @@ export default function TeamPage() {
             {/* 閉じるボタン */}
             <button
               onClick={() => setSelectedMember(null)}
-              className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all"
+              className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
             >
               閉じる
             </button>

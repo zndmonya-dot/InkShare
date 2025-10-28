@@ -1,11 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { StatusPanel } from '@/components/StatusPanel'
-import { CustomStatusModal } from '@/components/CustomStatusModal'
 import { getStatusConfig } from '@/constants/statusOptions'
 import { CustomStatus } from '@/types/status'
+
+// 遅延ロード（パフォーマンス最適化）
+const StatusPanel = lazy(() => import('@/components/StatusPanel').then(mod => ({ default: mod.StatusPanel })))
+const CustomStatusModal = lazy(() => import('@/components/CustomStatusModal').then(mod => ({ default: mod.CustomStatusModal })))
 
 export default function Home() {
   const router = useRouter()
@@ -21,14 +23,30 @@ export default function Home() {
     icon: 'ri-edit-line',
   })
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
+  const [showOrgDropdown, setShowOrgDropdown] = useState(false)
+  const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // 初期データ取得
+  // 初期データ取得（並列化で高速化）
   useEffect(() => {
     const fetchData = async () => {
+      const startTime = performance.now()
+      
       try {
-        // ユーザープロフィール取得
-        const profileRes = await fetch('/api/auth/me')
-        const profileData = await profileRes.json()
+        // プロフィールとステータスを並列取得
+        const [profileRes, statusRes] = await Promise.all([
+          fetch('/api/auth/me'),
+          fetch('/api/status')
+        ])
+
+        const [profileData, statusData] = await Promise.all([
+          profileRes.json(),
+          statusRes.json()
+        ])
+
+        console.log(`Data fetch completed in ${Math.round(performance.now() - startTime)}ms`)
 
         if (!profileData.user) {
           // ログインしていない場合はランディングページへ
@@ -39,10 +57,7 @@ export default function Home() {
         // グループがなくてもホーム画面は表示する
         setUserProfile(profileData.user)
 
-        // ステータス取得
-        const statusRes = await fetch('/api/status')
-        const statusData = await statusRes.json()
-
+        // ステータス設定
         if (statusData.status) {
           setCurrentStatus(statusData.status.status)
           setCustomStatus1({
@@ -114,141 +129,337 @@ export default function Home() {
   }, [currentStatus, handleStatusChange])
 
   // 組織切り替え
-  const handleOrgSwitch = async (orgId: string) => {
+  const handleOrgSwitch = useCallback(async (orgId: string) => {
+    // 既に切り替え中の場合は何もしない
+    if (isSwitchingOrg) {
+      console.log('Already switching, ignoring...')
+      return
+    }
+    
+    console.log('Switching organization to:', orgId)
+    setIsSwitchingOrg(true)
+    setShowOrgDropdown(false)
+    
     try {
-      await fetch('/api/organization/switch', {
+      const response = await fetch('/api/organization/switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ organizationId: orgId }),
       })
-      router.refresh()
-      window.location.reload() // 全体をリロード
+      
+      if (!response.ok) {
+        console.error('Failed to switch organization:', await response.text())
+        setIsSwitchingOrg(false)
+        return
+      }
+      
+      console.log('Organization switched successfully, reloading...')
+      // 少し待ってからリロード（ちらつき防止）
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
     } catch (error) {
       console.error('Failed to switch organization:', error)
+      setIsSwitchingOrg(false)
     }
-  }
+  }, [isSwitchingOrg])
+
+  // ドロップダウン外クリックで閉じる
+  useEffect(() => {
+    if (!showOrgDropdown) return
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowOrgDropdown(false)
+      }
+    }
+    
+    // 少し遅延させてイベントリスナーを追加（即座の閉じるを防ぐ）
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside)
+    }, 100)
+    
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showOrgDropdown])
+
+  // チーム脱退処理
+  const handleLeaveOrganization = useCallback(async () => {
+    if (!userProfile?.currentOrganization) return
+
+    try {
+      const response = await fetch('/api/organization/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organizationId: userProfile.currentOrganization.id }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        alert(data.error || '脱退に失敗しました')
+        return
+      }
+
+      alert('グループから脱退しました')
+      window.location.reload()
+    } catch (error) {
+      console.error('Leave organization error:', error)
+      alert('脱退に失敗しました')
+    }
+  }, [userProfile])
+
+  // ステータス設定を取得（デフォルト値を設定）
+  const statusConfig = getStatusConfig(currentStatus)
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center text-lime-400 text-2xl splatoon-glow">
-        Loading InkLink...
+      <div className="h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center relative overflow-hidden">
+        {/* 背景のインク - スクロール防止版 */}
+        <div className="fixed inset-0 opacity-20 pointer-events-none overflow-hidden">
+          <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+          <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+        </div>
+        
+        {/* スプラトゥーン風スピナー */}
+        <div className="text-center relative">
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            {/* 外側のリング */}
+            <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+            {/* 回転するインク */}
+            <div className="absolute inset-0 ink-spinner">
+              <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+            </div>
+            {/* 中央のロゴ */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
+                <i className="ri-paint-brush-fill text-2xl text-splat-dark"></i>
+              </div>
+            </div>
+          </div>
+          <p className="text-white/70 text-lg font-medium">読み込み中...</p>
+        </div>
       </div>
     )
   }
 
-  const statusConfig = getStatusConfig(currentStatus)
-
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-gray-950 via-gray-900 to-black">
-      {/* ヘッダー */}
-      <header className="px-4 py-3 sm:py-4 flex items-center justify-between flex-shrink-0 overflow-visible">
-        <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 sm:w-14 sm:h-14 ${statusConfig.bgColor} rounded-2xl flex items-center justify-center shadow-lg relative overflow-visible ${statusConfig.glow}`}>
-            <i className={`${statusConfig.icon} text-3xl sm:text-4xl text-gray-900`}></i>
-            {/* インク飛び散り */}
-            <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${statusConfig.inkLight} opacity-70 ink-splash`}></div>
-            <div className={`absolute -bottom-1 -left-1 w-3 h-3 rounded-full ${statusConfig.inkMedium} opacity-60 ink-drip`}></div>
-          </div>
-          <div>
-            <div className="text-white text-base sm:text-lg font-bold">{userProfile?.name}</div>
-            {/* 組織切り替えドロップダウン */}
-            {userProfile?.organizations && userProfile.organizations.length > 1 ? (
-              <select
-                value={userProfile.currentOrganization?.id || ''}
-                onChange={(e) => handleOrgSwitch(e.target.value)}
-                className="text-sm sm:text-base text-gray-400 bg-transparent border border-gray-700 rounded px-2 py-1 hover:border-lime-400 transition-colors cursor-pointer"
-              >
-                {userProfile.organizations.map((org: any) => (
-                  <option key={org.id} value={org.id} className="bg-gray-800">
-                    {org.name} {org.isActive && '(現在)'}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div className="text-sm sm:text-base text-gray-400">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark relative overflow-hidden">
+      {/* 背景のインク - スクロール防止版 */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+      </div>
+      {/* ヘッダー - 改善版 */}
+      <header className="relative px-6 py-4 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+        {/* 左側：ユーザー＆グループ情報 */}
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <div className="text-white text-lg font-bold">{userProfile?.name}</div>
+            <div className="flex items-center gap-2">
+              <span className="text-white/60 text-sm">
                 {userProfile?.currentOrganization?.name || 'グループ未参加'}
-              </div>
-            )}
+              </span>
+              {/* グループ切り替えボタン（複数ある場合のみ） */}
+              {userProfile?.organizations && userProfile.organizations.length > 1 && (
+                <button
+                  onClick={() => setShowOrgDropdown(!showOrgDropdown)}
+                  className="text-white/60 hover:text-white transition-all"
+                  title="グループを切り替え"
+                >
+                  <i className="ri-arrow-down-s-line text-lg"></i>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* 右側：アクションボタン */}
+        <div className="flex items-center gap-2">
+          {/* 通知ベル */}
+          {userProfile?.currentOrganization && (
+            <button
+              onClick={() => {
+                // TODO: 通知一覧モーダルを表示
+                alert('通知機能は開発中です')
+              }}
+              className="relative w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+              title="通知"
+            >
+              <i className="ri-notification-3-line text-lg text-white/80"></i>
+              {unreadNotifications > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                </span>
+              )}
+            </button>
+          )}
+          
+          {userProfile?.currentOrganization && (
+            <button
+              onClick={() => router.push('/team')}
+              className="px-5 py-2.5 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-sm rounded-xl transition-all shadow-lg flex items-center gap-2"
+            >
+              <i className="ri-group-line text-lg"></i>
+              <span>チーム</span>
+            </button>
+          )}
+          {/* アカウント設定 */}
+          <button
+            onClick={() => router.push('/account')}
+            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+            title="アカウント設定"
+          >
+            <i className="ri-user-settings-line text-lg text-white/80"></i>
+          </button>
+          
           {userProfile?.currentOrganization?.role === 'admin' && (
             <button
               onClick={() => router.push('/settings')}
-              className="relative w-10 h-10 sm:w-12 sm:h-12 bg-cyan-400 hover:bg-cyan-300 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]"
+              className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
               title="組織設定"
             >
-              <i className="ri-settings-3-line text-xl sm:text-2xl text-gray-900"></i>
+              <i className="ri-settings-3-line text-lg text-white/80"></i>
             </button>
           )}
           <button
             onClick={() => router.push('/logout')}
-            className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all active:scale-95 border border-gray-700 hover:border-gray-500"
+            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
             title="ログアウト"
           >
-            <i className="ri-logout-box-line text-xl sm:text-2xl text-gray-300"></i>
+            <i className="ri-logout-box-line text-lg text-white/80"></i>
           </button>
-          {userProfile?.currentOrganization && (
-            <button
-              onClick={() => router.push('/team')}
-              className="relative px-4 sm:px-6 py-2 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm sm:text-base rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)] hover:shadow-[0_0_40px_rgba(191,255,0,0.7)] overflow-visible group"
-            >
-              {/* インク飛び散り */}
-              <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
-              <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
-              <span className="relative z-10 flex items-center gap-2">
-                <i className="ri-group-line"></i>
-                <span className="hidden sm:inline">チームを見る</span>
-              </span>
-            </button>
-          )}
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-visible">
+      {/* グループ切り替えモーダル - 操作性改善版 */}
+      {showOrgDropdown && userProfile?.organizations && userProfile.organizations.length > 1 && (
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowOrgDropdown(false)}
+        >
+          <div 
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">グループ</h2>
+              <button
+                onClick={() => setShowOrgDropdown(false)}
+                className="text-white/60 hover:text-white transition-all"
+              >
+                <i className="ri-close-line text-2xl"></i>
+              </button>
+            </div>
+            
+            <div className="space-y-3 mb-6">
+              {userProfile.organizations.map((org: any) => (
+                <button
+                  key={org.id}
+                  onClick={() => {
+                    if (org.id !== userProfile.currentOrganization?.id) {
+                      setShowOrgDropdown(false)
+                      handleOrgSwitch(org.id)
+                    }
+                  }}
+                  disabled={isSwitchingOrg || org.id === userProfile.currentOrganization?.id}
+                  className={`w-full text-left px-6 py-4 rounded-xl transition-all text-lg ${
+                    org.id === userProfile.currentOrganization?.id
+                      ? 'bg-ink-yellow/30 text-white font-bold border-2 border-ink-yellow cursor-default'
+                      : 'bg-white/5 text-white/80 hover:bg-white/10 hover:text-white border border-white/20 cursor-pointer'
+                  } ${isSwitchingOrg ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{org.name}</span>
+                    {org.id === userProfile.currentOrganization?.id && (
+                      <i className="ri-check-line text-2xl text-ink-yellow"></i>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* 脱退ボタンを分離 */}
+            {userProfile?.currentOrganization && (
+              <div className="pt-6 border-t border-white/20">
+                <button
+                  onClick={() => {
+                    setShowOrgDropdown(false)
+                    setTimeout(() => {
+                      if (confirm(`本当に「${userProfile.currentOrganization.name}」から脱退しますか？\n\n※唯一の管理者の場合は脱退できません`)) {
+                        handleLeaveOrganization()
+                      }
+                    }, 100)
+                  }}
+                  className="w-full px-6 py-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-lg rounded-xl transition-all border border-red-500/30 hover:border-red-500/50"
+                >
+                  <i className="ri-logout-circle-line mr-2"></i>
+                  現在のグループから脱退
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <main className="relative flex-1 flex items-center justify-center p-4">
         {!userProfile?.currentOrganization ? (
-          // グループがない場合
-          <div className="max-w-md w-full text-center">
-            <div className="mb-6">
-              <i className="ri-inbox-line text-6xl text-gray-600 mb-4"></i>
-              <p className="text-gray-400 text-lg">グループがありません</p>
+          // グループがない場合 - クリーン版
+          <div className="max-w-md w-full text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20">
+            <div className="mb-8">
+              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
+                <i className="ri-inbox-line text-5xl text-white/60"></i>
+              </div>
+              <p className="text-white text-xl font-bold">グループがありません</p>
+              <p className="text-white/60 text-sm mt-2">グループを作成するか、招待コードで参加しましょう</p>
             </div>
             <button
               onClick={() => router.push('/join')}
-              className="w-full px-6 py-4 bg-orange-400 hover:bg-orange-300 text-black font-bold rounded-xl transition-all active:scale-95 mb-3"
+              className="w-full px-6 py-4 bg-ink-magenta hover:bg-ink-magenta/90 text-white font-bold text-lg rounded-xl transition-all mb-3 shadow-lg"
             >
-              <i className="ri-key-2-line mr-2"></i>
-              招待コードで参加
+              <span className="flex items-center justify-center gap-2">
+                <i className="ri-key-2-line text-xl"></i>
+                招待コードで参加
+              </span>
             </button>
             <button
               onClick={() => router.push('/group/create')}
-              className="w-full px-6 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all active:scale-95"
+              className="w-full px-6 py-4 bg-white/10 hover:bg-white/20 text-ink-cyan font-bold text-lg rounded-xl transition-all border border-ink-cyan/50 hover:border-ink-cyan"
             >
-              <i className="ri-add-line mr-2"></i>
-              グループを作成
+              <span className="flex items-center justify-center gap-2">
+                <i className="ri-add-line text-xl"></i>
+                グループを作成
+              </span>
             </button>
           </div>
-        ) : (
-          // グループがある場合の通常表示
-          <StatusPanel
-            currentStatus={currentStatus}
-            onStatusChange={handleStatusChange}
-            customStatus1={customStatus1}
-            customStatus2={customStatus2}
-            onCustomClick={(type) => setShowCustomModal(type)}
-          />
-        )}
+                ) : (
+                  // グループがある場合の通常表示
+                  <Suspense fallback={
+                    <div className="text-white text-lg">読み込み中...</div>
+                  }>
+                    <StatusPanel
+                      currentStatus={currentStatus}
+                      onStatusChange={handleStatusChange}
+                      customStatus1={customStatus1}
+                      customStatus2={customStatus2}
+                      onCustomClick={(type) => setShowCustomModal(type)}
+                    />
+                  </Suspense>
+                )}
       </main>
 
-      {showCustomModal && (
-        <CustomStatusModal
-          isOpen={!!showCustomModal}
-          onClose={() => setShowCustomModal(null)}
-          onSave={(label, icon) => handleCustomSave(showCustomModal, label, icon)}
-          currentStatus={showCustomModal === 'custom1' ? customStatus1 : customStatus2}
-        />
-      )}
+              {showCustomModal && (
+                <Suspense fallback={null}>
+                  <CustomStatusModal
+                    isOpen={!!showCustomModal}
+                    onClose={() => setShowCustomModal(null)}
+                    onSave={(label, icon) => handleCustomSave(showCustomModal, label, icon)}
+                    currentStatus={showCustomModal === 'custom1' ? customStatus1 : customStatus2}
+                  />
+                </Suspense>
+              )}
     </div>
   )
 }

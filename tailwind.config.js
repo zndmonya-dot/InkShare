@@ -8,20 +8,24 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Material Design M3 color scheme
-        primary: '#6750A4',
-        'primary-container': '#EADDFF',
-        'on-primary': '#FFFFFF',
-        'on-primary-container': '#21005D',
-        secondary: '#625B71',
-        'secondary-container': '#E8DEF8',
-        'on-secondary': '#FFFFFF',
-        'on-secondary-container': '#1D192B',
-        surface: '#FFFBFE',
-        'surface-variant': '#E7E0EC',
-        'on-surface': '#1C1B1F',
-        'on-surface-variant': '#49454F',
-        outline: '#79747E',
+        // Splatoon-inspired color scheme
+        'ink-yellow': '#F7D308',
+        'ink-magenta': '#FF4AAD',
+        'ink-cyan': '#00D9FF',
+        'ink-green': '#19D719',
+        'ink-purple': '#DB00DB',
+        'ink-orange': '#FF8C00',
+        'ink-blue': '#2E3D65',
+        'ink-pink': '#FF69B4',
+        'splat-dark': '#1A1A2E',
+        'splat-light': '#F5F5F5',
+      },
+      fontFamily: {
+        'splat': ['ui-rounded', 'system-ui', 'sans-serif'],
+      },
+      backgroundImage: {
+        'ink-gradient': 'linear-gradient(135deg, #F7D308 0%, #FF4AAD 50%, #00D9FF 100%)',
+        'ink-gradient-2': 'linear-gradient(135deg, #19D719 0%, #DB00DB 50%, #FF8C00 100%)',
       },
     },
   },

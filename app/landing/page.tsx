@@ -4,107 +4,105 @@ import Link from 'next/link'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden relative">
-      {/* 背景のインク飛び散りエフェクト */}
-      <div className="absolute top-20 left-20 w-96 h-96 bg-lime-400 opacity-10 rounded-full blur-3xl ink-float"></div>
-      <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-400 opacity-10 rounded-full blur-3xl ink-pulse"></div>
-      <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl ink-drip"></div>
+    <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-8 overflow-hidden relative">
+      {/* 背景のインク - スクロール防止版 */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+      </div>
 
-      <div className="relative max-w-4xl w-full text-center">
-        {/* ロゴ */}
-        <div className="mb-8 flex items-center justify-center gap-6">
-          <div className="w-24 h-24 bg-lime-400 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(191,255,0,0.7)] relative overflow-visible ink-pulse">
-            <i className="ri-paint-brush-fill text-6xl text-gray-900"></i>
-            {/* インク飛び散り */}
-            <div className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-lime-300 opacity-70 ink-splash"></div>
-            <div className="absolute -bottom-2 -left-2 w-5 h-5 rounded-full bg-yellow-300 opacity-60 ink-drip"></div>
+      <div className="relative max-w-5xl w-full">
+        {/* ロゴ - バランス版 */}
+        <div className="text-center mb-16">
+          <div className="inline-flex flex-col items-center gap-6 relative">
+            {/* ロゴアイコン - シンプル版 */}
+            <div className="relative w-28 h-28 bg-ink-yellow rounded-full flex items-center justify-center shadow-xl">
+              <i className="ri-paint-brush-fill text-7xl text-splat-dark relative z-10"></i>
+            </div>
+            
+            {/* ブランド名 */}
+            <h1 className="text-7xl font-black text-white tracking-tight">
+              InkLink
+            </h1>
           </div>
-          <h1 className="text-6xl font-bold text-white drop-shadow-[0_0_30px_rgba(191,255,0,0.6)] splatoon-glow">
-            InkLink
-          </h1>
+
+          {/* キャッチコピー */}
+          <div className="mt-10 space-y-4">
+            <p className="text-3xl text-ink-yellow font-bold">
+              話しかけやすさを、可視化する
+            </p>
+            <p className="text-lg text-white/70">
+              チームの今をリアルタイムで共有する、ステータス管理ツール
+            </p>
+          </div>
         </div>
 
-        {/* キャッチコピー */}
-        <p className="text-2xl text-lime-400 font-bold mb-4 splatoon-glow">
-          話しかけやすさを、可視化する
-        </p>
-        <p className="text-lg text-gray-400 mb-12">
-          チームの今をリアルタイムで共有する、ステータス管理ツール
-        </p>
-
-        {/* 特徴 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gray-800/60 border-2 border-lime-400/30 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-lime-400/60 transition-all">
-            <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-            <div className="mb-3">
-              <i className="ri-chat-check-line text-5xl text-lime-400"></i>
-            </div>
-            <h3 className="text-lime-400 font-bold text-lg mb-2">リアルタイムステータス</h3>
-            <p className="text-gray-400 text-sm">
+        {/* 特徴 - クリーン版 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-yellow/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-yellow">
+            <i className="ri-chat-check-line text-5xl text-ink-yellow mb-4"></i>
+            <h3 className="text-ink-yellow font-bold text-lg mb-3">リアルタイムステータス</h3>
+            <p className="text-white/70 text-sm">
               10種類のステータスで、今話しかけていいかすぐわかる
             </p>
           </div>
 
-          <div className="bg-gray-800/60 border-2 border-cyan-400/30 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-cyan-400/60 transition-all">
-            <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-cyan-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-            <div className="mb-3">
-              <i className="ri-team-line text-5xl text-cyan-400"></i>
-            </div>
-            <h3 className="text-cyan-400 font-bold text-lg mb-2">プロアクティブな交流</h3>
-            <p className="text-gray-400 text-sm">
-              「誰か雑談しましょう」「お昼誘って」など、積極的なコミュニケーションを促進
+          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-cyan/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-cyan">
+            <i className="ri-team-line text-5xl text-ink-cyan mb-4"></i>
+            <h3 className="text-ink-cyan font-bold text-lg mb-3">プロアクティブな交流</h3>
+            <p className="text-white/70 text-sm">
+              積極的なコミュニケーションを促進
             </p>
           </div>
 
-          <div className="bg-gray-800/60 border-2 border-orange-400/30 rounded-2xl p-6 backdrop-blur-sm relative overflow-visible group hover:border-orange-400/60 transition-all">
-            <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-orange-300 opacity-50 blur-sm ink-splash group-hover:scale-125 transition-transform"></div>
-            <div className="mb-3">
-              <i className="ri-smartphone-line text-5xl text-orange-400"></i>
-            </div>
-            <h3 className="text-orange-400 font-bold text-lg mb-2">PWA対応</h3>
-            <p className="text-gray-400 text-sm">
-              スマホにインストールして、アプリみたいに使える
+          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-magenta/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-magenta">
+            <i className="ri-smartphone-line text-5xl text-ink-magenta mb-4"></i>
+            <h3 className="text-ink-magenta font-bold text-lg mb-3">PWA対応</h3>
+            <p className="text-white/70 text-sm">
+              スマホにインストールして使える
             </p>
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="space-y-6">
-          {/* サインアップボタン */}
-          <div className="text-center">
+        {/* CTA - デモボタン追加 */}
+        <div className="text-center space-y-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* サインアップボタン */}
             <Link
               href="/signup"
-              className="inline-block px-16 py-5 bg-lime-400 hover:bg-lime-300 text-black font-bold text-2xl rounded-2xl transition-all active:scale-95 shadow-[0_0_40px_rgba(191,255,0,0.6)] hover:shadow-[0_0_50px_rgba(191,255,0,0.8)] relative group"
+              className="inline-block px-12 py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark text-xl font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl"
             >
-              <div className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
-              <div className="absolute -bottom-2 -left-2 w-5 h-5 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
-              <span className="flex items-center gap-3 relative z-10">
-                <i className="ri-user-add-line"></i>
-                無料で始める
-              </span>
+              無料で始める
             </Link>
-            <p className="text-gray-400 text-sm mt-4">
-              個人グループも法人組織も作成できます
-            </p>
-          </div>
 
-          {/* ログインボタン */}
-          <div className="text-center">
+            {/* ログインボタン - 目立つように */}
             <Link
               href="/login"
-              className="inline-block px-12 py-4 bg-white/10 hover:bg-white/20 text-lime-400 font-bold text-lg rounded-2xl transition-all border-2 border-lime-400/50 hover:border-lime-400 active:scale-95"
+              className="inline-block px-12 py-4 bg-white/10 hover:bg-white/20 text-white text-xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 border-2 border-white/30 hover:border-white/50"
             >
-              <span className="flex items-center gap-2">
-                <i className="ri-login-box-line"></i>
-                ログイン
-              </span>
+              ログイン
             </Link>
           </div>
-        </div>
 
-        {/* フッター */}
-        <div className="mt-16 text-gray-500 text-sm">
-          <p>無料プラン: 最大10名まで</p>
+          {/* デモボタン */}
+          <div>
+            <Link
+              href="/demo"
+              className="inline-block px-8 py-3 bg-ink-cyan/20 hover:bg-ink-cyan/30 text-ink-cyan text-base font-bold rounded-xl transition-all hover:scale-105 active:scale-95 border border-ink-cyan/50"
+            >
+              <i className="ri-play-circle-line mr-2"></i>
+              デモを試す（ログイン不要）
+            </Link>
+          </div>
+
+          <p className="text-white/60 text-base font-bold">
+            個人グループも法人組織も作成できます
+          </p>
+
+          {/* フッター */}
+          <p className="text-white/50 text-sm mt-8">
+            無料プラン: 最大10名まで
+          </p>
         </div>
       </div>
     </div>

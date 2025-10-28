@@ -79,7 +79,31 @@ export const CUSTOM_STATUS_COLORS = {
 } as const
 
 // ステータスIDから設定を取得するヘルパー関数
-export function getStatusConfig(status: PresenceStatus): StatusOption | undefined {
-  return STATUS_OPTIONS.find(option => option.status === status)
+export function getStatusConfig(status: PresenceStatus): StatusOption {
+  const config = STATUS_OPTIONS.find(option => option.status === status)
+  
+  // カスタムステータスの場合
+  if (status === 'custom1') {
+    return {
+      status: 'custom1',
+      label: 'カスタム1',
+      icon: 'ri-edit-line',
+      activeColor: CUSTOM_STATUS_COLORS.custom1.activeColor,
+      glowColor: CUSTOM_STATUS_COLORS.custom1.glowColor,
+    }
+  }
+  
+  if (status === 'custom2') {
+    return {
+      status: 'custom2',
+      label: 'カスタム2',
+      icon: 'ri-edit-line',
+      activeColor: CUSTOM_STATUS_COLORS.custom2.activeColor,
+      glowColor: CUSTOM_STATUS_COLORS.custom2.glowColor,
+    }
+  }
+  
+  // 見つからない場合はデフォルト（available）を返す
+  return config || STATUS_OPTIONS[0]
 }
 

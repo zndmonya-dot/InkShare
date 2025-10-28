@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/auth-server'
 import { getSupabaseAdmin } from '@/lib/db'
+import { checkUserTeamLimit, LIMITS } from '@/lib/limits'
 
 // 招待コード生成関数
 function generateInviteCode(): string {
@@ -22,7 +23,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 })
     }
 
-    // 2. リクエストボディ取得
+    // 2. ユーザーのチーム数制限チェック
+    const { allowed, currentCount } = await checkUserTeamLimit(user.id)
+    
+    if (!allowed) {
+      return NextResponse.json({ 
+        error: `チーム数の上限（${LIMITS.FREE_PLAN.MAX_TEAMS_PER_USER}チーム）に達しています。\n現在：${currentCount}チーム` 
+      }, { status: 403 })
+    }
+
+    // 3. リクエストボディ取得
     const body = await request.json()
     const { groupName, type } = body
 

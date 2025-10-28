@@ -25,7 +25,6 @@ export default function SignupPage() {
     setError('')
 
     try {
-      // 1. サーバー側でユーザー作成（メール確認スキップ）
       const signupResponse = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,7 +36,6 @@ export default function SignupPage() {
         throw new Error(data.error || 'サインアップに失敗しました')
       }
 
-      // 2. クライアント側でログイン
       const supabase = createClient()
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -48,7 +46,6 @@ export default function SignupPage() {
         throw new Error('ログインに失敗しました')
       }
 
-      // 3. ホーム画面へ（グループなし状態で表示）
       router.push('/')
       router.refresh()
     } catch (err: any) {
@@ -58,44 +55,37 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden">
-      {/* 背景のインク飛び散りエフェクト */}
-      <div className="absolute top-10 right-20 w-72 h-72 bg-cyan-400 opacity-10 rounded-full blur-3xl ink-float"></div>
-      <div className="absolute bottom-10 left-10 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl ink-pulse"></div>
-      <div className="absolute top-1/3 right-1/4 w-56 h-56 bg-lime-400 opacity-10 rounded-full blur-3xl ink-drip"></div>
+    <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-6 overflow-hidden relative">
+      {/* 背景のインク - スクロール防止版 */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]"></div>
+        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-magenta ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+      </div>
 
       <div className="relative w-full max-w-md">
         {/* ロゴ */}
         <div className="text-center mb-8">
           <div className="inline-block">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-16 h-16 bg-cyan-400 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.6)] relative overflow-visible">
-                <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
-                {/* インク飛び散り */}
-                <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-cyan-300 opacity-70 ink-splash"></div>
-                <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-blue-300 opacity-60 ink-drip"></div>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-16 h-16 bg-ink-cyan rounded-full flex items-center justify-center shadow-xl">
+                <i className="ri-paint-brush-fill text-4xl text-splat-dark"></i>
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] splatoon-glow">
+              <h1 className="text-5xl font-black text-white">
                 InkLink
               </h1>
             </div>
-            <p className="text-gray-400 text-sm">アカウントを作成して始めよう</p>
+            <p className="text-white/70 text-base font-bold">アカウントを作成して始めよう</p>
           </div>
         </div>
 
         {/* サインアップフォーム */}
-        <div className="relative bg-gray-800/60 border-2 border-cyan-400/30 rounded-2xl p-8 backdrop-blur-sm shadow-[0_0_50px_rgba(34,211,238,0.1)] overflow-visible">
-          {/* カードのインク飛び散り */}
-          <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-cyan-300 opacity-50 blur-md ink-splash"></div>
-          <div className="absolute -bottom-3 -left-3 w-6 h-6 rounded-full bg-orange-300 opacity-40 blur-sm ink-drip"></div>
-
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
             アカウント作成
           </h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-rose-500/20 border-2 border-rose-500 rounded-xl text-rose-300 text-sm relative overflow-visible">
-              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-400 opacity-70 ink-pulse"></div>
+            <div className="mb-4 p-3 bg-rose-500/20 border border-rose-500 rounded-xl text-rose-300 text-sm">
               {error}
             </div>
           )}
@@ -103,7 +93,7 @@ export default function SignupPage() {
           <form onSubmit={handleSignup} className="space-y-4">
             {/* 名前 */}
             <div>
-              <label className="block text-sm font-bold text-cyan-400 mb-2">
+              <label className="block text-sm font-medium text-ink-cyan mb-2">
                 <i className="ri-user-line mr-1"></i>
                 あなたの名前
               </label>
@@ -114,13 +104,13 @@ export default function SignupPage() {
                 required
                 placeholder="山田太郎"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
               />
             </div>
 
             {/* メールアドレス */}
             <div>
-              <label className="block text-sm font-bold text-cyan-400 mb-2">
+              <label className="block text-sm font-medium text-ink-cyan mb-2">
                 <i className="ri-mail-line mr-1"></i>
                 メールアドレス
               </label>
@@ -131,13 +121,13 @@ export default function SignupPage() {
                 required
                 placeholder="your@email.com"
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
               />
             </div>
 
             {/* パスワード */}
             <div>
-              <label className="block text-sm font-bold text-cyan-400 mb-2">
+              <label className="block text-sm font-medium text-ink-cyan mb-2">
                 <i className="ri-lock-password-line mr-1"></i>
                 パスワード
               </label>
@@ -149,9 +139,9 @@ export default function SignupPage() {
                 placeholder="8文字以上"
                 minLength={8}
                 disabled={isLoading}
-                className="w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:border-cyan-400 focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50"
+                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-white/50 mt-1">
                 8文字以上で設定してください
               </p>
             </div>
@@ -160,47 +150,36 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="relative w-full py-4 bg-cyan-400 hover:bg-cyan-300 disabled:bg-gray-600 disabled:cursor-not-allowed text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:shadow-[0_0_40px_rgba(34,211,238,0.7)] overflow-visible group mt-6"
+              className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark text-lg font-bold rounded-xl transition-all shadow-lg mt-2"
             >
-              {!isLoading && (
-                <>
-                  {/* ボタンのインク飛び散り */}
-                  <div className="absolute -top-3 -right-3 w-5 h-5 rounded-full bg-cyan-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
-                  <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-blue-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
-                  <div className="absolute top-1 -right-2 w-3 h-3 rounded-full bg-cyan-200 opacity-50 ink-pulse"></div>
-                </>
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="ri-loader-4-line animate-spin"></i>
+                  作成中...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="ri-user-add-line"></i>
+                  アカウントを作成
+                </span>
               )}
-              <span className="relative z-10">
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <i className="ri-loader-4-line animate-spin"></i>
-                    作成中...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <i className="ri-user-add-line"></i>
-                    アカウントを作成
-                  </span>
-                )}
-              </span>
             </button>
           </form>
 
           {/* 利用規約 */}
-          <p className="mt-4 text-xs text-gray-400 text-center">
+          <p className="mt-4 text-xs text-white/50 text-center">
             サインアップすることで、利用規約に同意したことになります
           </p>
 
           {/* ログインへのリンク */}
-          <div className="mt-6 text-center pt-6 border-t border-gray-700">
-            <p className="text-gray-400 text-sm mb-2">
+          <div className="mt-6 text-center pt-6 border-t border-white/10">
+            <p className="text-white/60 text-sm mb-3">
               すでにアカウントをお持ちの方は
             </p>
             <Link
               href="/login"
-              className="inline-block px-6 py-2 bg-white/10 hover:bg-white/20 text-cyan-400 font-bold rounded-xl transition-all border-2 border-cyan-400/30 hover:border-cyan-400/50"
+              className="inline-block px-6 py-2 bg-white/10 hover:bg-white/20 text-ink-yellow font-medium rounded-lg transition-all border border-ink-yellow/50 hover:border-ink-yellow"
             >
-              <i className="ri-login-box-line mr-1"></i>
               ログイン
             </Link>
           </div>
@@ -210,7 +189,7 @@ export default function SignupPage() {
         <div className="mt-6 text-center">
           <Link
             href="/"
-            className="text-gray-400 hover:text-white transition-colors text-sm inline-flex items-center gap-1"
+            className="text-white/50 hover:text-white transition-colors text-sm inline-flex items-center gap-1"
           >
             <i className="ri-arrow-left-line"></i>
             トップに戻る
@@ -220,4 +199,3 @@ export default function SignupPage() {
     </div>
   )
 }
-

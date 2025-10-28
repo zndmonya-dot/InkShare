@@ -56,9 +56,8 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     }
   }
 
-  // 組織の詳細を個別に取得
-  const organizations = []
-  for (const uo of userOrgs || []) {
+  // 組織の詳細を並列取得（高速化）
+  const orgPromises = (userOrgs || []).map(async (uo) => {
     const { data: org } = await supabase
       .from('organizations')
       .select('id, name, type')
@@ -66,15 +65,19 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       .single()
 
     if (org) {
-      organizations.push({
+      return {
         id: org.id,
         name: org.name,
         type: org.type,
         role: uo.role,
         isActive: uo.is_active,
-      })
+      }
     }
-  }
+    return null
+  })
+
+  const orgResults = await Promise.all(orgPromises)
+  const organizations = orgResults.filter((org): org is NonNullable<typeof org> => org !== null)
 
   const currentOrg = organizations.find(org => org.isActive)
 

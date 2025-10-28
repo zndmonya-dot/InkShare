@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/auth-server'
 import { getUserProfile } from '@/lib/auth'
-import { queryOne, query } from '@/lib/db'
+import { getSupabaseAdmin } from '@/lib/db'
 
 export async function GET(request: Request) {
   try {
@@ -20,27 +20,42 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: '管理者のみアクセス可能です' }, { status: 403 })
     }
 
-    // 招待コードを取得または生成
-    let org = await queryOne<{ invite_code: string | null }>(
-      'SELECT invite_code FROM organizations WHERE id = $1',
-      [profile.currentOrganization.id]
-    )
+    const supabase = getSupabaseAdmin()
 
-    if (!org || !org.invite_code) {
+    // 招待コードを取得または生成
+    const { data: org, error: orgError } = await supabase
+      .from('organizations')
+      .select('invite_code')
+      .eq('id', profile.currentOrganization.id)
+      .single()
+
+    if (orgError) {
+      console.error('Organization fetch error:', orgError)
+      return NextResponse.json({ error: orgError.message }, { status: 500 })
+    }
+
+    let inviteCode = org.invite_code
+
+    if (!inviteCode) {
       // 招待コードを生成
-      const inviteCode = generateInviteToken()
-      await query(
-        'UPDATE organizations SET invite_code = $1 WHERE id = $2',
-        [inviteCode, profile.currentOrganization.id]
-      )
-      org = { invite_code: inviteCode }
+      inviteCode = generateInviteToken()
+      const { error: updateError } = await supabase
+        .from('organizations')
+        .update({ invite_code: inviteCode })
+        .eq('id', profile.currentOrganization.id)
+
+      if (updateError) {
+        console.error('Invite code update error:', updateError)
+        return NextResponse.json({ error: updateError.message }, { status: 500 })
+      }
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    const inviteLink = `${baseUrl}/invite/${org.invite_code}`
+    const inviteLink = `${baseUrl}/invite/${inviteCode}`
 
     return NextResponse.json({ inviteLink }, { status: 200 })
   } catch (error: any) {
+    console.error('Invite link error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
