@@ -126,14 +126,8 @@ export async function signUpBusiness(email: string, password: string, name: stri
   if (orgError || !orgResult) throw new Error('組織の作成に失敗しました')
 
   // 3. アバターカラーをランダムに選択
-  const avatarColors = [
-    'from-lime-400 to-green-500',
-    'from-cyan-400 to-blue-500',
-    'from-orange-400 to-yellow-500',
-    'from-rose-400 to-pink-500',
-    'from-purple-400 to-indigo-500',
-  ]
-  const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
+  const { getRandomAvatarColor } = await import('./utils')
+  const randomColor = getRandomAvatarColor()
 
   // 4. ユーザー情報をDBに保存
   const { error: userError } = await supabaseAdmin
@@ -191,14 +185,8 @@ export async function signUpPersonal(email: string, password: string, name: stri
   const needsEmailConfirmation = !authData.session
 
   // 2. アバターカラーをランダムに選択
-  const avatarColors = [
-    'from-lime-400 to-green-500',
-    'from-cyan-400 to-blue-500',
-    'from-orange-400 to-yellow-500',
-    'from-rose-400 to-pink-500',
-    'from-purple-400 to-indigo-500',
-  ]
-  const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
+  const { getRandomAvatarColor } = await import('./utils')
+  const randomColor = getRandomAvatarColor()
 
   // 3. ユーザー情報をDBに保存（グループなし）
   const { error: userError } = await supabaseAdmin
@@ -274,15 +262,6 @@ export async function joinGroupByCode(userId: string, inviteCode: string) {
   return org
 }
 
-// 招待コード生成
-function generateInviteCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // 紛らわしい文字を除外
-  let code = ''
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return code
-}
 
 // サインイン
 export async function signIn(email: string, password: string) {

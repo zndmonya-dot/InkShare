@@ -37,14 +37,8 @@ export async function POST(request: Request) {
     }
 
     // アバターカラーをランダムに選択
-    const avatarColors = [
-      'from-lime-400 to-green-500',
-      'from-cyan-400 to-blue-500',
-      'from-orange-400 to-yellow-500',
-      'from-rose-400 to-pink-500',
-      'from-purple-400 to-indigo-500',
-    ]
-    const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
+    const { getRandomAvatarColor } = await import('@/lib/utils')
+    const randomColor = getRandomAvatarColor()
 
     // ユーザー情報をDBに保存
     const { error: userError } = await supabaseAdmin

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/auth-server'
 import { getSupabaseAdmin } from '@/lib/db'
+import { DEFAULT_CUSTOM_STATUS } from '@/lib/constants'
 
 // ステータス取得（現在アクティブな組織のステータス）
 export async function GET(request: Request) {
@@ -31,10 +32,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ 
         status: {
           status: 'available',
-          custom1_label: 'カスタム1',
-          custom1_icon: 'ri-edit-line',
-          custom2_label: 'カスタム2',
-          custom2_icon: 'ri-edit-line'
+          custom1_label: DEFAULT_CUSTOM_STATUS.custom1.label,
+          custom1_icon: DEFAULT_CUSTOM_STATUS.custom1.icon,
+          custom2_label: DEFAULT_CUSTOM_STATUS.custom2.label,
+          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon
         }
       }, { status: 200 })
     }
@@ -60,10 +61,10 @@ export async function GET(request: Request) {
           user_id: user.id,
           organization_id: activeOrg.organization_id,
           status: 'available',
-          custom1_label: 'カスタム1',
-          custom1_icon: 'ri-edit-line',
-          custom2_label: 'カスタム2',
-          custom2_icon: 'ri-edit-line'
+          custom1_label: DEFAULT_CUSTOM_STATUS.custom1.label,
+          custom1_icon: DEFAULT_CUSTOM_STATUS.custom1.icon,
+          custom2_label: DEFAULT_CUSTOM_STATUS.custom2.label,
+          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon
         })
         .select('status, custom1_label, custom1_icon, custom2_label, custom2_icon, updated_at')
         .single()

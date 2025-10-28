@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { getStatusConfig } from '@/constants/statusOptions'
-import { CustomStatus } from '@/types/status'
+import { getStatusConfig } from '@/config/status'
+import { CustomStatus } from '@/types'
+import { DEFAULT_CUSTOM_STATUS } from '@/lib/constants'
 
 // 遅延ロード（パフォーマンス最適化）
 const StatusPanel = lazy(() => import('@/components/StatusPanel').then(mod => ({ default: mod.StatusPanel })))
@@ -14,14 +15,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
   const [currentStatus, setCurrentStatus] = useState<any>('available')
-  const [customStatus1, setCustomStatus1] = useState<CustomStatus>({
-    label: 'カスタム1',
-    icon: 'ri-edit-line',
-  })
-  const [customStatus2, setCustomStatus2] = useState<CustomStatus>({
-    label: 'カスタム2',
-    icon: 'ri-edit-line',
-  })
+  const [customStatus1, setCustomStatus1] = useState<CustomStatus>(DEFAULT_CUSTOM_STATUS.custom1)
+  const [customStatus2, setCustomStatus2] = useState<CustomStatus>(DEFAULT_CUSTOM_STATUS.custom2)
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
   const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)

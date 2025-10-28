@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback } from 'react'
-import type { PresenceStatus, CustomStatus } from '@/types/status'
+import type { PresenceStatus, CustomStatus } from '@/types'
 import { StatusButton } from './StatusButton'
-import { STATUS_OPTIONS, CUSTOM_STATUS_COLORS } from '@/constants/statusOptions'
+import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 interface StatusPanelProps {
   currentStatus: PresenceStatus
@@ -60,8 +60,8 @@ export function StatusPanel({
             label={customStatus1.label}
             icon={customStatus1.icon}
             isActive={currentStatus === 'custom1'}
-            activeColor={CUSTOM_STATUS_COLORS.custom1.activeColor}
-            glowColor={CUSTOM_STATUS_COLORS.custom1.glowColor}
+            activeColor={CUSTOM_STATUS_CONFIG.custom1.activeColor}
+            glowColor={CUSTOM_STATUS_CONFIG.custom1.glowColor}
             onClick={custom1Handlers.onClick}
             onDoubleClick={custom1Handlers.onDoubleClick}
           />
@@ -73,8 +73,8 @@ export function StatusPanel({
             label={customStatus2.label}
             icon={customStatus2.icon}
             isActive={currentStatus === 'custom2'}
-            activeColor={CUSTOM_STATUS_COLORS.custom2.activeColor}
-            glowColor={CUSTOM_STATUS_COLORS.custom2.glowColor}
+            activeColor={CUSTOM_STATUS_CONFIG.custom2.activeColor}
+            glowColor={CUSTOM_STATUS_CONFIG.custom2.glowColor}
             onClick={custom2Handlers.onClick}
             onDoubleClick={custom2Handlers.onDoubleClick}
           />
