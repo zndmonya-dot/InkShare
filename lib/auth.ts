@@ -37,36 +37,44 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     return null
   }
 
-  // 所属組織を取得
+  // 所属組織を取得（JOINを使わない方法）
   const { data: userOrgs, error: orgsError } = await supabase
     .from('user_organizations')
-    .select(`
-      organization_id,
-      role,
-      is_active,
-      organizations (
-        id,
-        name,
-        type
-      )
-    `)
+    .select('organization_id, role, is_active')
     .eq('user_id', userId)
     .order('is_active', { ascending: false })
     .order('joined_at', { ascending: false })
 
   if (orgsError) {
     console.error('Organizations fetch error:', orgsError)
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatarColor: user.avatar_color,
+      organizations: [],
+    }
   }
 
-  console.log('📊 getUserProfile: Raw userOrgs data:', JSON.stringify(userOrgs, null, 2))
+  // 組織の詳細を個別に取得
+  const organizations = []
+  for (const uo of userOrgs || []) {
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('id, name, type')
+      .eq('id', uo.organization_id)
+      .single()
 
-  const organizations = (userOrgs || []).map((uo: any) => ({
-    id: uo.organizations?.id,
-    name: uo.organizations?.name,
-    type: uo.organizations?.type,
-    role: uo.role,
-    isActive: uo.is_active,
-  })).filter(org => org.id) // 不完全なデータを除外
+    if (org) {
+      organizations.push({
+        id: org.id,
+        name: org.name,
+        type: org.type,
+        role: uo.role,
+        isActive: uo.is_active,
+      })
+    }
+  }
 
   const currentOrg = organizations.find(org => org.isActive)
 
