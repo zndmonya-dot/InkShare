@@ -153,6 +153,83 @@ export default function AccountSettingsPage() {
           </div>
         </div>
 
+        {/* 所属グループ */}
+        {userProfile?.organizations && userProfile.organizations.length > 0 && (
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 mb-6 shadow-xl">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <i className="ri-team-line"></i>
+              所属グループ
+            </h2>
+            <div className="space-y-3">
+              {userProfile.organizations.map((org: any) => (
+                <div
+                  key={org.id}
+                  className={`p-4 rounded-xl border transition-all ${
+                    org.isActive
+                      ? 'bg-ink-yellow/20 border-ink-yellow/40'
+                      : 'bg-white/5 border-white/10'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-white font-medium">{org.name}</span>
+                        {org.isActive && (
+                          <span className="px-2 py-0.5 bg-ink-yellow text-splat-dark text-xs font-bold rounded">
+                            現在選択中
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className={`${org.role === 'admin' ? 'text-ink-cyan' : 'text-white/60'}`}>
+                          {org.role === 'admin' ? '管理者' : 'メンバー'}
+                        </span>
+                        <span className="text-white/40">·</span>
+                        <span className="text-white/60">
+                          {org.type === 'business' ? '法人向け' : '個人向け'}
+                        </span>
+                      </div>
+                    </div>
+                    {!org.isActive && (
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`${org.name}から脱退しますか？`)) return
+                          
+                          try {
+                            const res = await fetch('/api/organization/leave', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ organizationId: org.id }),
+                            })
+
+                            if (res.ok) {
+                              alert('グループから脱退しました')
+                              window.location.reload()
+                            } else {
+                              const data = await res.json()
+                              alert(data.error || '脱退に失敗しました')
+                            }
+                          } catch (error) {
+                            alert('脱退に失敗しました')
+                          }
+                        }}
+                        className="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 border border-rose-500/30 rounded-lg text-sm font-medium transition-all"
+                      >
+                        <i className="ri-logout-box-line mr-1"></i>
+                        脱退
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-4 text-white/50 text-xs">
+              <i className="ri-information-line mr-1"></i>
+              現在選択中のグループからは脱退できません。他のグループに切り替えてから脱退してください。
+            </p>
+          </div>
+        )}
+
         {/* パスワード変更 */}
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-xl">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">

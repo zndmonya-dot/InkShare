@@ -21,7 +21,6 @@ export default function Home() {
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
   const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // 初期データ取得（並列化で高速化）
@@ -180,32 +179,6 @@ export default function Home() {
     }
   }, [showOrgDropdown])
 
-  // チーム脱退処理
-  const handleLeaveOrganization = useCallback(async () => {
-    if (!userProfile?.currentOrganization) return
-
-    try {
-      const response = await fetch('/api/organization/leave', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ organizationId: userProfile.currentOrganization.id }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        alert(data.error || '脱退に失敗しました')
-        return
-      }
-
-      alert('グループから脱退しました')
-      window.location.reload()
-    } catch (error) {
-      console.error('Leave organization error:', error)
-      alert('脱退に失敗しました')
-    }
-  }, [userProfile])
-
   // ステータス設定を取得（デフォルト値を設定）
   const statusConfig = getStatusConfig(currentStatus)
 
@@ -248,108 +221,118 @@ export default function Home() {
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
       {/* ヘッダー - 改善版 */}
-      <header className="relative px-6 py-4 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+      <header className="relative px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm">
         {/* 左側：ユーザー＆グループ情報 */}
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <div className="text-white text-lg font-bold">{userProfile?.name}</div>
-            <div className="flex items-center gap-2">
-              <span className="text-white/60 text-sm">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {/* アバター */}
+          <div className={`w-10 h-10 ${userProfile?.avatarColor || 'bg-gradient-to-br from-lime-400 to-green-500'} rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg`}>
+            <span className="text-white font-bold text-lg">
+              {userProfile?.name?.[0]?.toUpperCase() || 'U'}
+            </span>
+          </div>
+          
+          {/* ユーザー情報 */}
+          <div className="flex flex-col min-w-0">
+            <div className="text-white text-base sm:text-lg font-bold truncate">
+              {userProfile?.name}
+            </div>
+            <button
+              onClick={() => userProfile?.organizations && userProfile.organizations.length > 1 && setShowOrgDropdown(!showOrgDropdown)}
+              className={`flex items-center gap-1 text-xs sm:text-sm ${
+                userProfile?.organizations && userProfile.organizations.length > 1
+                  ? 'text-white/70 hover:text-white cursor-pointer'
+                  : 'text-white/50 cursor-default'
+              } transition-all truncate max-w-[200px]`}
+              disabled={!userProfile?.organizations || userProfile.organizations.length <= 1}
+              title={userProfile?.currentOrganization?.name || 'グループ未参加'}
+            >
+              <i className="ri-team-line flex-shrink-0"></i>
+              <span className="truncate">
                 {userProfile?.currentOrganization?.name || 'グループ未参加'}
               </span>
-              {/* グループ切り替えボタン（複数ある場合のみ） */}
               {userProfile?.organizations && userProfile.organizations.length > 1 && (
-                <button
-                  onClick={() => setShowOrgDropdown(!showOrgDropdown)}
-                  className="text-white/60 hover:text-white transition-all"
-                  title="グループを切り替え"
-                >
-                  <i className="ri-arrow-down-s-line text-lg"></i>
-                </button>
+                <i className="ri-arrow-down-s-line flex-shrink-0"></i>
               )}
-            </div>
+            </button>
           </div>
         </div>
 
         {/* 右側：アクションボタン */}
-        <div className="flex items-center gap-2">
-          {/* 通知ベル */}
-          {userProfile?.currentOrganization && (
-            <button
-              onClick={() => {
-                // TODO: 通知一覧モーダルを表示
-                alert('通知機能は開発中です')
-              }}
-              className="relative w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
-              title="通知"
-            >
-              <i className="ri-notification-3-line text-lg text-white/80"></i>
-              {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                </span>
-              )}
-            </button>
-          )}
-          
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* チームボタン（グループがある場合のみ） */}
           {userProfile?.currentOrganization && (
             <button
               onClick={() => router.push('/team')}
-              className="px-5 py-2.5 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-sm rounded-xl transition-all shadow-lg flex items-center gap-2"
+              className="hidden sm:flex px-4 py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-sm rounded-lg transition-all shadow-lg items-center gap-2"
+              title="チーム"
             >
               <i className="ri-group-line text-lg"></i>
-              <span>チーム</span>
+              <span className="hidden md:inline">チーム</span>
             </button>
           )}
-          {/* アカウント設定 */}
-          <button
-            onClick={() => router.push('/account')}
-            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
-            title="アカウント設定"
-          >
-            <i className="ri-user-settings-line text-lg text-white/80"></i>
-          </button>
           
-          {userProfile?.currentOrganization?.role === 'admin' && (
+          {/* モバイル用：ドロップダウンメニュー */}
+          <div className="relative sm:hidden">
             <button
-              onClick={() => router.push('/settings')}
+              onClick={() => setShowOrgDropdown(!showOrgDropdown)}
               className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
-              title="組織設定"
             >
-              <i className="ri-settings-3-line text-lg text-white/80"></i>
+              <i className="ri-more-2-fill text-xl text-white/80"></i>
             </button>
-          )}
-          <button
-            onClick={() => router.push('/logout')}
-            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
-            title="ログアウト"
-          >
-            <i className="ri-logout-box-line text-lg text-white/80"></i>
-          </button>
+          </div>
+
+          {/* デスクトップ用：個別ボタン */}
+          <div className="hidden sm:flex items-center gap-2">
+            <button
+              onClick={() => router.push('/account')}
+              className="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+              title="アカウント設定"
+            >
+              <i className="ri-user-settings-line text-lg text-white/80"></i>
+            </button>
+            
+            {userProfile?.currentOrganization?.role === 'admin' && (
+              <button
+                onClick={() => router.push('/settings')}
+                className="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+                title="組織設定"
+              >
+                <i className="ri-settings-3-line text-lg text-white/80"></i>
+              </button>
+            )}
+            
+            <button
+              onClick={() => router.push('/logout')}
+              className="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+              title="ログアウト"
+            >
+              <i className="ri-logout-box-line text-lg text-white/80"></i>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* グループ切り替えモーダル - 操作性改善版 */}
+      {/* グループ切り替えドロップダウン - シンプル版 */}
       {showOrgDropdown && userProfile?.organizations && userProfile.organizations.length > 1 && (
         <div 
           className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setShowOrgDropdown(false)}
         >
           <div 
-            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 w-full max-w-md shadow-2xl"
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">グループ</h2>
+              <h2 className="text-xl font-bold text-white">グループを切り替え</h2>
               <button
                 onClick={() => setShowOrgDropdown(false)}
-                className="text-white/60 hover:text-white transition-all"
+                className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
               >
                 <i className="ri-close-line text-2xl"></i>
               </button>
             </div>
             
-            <div className="space-y-3 mb-6">
+            <div className="space-y-2">
               {userProfile.organizations.map((org: any) => (
                 <button
                   key={org.id}
@@ -360,14 +343,19 @@ export default function Home() {
                     }
                   }}
                   disabled={isSwitchingOrg || org.id === userProfile.currentOrganization?.id}
-                  className={`w-full text-left px-6 py-4 rounded-xl transition-all text-lg ${
+                  className={`w-full text-left px-5 py-3.5 rounded-xl transition-all ${
                     org.id === userProfile.currentOrganization?.id
-                      ? 'bg-ink-yellow/30 text-white font-bold border-2 border-ink-yellow cursor-default'
+                      ? 'bg-ink-yellow/20 text-white font-bold border-2 border-ink-yellow cursor-default'
                       : 'bg-white/5 text-white/80 hover:bg-white/10 hover:text-white border border-white/20 cursor-pointer'
                   } ${isSwitchingOrg ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span>{org.name}</span>
+                    <div>
+                      <div className="font-medium">{org.name}</div>
+                      <div className="text-xs text-white/50 mt-0.5">
+                        {org.role === 'admin' ? '管理者' : 'メンバー'} · {org.type === 'business' ? '法人' : '個人'}
+                      </div>
+                    </div>
                     {org.id === userProfile.currentOrganization?.id && (
                       <i className="ri-check-line text-2xl text-ink-yellow"></i>
                     )}
@@ -376,25 +364,12 @@ export default function Home() {
               ))}
             </div>
 
-            {/* 脱退ボタンを分離 */}
-            {userProfile?.currentOrganization && (
-              <div className="pt-6 border-t border-white/20">
-                <button
-                  onClick={() => {
-                    setShowOrgDropdown(false)
-                    setTimeout(() => {
-                      if (confirm(`本当に「${userProfile.currentOrganization.name}」から脱退しますか？\n\n※唯一の管理者の場合は脱退できません`)) {
-                        handleLeaveOrganization()
-                      }
-                    }, 100)
-                  }}
-                  className="w-full px-6 py-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-lg rounded-xl transition-all border border-red-500/30 hover:border-red-500/50"
-                >
-                  <i className="ri-logout-circle-line mr-2"></i>
-                  現在のグループから脱退
-                </button>
-              </div>
-            )}
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <p className="text-white/50 text-xs text-center">
+                <i className="ri-information-line mr-1"></i>
+                グループの脱退は「アカウント設定」から行えます
+              </p>
+            </div>
           </div>
         </div>
       )}
