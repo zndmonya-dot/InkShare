@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { query } from '@/lib/db'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -50,17 +49,22 @@ export default function SignupPage() {
       ]
       const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
 
-      // 3. ユーザー情報をDBに保存（組織なし）
-      await query(
-        `INSERT INTO users (id, email, name, avatar_color) VALUES ($1, $2, $3, $4)`,
-        [authData.user.id, email, name, randomColor]
-      )
+      // 3. ユーザー情報をDBに保存（APIルート経由）
+      const response = await fetch('/api/auth/signup/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: authData.user.id,
+          email,
+          name,
+          avatarColor: randomColor
+        }),
+      })
 
-      // 4. 初期ステータスを作成
-      await query(
-        'INSERT INTO user_status (user_id, status) VALUES ($1, $2)',
-        [authData.user.id, 'available']
-      )
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'ユーザー情報の保存に失敗しました')
+      }
 
       // メール確認が必要な場合は確認待ち画面へ
       if (needsEmailConfirmation) {
