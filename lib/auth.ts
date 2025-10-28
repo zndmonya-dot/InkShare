@@ -23,49 +23,47 @@ export interface UserProfile {
 
 // Supabaseからユーザープロフィールを取得
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
-  // ユーザー基本情報を取得
-  const user = await queryOne<{
-    id: string
-    email: string
-    name: string
-    avatar_color: string
-  }>(
-    'SELECT id, email, name, avatar_color FROM users WHERE id = $1',
-    [userId]
-  )
+  const { getSupabaseAdmin } = await import('./db')
+  const supabase = getSupabaseAdmin()
 
-  if (!user) return null
+  // ユーザー基本情報を取得
+  const { data: user, error: userError } = await supabase
+    .from('users')
+    .select('id, email, name, avatar_color')
+    .eq('id', userId)
+    .single()
+
+  if (userError || !user) {
+    console.error('User fetch error:', userError)
+    return null
+  }
 
   // 所属組織を取得
-  const organizations = await query<{
-    org_id: string
-    org_name: string
-    org_type: 'business' | 'personal'
-    role: 'admin' | 'member'
-    is_active: boolean
-  }>(
-    `SELECT 
-      o.id as org_id,
-      o.name as org_name,
-      o.type as org_type,
-      uo.role,
-      uo.is_active
-    FROM user_organizations uo
-    JOIN organizations o ON uo.organization_id = o.id
-    WHERE uo.user_id = $1
-    ORDER BY uo.is_active DESC, uo.joined_at DESC`,
-    [userId]
-  )
+  const { data: userOrgs, error: orgsError } = await supabase
+    .from('user_organizations')
+    .select(`
+      organization_id,
+      role,
+      is_active,
+      organizations (
+        id,
+        name,
+        type
+      )
+    `)
+    .eq('user_id', userId)
+    .order('is_active', { ascending: false })
+    .order('joined_at', { ascending: false })
 
-  const orgs = organizations.map(org => ({
-    id: org.org_id,
-    name: org.org_name,
-    type: org.org_type,
-    role: org.role,
-    isActive: org.is_active,
+  const organizations = (userOrgs || []).map((uo: any) => ({
+    id: uo.organizations.id,
+    name: uo.organizations.name,
+    type: uo.organizations.type,
+    role: uo.role,
+    isActive: uo.is_active,
   }))
 
-  const currentOrg = orgs.find(org => org.isActive)
+  const currentOrg = organizations.find(org => org.isActive)
 
   return {
     id: user.id,
@@ -78,7 +76,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       type: currentOrg.type,
       role: currentOrg.role,
     } : undefined,
-    organizations: orgs,
+    organizations,
   }
 }
 
@@ -138,6 +136,8 @@ export async function signUpBusiness(email: string, password: string, name: stri
 // 個人向けサインアップ（アカウントのみ作成、グループなし）
 export async function signUpPersonal(email: string, password: string, name: string) {
   const supabase = createClient()
+  const { getSupabaseAdmin } = await import('./db')
+  const supabaseAdmin = getSupabaseAdmin()
 
   // 1. Supabase Authでユーザー作成
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -149,7 +149,6 @@ export async function signUpPersonal(email: string, password: string, name: stri
   if (!authData.user) throw new Error('ユーザーの作成に失敗しました')
 
   // メール確認が必要かどうかを判定
-  // session が null の場合は、メール確認が必要
   const needsEmailConfirmation = !authData.session
 
   // 2. アバターカラーをランダムに選択
@@ -163,16 +162,26 @@ export async function signUpPersonal(email: string, password: string, name: stri
   const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
 
   // 3. ユーザー情報をDBに保存（グループなし）
-  await query(
-    `INSERT INTO users (id, email, name, avatar_color) VALUES ($1, $2, $3, $4)`,
-    [authData.user.id, email, name, randomColor]
-  )
+  const { error: userError } = await supabaseAdmin
+    .from('users')
+    .insert({
+      id: authData.user.id,
+      email,
+      name,
+      avatar_color: randomColor
+    })
+
+  if (userError) throw userError
 
   // 4. 初期ステータスを作成
-  await query(
-    'INSERT INTO user_status (user_id, status) VALUES ($1, $2)',
-    [authData.user.id, 'available']
-  )
+  const { error: statusError } = await supabaseAdmin
+    .from('user_status')
+    .insert({
+      user_id: authData.user.id,
+      status: 'available'
+    })
+
+  if (statusError) throw statusError
 
   return {
     user: authData.user,

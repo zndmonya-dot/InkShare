@@ -17,15 +17,25 @@ function getSupabaseAdmin() {
   })
 }
 
-// クエリヘルパー関数（互換性のため残す）
+// PostgreSQL クエリを実行するヘルパー
 export async function query<T = any>(
   text: string,
   params?: any[]
 ): Promise<T[]> {
-  // SQL文をSupabaseのRPCまたはクエリに変換する必要がある
-  // 今のところは警告を出す
-  console.warn('⚠️ query() は非推奨です。Supabaseクライアントを直接使用してください')
-  return []
+  const supabase = getSupabaseAdmin()
+  
+  // パラメータをバインドしてRPCとして実行
+  const { data, error } = await supabase.rpc('execute_sql', {
+    sql_query: text,
+    sql_params: params || []
+  })
+
+  if (error) {
+    console.error('Query error:', error)
+    throw new Error(error.message)
+  }
+
+  return data || []
 }
 
 // 単一行取得ヘルパー
@@ -33,15 +43,17 @@ export async function queryOne<T = any>(
   text: string,
   params?: any[]
 ): Promise<T | null> {
-  console.warn('⚠️ queryOne() は非推奨です。Supabaseクライアントを直接使用してください')
-  return null
+  const results = await query<T>(text, params)
+  return results.length > 0 ? results[0] : null
 }
 
 // トランザクションヘルパー
 export async function transaction<T>(
   callback: (client: any) => Promise<T>
 ): Promise<T> {
-  console.warn('⚠️ transaction() は非推奨です。Supabaseクライアントを直接使用してください')
+  const supabase = getSupabaseAdmin()
+  // Supabaseはトランザクションを直接サポートしていないため、
+  // RPCで実装する必要があります
   throw new Error('トランザクションは未実装です')
 }
 
