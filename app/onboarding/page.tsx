@@ -31,11 +31,10 @@ export default function OnboardingPage() {
         {/* ウェルカムメッセージ */}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-white mb-3">
-            <i className="ri-check-line text-lime-400 mr-2"></i>
-            アカウント作成完了！
+            InkLinkを始めましょう
           </h2>
           <p className="text-gray-400 text-lg">
-            次は、グループを作成するか、既存のグループに参加してください
+            グループを作成するか、既存のグループに参加してください
           </p>
         </div>
 
