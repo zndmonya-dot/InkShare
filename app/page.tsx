@@ -209,49 +209,140 @@ export default function Home() {
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-visible">
         {!userProfile?.currentOrganization ? (
           // グループがない場合の表示
-          <div className="max-w-2xl w-full text-center">
-            <div className="bg-gray-800/60 border-2 border-orange-400/30 rounded-2xl p-8 backdrop-blur-sm">
-              <div className="w-20 h-20 bg-orange-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(251,146,60,0.7)]">
-                <i className="ri-user-add-line text-5xl text-gray-900"></i>
-              </div>
-              <h2 className="text-3xl font-bold text-white mb-4">
-                グループに参加しましょう
-              </h2>
-              <p className="text-gray-400 text-lg mb-8">
-                友達から招待コードをもらって参加するか、新しいグループを作成してください
-              </p>
-              
-              {/* メインアクション：招待コードで参加 */}
-              <button
-                onClick={() => router.push('/join')}
-                className="w-full px-8 py-5 bg-orange-400 hover:bg-orange-300 text-black font-bold text-xl rounded-xl transition-all active:scale-95 shadow-[0_0_40px_rgba(251,146,60,0.6)] mb-6"
-              >
-                <i className="ri-key-2-line mr-2"></i>
-                招待コードで参加
-              </button>
-
-              {/* サブアクション：グループ作成 */}
-              <details className="text-left">
-                <summary className="text-gray-400 hover:text-white transition-colors cursor-pointer text-center mb-4">
-                  または新しいグループを作成
-                </summary>
-                <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                  <button
-                    onClick={() => router.push('/group/create?type=personal')}
-                    className="flex-1 px-6 py-3 bg-lime-400/20 hover:bg-lime-400/30 text-lime-400 font-bold rounded-xl transition-all border-2 border-lime-400/50"
-                  >
-                    <i className="ri-group-line mr-2"></i>
-                    個人グループ
-                  </button>
-                  <button
-                    onClick={() => router.push('/group/create?type=business')}
-                    className="flex-1 px-6 py-3 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 font-bold rounded-xl transition-all border-2 border-cyan-400/50"
-                  >
-                    <i className="ri-building-line mr-2"></i>
-                    法人組織
-                  </button>
+          <div className="max-w-3xl w-full">
+            {/* ウェルカムメッセージ */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-lime-400 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(191,255,0,0.6)]">
+                  <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
                 </div>
-              </details>
+                <h1 className="text-4xl font-bold text-white">InkLink へようこそ！</h1>
+              </div>
+              <p className="text-xl text-gray-300 mb-2">
+                友達や仲間の「話しかけやすさ」をリアルタイムで確認
+              </p>
+              <p className="text-gray-400">
+                忙しい？ランチ行きたい？今の気持ちを共有しよう
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* 左側：サンプルプレビュー */}
+              <div className="bg-gray-800/60 border-2 border-lime-400/30 rounded-2xl p-6 backdrop-blur-sm">
+                <h3 className="text-lime-400 font-bold text-lg mb-4 flex items-center gap-2">
+                  <i className="ri-eye-line"></i>
+                  こんな感じで使えます
+                </h3>
+                
+                <div className="space-y-3">
+                  {/* サンプルメンバー1 */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-900/60 rounded-xl">
+                    <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-xl flex items-center justify-center">
+                      <i className="ri-user-line text-xl text-gray-900"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">太郎</div>
+                      <div className="flex items-center gap-1 text-xs text-lime-400">
+                        <i className="ri-chat-smile-3-line"></i>
+                        <span>話しかけやすい</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* サンプルメンバー2 */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-900/60 rounded-xl">
+                    <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                      <i className="ri-user-line text-xl text-gray-900"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">花子</div>
+                      <div className="flex items-center gap-1 text-xs text-orange-400">
+                        <i className="ri-restaurant-line"></i>
+                        <span>ランチ行きたい</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* サンプルメンバー3 */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-900/60 rounded-xl">
+                    <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center">
+                      <i className="ri-user-line text-xl text-gray-900"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">次郎</div>
+                      <div className="flex items-center gap-1 text-xs text-rose-400">
+                        <i className="ri-door-open-line"></i>
+                        <span>帰宅中</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* あなた */}
+                  <div className="flex items-center gap-3 p-3 bg-lime-400/10 border-2 border-lime-400/30 rounded-xl">
+                    <div className="w-10 h-10 bg-gradient-to-br from-lime-400 to-green-500 rounded-xl flex items-center justify-center">
+                      <i className="ri-user-line text-xl text-gray-900"></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-white font-bold text-sm">{userProfile?.name}</div>
+                      <div className="text-xs text-gray-400">グループに参加すると使えます</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 右側：アクション */}
+              <div className="bg-gray-800/60 border-2 border-orange-400/30 rounded-2xl p-6 backdrop-blur-sm flex flex-col justify-center">
+                <h3 className="text-orange-400 font-bold text-lg mb-4 text-center">
+                  始め方
+                </h3>
+                
+                {/* メインアクション：招待コードで参加 */}
+                <button
+                  onClick={() => router.push('/join')}
+                  className="w-full px-8 py-5 bg-orange-400 hover:bg-orange-300 text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_40px_rgba(251,146,60,0.6)] mb-4"
+                >
+                  <i className="ri-key-2-line mr-2"></i>
+                  招待コードで参加
+                </button>
+
+                <div className="flex items-center gap-3 my-3">
+                  <div className="flex-1 h-px bg-gray-700"></div>
+                  <span className="text-gray-500 text-sm">または</span>
+                  <div className="flex-1 h-px bg-gray-700"></div>
+                </div>
+
+                {/* サブアクション：グループ作成 */}
+                <button
+                  onClick={() => router.push('/group/create')}
+                  className="w-full px-8 py-4 bg-lime-400/20 hover:bg-lime-400/30 text-lime-400 font-bold text-lg rounded-xl transition-all border-2 border-lime-400/50"
+                >
+                  <i className="ri-add-line mr-2"></i>
+                  新しいグループを作成
+                </button>
+                <p className="text-gray-500 text-xs text-center mt-2">
+                  <i className="ri-vip-crown-line mr-1"></i>
+                  10人まで無料
+                </p>
+              </div>
+            </div>
+
+            {/* 特徴 */}
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-gray-800/40 rounded-xl p-4">
+                <i className="ri-time-line text-3xl text-lime-400 mb-2"></i>
+                <p className="text-white text-sm font-bold mb-1">リアルタイム</p>
+                <p className="text-gray-400 text-xs">今の状況がすぐわかる</p>
+              </div>
+              <div className="bg-gray-800/40 rounded-xl p-4">
+                <i className="ri-shield-check-line text-3xl text-cyan-400 mb-2"></i>
+                <p className="text-white text-sm font-bold mb-1">プライベート</p>
+                <p className="text-gray-400 text-xs">グループメンバーだけ</p>
+              </div>
+              <div className="bg-gray-800/40 rounded-xl p-4">
+                <i className="ri-heart-line text-3xl text-rose-400 mb-2"></i>
+                <p className="text-white text-sm font-bold mb-1">気軽に使える</p>
+                <p className="text-gray-400 text-xs">タップで簡単変更</p>
+              </div>
             </div>
           </div>
         ) : (
