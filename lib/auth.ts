@@ -54,13 +54,19 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     .order('is_active', { ascending: false })
     .order('joined_at', { ascending: false })
 
+  if (orgsError) {
+    console.error('Organizations fetch error:', orgsError)
+  }
+
+  console.log('📊 getUserProfile: Raw userOrgs data:', JSON.stringify(userOrgs, null, 2))
+
   const organizations = (userOrgs || []).map((uo: any) => ({
-    id: uo.organizations.id,
-    name: uo.organizations.name,
-    type: uo.organizations.type,
+    id: uo.organizations?.id,
+    name: uo.organizations?.name,
+    type: uo.organizations?.type,
     role: uo.role,
     isActive: uo.is_active,
-  }))
+  })).filter(org => org.id) // 不完全なデータを除外
 
   const currentOrg = organizations.find(org => org.isActive)
 
