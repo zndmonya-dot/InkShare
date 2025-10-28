@@ -36,12 +36,7 @@ export default function Home() {
           return
         }
 
-        if (!profileData.user.currentOrganization) {
-          // 組織に所属していない場合はオンボーディングページへ
-          router.push('/onboarding')
-          return
-        }
-
+        // グループがなくてもホーム画面は表示する
         setUserProfile(profileData.user)
 
         // ステータス取得
@@ -170,7 +165,9 @@ export default function Home() {
                 ))}
               </select>
             ) : (
-              <div className="text-sm sm:text-base text-gray-400">{userProfile?.currentOrganization?.name}</div>
+              <div className="text-sm sm:text-base text-gray-400">
+                {userProfile?.currentOrganization?.name || 'グループ未参加'}
+              </div>
             )}
           </div>
         </div>
@@ -192,29 +189,72 @@ export default function Home() {
           >
             <i className="ri-logout-box-line text-xl sm:text-2xl text-gray-300"></i>
           </button>
-          <button
-            onClick={() => router.push('/team')}
-            className="relative px-4 sm:px-6 py-2 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm sm:text-base rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)] hover:shadow-[0_0_40px_rgba(191,255,0,0.7)] overflow-visible group"
-          >
-            {/* インク飛び散り */}
-            <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
-            <span className="relative z-10 flex items-center gap-2">
-              <i className="ri-group-line"></i>
-              <span className="hidden sm:inline">チームを見る</span>
-            </span>
-          </button>
+          {userProfile?.currentOrganization && (
+            <button
+              onClick={() => router.push('/team')}
+              className="relative px-4 sm:px-6 py-2 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm sm:text-base rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)] hover:shadow-[0_0_40px_rgba(191,255,0,0.7)] overflow-visible group"
+            >
+              {/* インク飛び散り */}
+              <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-lime-300 opacity-70 ink-splash group-hover:scale-110 transition-transform"></div>
+              <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip group-hover:scale-110 transition-transform"></div>
+              <span className="relative z-10 flex items-center gap-2">
+                <i className="ri-group-line"></i>
+                <span className="hidden sm:inline">チームを見る</span>
+              </span>
+            </button>
+          )}
         </div>
       </header>
 
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-visible">
-        <StatusPanel
-          currentStatus={currentStatus}
-          onStatusChange={handleStatusChange}
-          customStatus1={customStatus1}
-          customStatus2={customStatus2}
-          onCustomClick={(type) => setShowCustomModal(type)}
-        />
+        {!userProfile?.currentOrganization ? (
+          // グループがない場合の表示
+          <div className="max-w-2xl w-full text-center">
+            <div className="bg-gray-800/60 border-2 border-lime-400/30 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-lime-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(191,255,0,0.7)]">
+                <i className="ri-group-line text-5xl text-gray-900"></i>
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">
+                グループに参加しましょう
+              </h2>
+              <p className="text-gray-400 text-lg mb-8">
+                InkLinkを始めるには、グループを作成するか、既存のグループに参加してください
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => router.push('/group/create?type=personal')}
+                  className="px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)]"
+                >
+                  <i className="ri-add-line mr-2"></i>
+                  個人グループ作成
+                </button>
+                <button
+                  onClick={() => router.push('/group/create?type=business')}
+                  className="px-8 py-4 bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.5)]"
+                >
+                  <i className="ri-building-line mr-2"></i>
+                  法人組織作成
+                </button>
+              </div>
+              <button
+                onClick={() => router.push('/join')}
+                className="mt-4 text-gray-400 hover:text-white transition-colors"
+              >
+                <i className="ri-user-add-line mr-1"></i>
+                招待コードで参加
+              </button>
+            </div>
+          </div>
+        ) : (
+          // グループがある場合の通常表示
+          <StatusPanel
+            currentStatus={currentStatus}
+            onStatusChange={handleStatusChange}
+            customStatus1={customStatus1}
+            customStatus2={customStatus2}
+            onCustomClick={(type) => setShowCustomModal(type)}
+          />
+        )}
       </main>
 
       {showCustomModal && (
