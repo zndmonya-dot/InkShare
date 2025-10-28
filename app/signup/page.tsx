@@ -48,8 +48,8 @@ export default function SignupPage() {
         throw new Error('ログインに失敗しました')
       }
 
-      // 3. オンボーディング画面へ
-      router.push('/onboarding')
+      // 3. ホーム画面へ（グループなし状態で表示）
+      router.push('/')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'サインアップに失敗しました')

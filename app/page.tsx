@@ -210,39 +210,48 @@ export default function Home() {
         {!userProfile?.currentOrganization ? (
           // グループがない場合の表示
           <div className="max-w-2xl w-full text-center">
-            <div className="bg-gray-800/60 border-2 border-lime-400/30 rounded-2xl p-8 backdrop-blur-sm">
-              <div className="w-20 h-20 bg-lime-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(191,255,0,0.7)]">
-                <i className="ri-group-line text-5xl text-gray-900"></i>
+            <div className="bg-gray-800/60 border-2 border-orange-400/30 rounded-2xl p-8 backdrop-blur-sm">
+              <div className="w-20 h-20 bg-orange-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(251,146,60,0.7)]">
+                <i className="ri-user-add-line text-5xl text-gray-900"></i>
               </div>
               <h2 className="text-3xl font-bold text-white mb-4">
                 グループに参加しましょう
               </h2>
               <p className="text-gray-400 text-lg mb-8">
-                InkLinkを始めるには、グループを作成するか、既存のグループに参加してください
+                友達から招待コードをもらって参加するか、新しいグループを作成してください
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => router.push('/group/create?type=personal')}
-                  className="px-8 py-4 bg-lime-400 hover:bg-lime-300 text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)]"
-                >
-                  <i className="ri-add-line mr-2"></i>
-                  個人グループ作成
-                </button>
-                <button
-                  onClick={() => router.push('/group/create?type=business')}
-                  className="px-8 py-4 bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-lg rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.5)]"
-                >
-                  <i className="ri-building-line mr-2"></i>
-                  法人組織作成
-                </button>
-              </div>
+              
+              {/* メインアクション：招待コードで参加 */}
               <button
                 onClick={() => router.push('/join')}
-                className="mt-4 text-gray-400 hover:text-white transition-colors"
+                className="w-full px-8 py-5 bg-orange-400 hover:bg-orange-300 text-black font-bold text-xl rounded-xl transition-all active:scale-95 shadow-[0_0_40px_rgba(251,146,60,0.6)] mb-6"
               >
-                <i className="ri-user-add-line mr-1"></i>
+                <i className="ri-key-2-line mr-2"></i>
                 招待コードで参加
               </button>
+
+              {/* サブアクション：グループ作成 */}
+              <details className="text-left">
+                <summary className="text-gray-400 hover:text-white transition-colors cursor-pointer text-center mb-4">
+                  または新しいグループを作成
+                </summary>
+                <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                  <button
+                    onClick={() => router.push('/group/create?type=personal')}
+                    className="flex-1 px-6 py-3 bg-lime-400/20 hover:bg-lime-400/30 text-lime-400 font-bold rounded-xl transition-all border-2 border-lime-400/50"
+                  >
+                    <i className="ri-group-line mr-2"></i>
+                    個人グループ
+                  </button>
+                  <button
+                    onClick={() => router.push('/group/create?type=business')}
+                    className="flex-1 px-6 py-3 bg-cyan-400/20 hover:bg-cyan-400/30 text-cyan-400 font-bold rounded-xl transition-all border-2 border-cyan-400/50"
+                  >
+                    <i className="ri-building-line mr-2"></i>
+                    法人組織
+                  </button>
+                </div>
+              </details>
             </div>
           </div>
         ) : (
