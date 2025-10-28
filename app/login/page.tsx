@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { getUserProfile } from '@/lib/auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -31,9 +30,11 @@ export default function LoginPage() {
         throw new Error(signInError?.message || 'ログインに失敗しました')
       }
 
-      // ユーザーのプロフィール情報を取得して組織参加状況を確認
-      const profile = await getUserProfile(data.user.id)
-      const hasOrganization = profile ? (profile.organizations.length > 0) : false
+      // ユーザーのプロフィール情報を取得して組織参加状況を確認（API経由）
+      const profileResponse = await fetch('/api/auth/me')
+      const profileData = await profileResponse.json()
+      
+      const hasOrganization = profileData.user && profileData.user.organizations && profileData.user.organizations.length > 0
 
       // グループに参加していない場合はオンボーディング画面へ
       if (!hasOrganization) {
