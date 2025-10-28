@@ -25,54 +25,31 @@ export default function SignupPage() {
     setError('')
 
     try {
-      const supabase = createClient()
+      // 1. サーバー側でユーザー作成（メール確認スキップ）
+      const signupResponse = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      })
 
-      // 1. Supabase Authでユーザー作成
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      if (!signupResponse.ok) {
+        const data = await signupResponse.json()
+        throw new Error(data.error || 'サインアップに失敗しました')
+      }
+
+      // 2. クライアント側でログイン
+      const supabase = createClient()
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (authError) throw authError
-      if (!authData.user) throw new Error('ユーザーの作成に失敗しました')
-
-      // メール確認が必要かどうかを判定
-      const needsEmailConfirmation = !authData.session
-
-      // 2. アバターカラーをランダムに選択
-      const avatarColors = [
-        'from-lime-400 to-green-500',
-        'from-cyan-400 to-blue-500',
-        'from-orange-400 to-yellow-500',
-        'from-rose-400 to-pink-500',
-        'from-purple-400 to-indigo-500',
-      ]
-      const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)]
-
-      // 3. ユーザー情報をDBに保存（APIルート経由）
-      const response = await fetch('/api/auth/signup/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: authData.user.id,
-          email,
-          name,
-          avatarColor: randomColor
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'ユーザー情報の保存に失敗しました')
+      if (signInError || !signInData.session) {
+        throw new Error('ログインに失敗しました')
       }
 
-      // メール確認が必要な場合は確認待ち画面へ
-      if (needsEmailConfirmation) {
-        router.push('/signup/confirm-email')
-      } else {
-        // オンボーディング画面へ
-        router.push('/onboarding')
-      }
+      // 3. オンボーディング画面へ
+      router.push('/onboarding')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'サインアップに失敗しました')
