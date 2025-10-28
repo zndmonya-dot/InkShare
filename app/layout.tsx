@@ -1,15 +1,21 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { RegisterServiceWorker } from './register-sw'
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+import { NotificationPermissionPrompt } from '@/components/NotificationPermissionPrompt'
 
 export const metadata: Metadata = {
-  title: '在籍管理ツール - 話しかけやすさの可視化',
-  description: '「話しかけて良いかどうか」を可視化するエンジニア向けコミュニケーション支援ツール',
+  title: 'InkLink - 話しかけやすさを可視化',
+  description: 'チームの今をリアルタイムで共有する、ステータス管理ツール。話しかけて良いかがすぐわかる。',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: '在籍管理',
+    title: 'InkLink',
+  },
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
   },
 }
 
@@ -34,6 +40,8 @@ export default function RootLayout({
       </head>
       <body className="bg-surface text-on-surface antialiased">
         <RegisterServiceWorker />
+        <PWAInstallPrompt />
+        <NotificationPermissionPrompt />
         {children}
       </body>
     </html>

@@ -1,7 +1,7 @@
 {
-  "name": "在籍管理ツール - 話しかけやすさの可視化",
-  "short_name": "在籍管理",
-  "description": "「話しかけて良いかどうか」を可視化するエンジニア向けコミュニケーション支援ツール",
+  "name": "InkLink - 話しかけやすさを可視化",
+  "short_name": "InkLink",
+  "description": "チームの今をリアルタイムで共有する、ステータス管理ツール。話しかけて良いかがすぐわかる。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
@@ -13,10 +13,54 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["productivity", "business"],
+  "categories": ["productivity", "business", "social"],
   "lang": "ja",
-  "dir": "ltr"
+  "dir": "ltr",
+  "scope": "/",
+  "id": "com.inklink.app",
+  "shortcuts": [
+    {
+      "name": "ステータス変更",
+      "short_name": "ステータス",
+      "description": "すぐにステータスを変更",
+      "url": "/?action=change-status",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "チームを見る",
+      "short_name": "チーム",
+      "description": "チームメンバーのステータスを確認",
+      "url": "/team",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
 }
 
