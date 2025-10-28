@@ -21,7 +21,16 @@ module.exports = {
         'splat-light': '#F5F5F5',
       },
       fontFamily: {
-        'splat': ['ui-rounded', 'system-ui', 'sans-serif'],
+        'splat': [
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Helvetica Neue',
+          'Hiragino Kaku Gothic ProN',
+          'Hiragino Sans',
+          'BIZ UDPGothic',
+          'Meiryo',
+          'sans-serif',
+        ],
       },
       backgroundImage: {
         'ink-gradient': 'linear-gradient(135deg, #F7D308 0%, #FF4AAD 50%, #00D9FF 100%)',
