@@ -186,6 +186,13 @@ export default function Home() {
             </button>
           )}
           <button
+            onClick={() => router.push('/logout')}
+            className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all active:scale-95 border border-gray-700 hover:border-gray-500"
+            title="ログアウト"
+          >
+            <i className="ri-logout-box-line text-xl sm:text-2xl text-gray-300"></i>
+          </button>
+          <button
             onClick={() => router.push('/team')}
             className="relative px-4 sm:px-6 py-2 sm:py-3 bg-lime-400 hover:bg-lime-300 text-black font-bold text-sm sm:text-base rounded-xl transition-all active:scale-95 shadow-[0_0_30px_rgba(191,255,0,0.5)] hover:shadow-[0_0_40px_rgba(191,255,0,0.7)] overflow-visible group"
           >

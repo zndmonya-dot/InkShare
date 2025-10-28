@@ -167,6 +167,15 @@ export default function CreateGroupPage() {
       <div className={`absolute bottom-20 right-20 w-80 h-80 ${bgGlow2} opacity-10 rounded-full blur-3xl ink-pulse`}></div>
       <div className={`absolute top-1/2 left-1/3 w-64 h-64 ${bgGlow3} opacity-10 rounded-full blur-3xl ink-drip`}></div>
 
+      {/* ログアウトボタン（右上） */}
+      <Link
+        href="/logout"
+        className="absolute top-6 right-6 px-4 py-2 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white rounded-lg transition-all border border-gray-700 hover:border-gray-500 text-sm"
+      >
+        <i className="ri-logout-box-line mr-1"></i>
+        ログアウト
+      </Link>
+
       <div className="relative w-full max-w-md">
         {/* ロゴ */}
         <div className="text-center mb-8">
