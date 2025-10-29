@@ -46,6 +46,19 @@ const getInkColors = (activeColor: string) => {
   return colorMap[activeColor] || { light: 'bg-white', medium: 'bg-white', dark: 'bg-white', bright: 'bg-white' }
 }
 
+// 背景色に応じて適切な文字色を返す（濃い色は白文字、明るい色は黒文字）
+const getTextColor = (activeColor: string): string => {
+  // 白文字が必要な濃い色
+  const darkColors = [
+    'bg-red-500', 'bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 
+    'bg-green-500', 'bg-teal-500', 'bg-cyan-500', 'bg-violet-500',
+    'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500', 'bg-indigo-400',
+    'bg-sky-500', 'bg-emerald-500', 'bg-slate-500', 'bg-slate-400'
+  ]
+  
+  return darkColors.includes(activeColor) ? 'text-white' : 'text-splat-dark'
+}
+
 export function StatusButton({
   label,
   icon,
@@ -56,6 +69,7 @@ export function StatusButton({
   onDoubleClick,
 }: StatusButtonProps) {
   const inkColors = getInkColors(activeColor)
+  const textColor = getTextColor(activeColor)
   
   return (
     <button
@@ -76,11 +90,11 @@ export function StatusButton({
     >
       {/* コンテンツ */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-3 h-full">
-        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? 'text-splat-dark' : 'text-white/50'} flex-shrink-0`}></i>
+        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? textColor : 'text-white/50'} flex-shrink-0`}></i>
         <span
           className={`
             text-sm sm:text-base md:text-lg font-bold text-center leading-tight px-2
-            ${isActive ? 'text-splat-dark' : 'text-white/60'}
+            ${isActive ? textColor : 'text-white/60'}
           `}
         >
           {label}
