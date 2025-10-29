@@ -19,6 +19,7 @@ export default function Home() {
   const [customStatus2, setCustomStatus2] = useState<CustomStatus>(DEFAULT_CUSTOM_STATUS.custom2)
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
   const [unreadNotifications, setUnreadNotifications] = useState(0)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -271,10 +272,10 @@ export default function Home() {
             </button>
           )}
           
-          {/* モバイル用：ドロップダウンメニュー */}
+          {/* モバイル用：メニューボタン */}
           <div className="relative sm:hidden">
             <button
-              onClick={() => setShowOrgDropdown(!showOrgDropdown)}
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
               className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
             >
               <i className="ri-more-2-fill text-xl text-white/80"></i>
@@ -311,6 +312,95 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* モバイル専用：メニューモーダル */}
+      {showMobileMenu && (
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:hidden"
+          onClick={() => setShowMobileMenu(false)}
+        >
+          <div 
+            className="bg-white/10 backdrop-blur-md border-t border-white/20 rounded-t-3xl w-full shadow-2xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 space-y-2">
+              {/* チームボタン */}
+              {userProfile?.currentOrganization && (
+                <button
+                  onClick={() => {
+                    setShowMobileMenu(false)
+                    router.push('/team')
+                  }}
+                  className="w-full px-5 py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg flex items-center gap-3"
+                >
+                  <i className="ri-group-line text-xl"></i>
+                  <span>チーム</span>
+                </button>
+              )}
+              
+              {/* グループ切り替えボタン（複数ある場合のみ） */}
+              {userProfile?.organizations && userProfile.organizations.length > 1 && (
+                <button
+                  onClick={() => {
+                    setShowMobileMenu(false)
+                    setTimeout(() => setShowOrgDropdown(true), 100)
+                  }}
+                  className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
+                >
+                  <i className="ri-swap-line text-xl"></i>
+                  <span>グループ切り替え</span>
+                </button>
+              )}
+              
+              {/* アカウント設定 */}
+              <button
+                onClick={() => {
+                  setShowMobileMenu(false)
+                  router.push('/account')
+                }}
+                className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
+              >
+                <i className="ri-user-settings-line text-xl"></i>
+                <span>アカウント設定</span>
+              </button>
+              
+              {/* 組織設定（管理者のみ） */}
+              {userProfile?.currentOrganization?.role === 'admin' && (
+                <button
+                  onClick={() => {
+                    setShowMobileMenu(false)
+                    router.push('/settings')
+                  }}
+                  className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
+                >
+                  <i className="ri-settings-3-line text-xl"></i>
+                  <span>組織設定</span>
+                </button>
+              )}
+              
+              {/* ログアウト */}
+              <button
+                onClick={() => {
+                  setShowMobileMenu(false)
+                  router.push('/logout')
+                }}
+                className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-rose-400 font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
+              >
+                <i className="ri-logout-box-line text-xl"></i>
+                <span>ログアウト</span>
+              </button>
+            </div>
+            
+            {/* 閉じるエリア */}
+            <button
+              onClick={() => setShowMobileMenu(false)}
+              className="w-full py-4 text-white/50 text-sm"
+            >
+              閉じる
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* グループ切り替えドロップダウン - シンプル版 */}
       {showOrgDropdown && userProfile?.organizations && userProfile.organizations.length > 1 && (

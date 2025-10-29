@@ -36,6 +36,15 @@ module.exports = {
         'ink-gradient': 'linear-gradient(135deg, #F7D308 0%, #FF4AAD 50%, #00D9FF 100%)',
         'ink-gradient-2': 'linear-gradient(135deg, #19D719 0%, #DB00DB 50%, #FF8C00 100%)',
       },
+      animation: {
+        'slide-up': 'slideUp 0.2s ease-out',
+      },
+      keyframes: {
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [],
