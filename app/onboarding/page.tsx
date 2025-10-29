@@ -31,7 +31,7 @@ export default function OnboardingPage() {
                 <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-yellow-300 opacity-60 ink-drip"></div>
               </div>
               <h1 className="text-4xl font-bold text-white drop-shadow-[0_0_25px_rgba(191,255,0,0.6)] splatoon-glow">
-                InkLink
+                Inkshare
               </h1>
             </div>
           </div>
@@ -40,7 +40,7 @@ export default function OnboardingPage() {
         {/* ウェルカムメッセージ */}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-white mb-3">
-            InkLinkを始めましょう
+            Inkshareを始めましょう
           </h2>
           <p className="text-gray-400 text-lg">
             グループを作成するか、既存のグループに参加してください

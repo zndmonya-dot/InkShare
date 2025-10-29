@@ -33,7 +33,7 @@ export function PWAInstallPrompt() {
       // 初回訪問から少し経ってから表示
       setTimeout(() => {
         const dismissed = localStorage.getItem('pwa-install-dismissed')
-        if (!dismissed) {
+        if (!dismissed) { 
           setShowPrompt(true)
         }
       }, 5000) // 5秒後
@@ -98,7 +98,7 @@ export function PWAInstallPrompt() {
           
           <div className="flex-1">
             <h3 className="text-white font-bold text-base mb-1">
-              InkLinkをインストール
+              Inkshareをインストール
             </h3>
             <p className="text-gray-300 text-sm mb-3">
               {isIOS 

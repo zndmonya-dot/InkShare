@@ -123,7 +123,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
                 <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
               </div>
               <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] splatoon-glow">
-                InkLink
+                Inkshare
               </h1>
             </div>
           </div>

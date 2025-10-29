@@ -49,7 +49,7 @@ export async function notifyStatusChange(
   newStatus: string,
   statusLabel: string
 ): Promise<void> {
-  await showLocalNotification('InkLink', {
+  await showLocalNotification('Inkshare', {
     body: `${userName}さんが「${statusLabel}」に変更しました`,
     tag: 'status-change',
     requireInteraction: false,
@@ -63,7 +63,7 @@ export async function notifyStatusChange(
 
 // メンバー参加通知
 export async function notifyMemberJoined(userName: string): Promise<void> {
-  await showLocalNotification('InkLink', {
+  await showLocalNotification('Inkshare', {
     body: `${userName}さんがチームに参加しました`,
     tag: 'member-joined',
     requireInteraction: false,

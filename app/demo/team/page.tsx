@@ -8,34 +8,34 @@ const DEMO_TEAMS = {
   '1': { // 開発チーム
     name: '開発チーム',
     members: [
-      { name: '山田太郎', status: 'available', lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() },
-      { name: '佐藤花子', status: 'busy', lastUpdated: new Date(Date.now() - 2 * 60 * 1000).toISOString() },
-      { name: '鈴木次郎', status: 'want-lunch', lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString() },
-      { name: '田中美咲', status: 'want-to-talk', lastUpdated: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString() },
-      { name: '高橋健太', status: 'need-help', lastUpdated: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() },
-      { name: '伊藤優子', status: 'going-home', lastUpdated: new Date(Date.now() - 45 * 60 * 1000).toISOString() },
-      { name: '渡辺誠', status: 'out', lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() },
-      { name: '中村結衣', status: 'leaving', lastUpdated: new Date(Date.now() - 30 * 1000).toISOString() },
+      { name: '山田太郎', status: 'available', lastUpdated: new Date(Date.now() - 5 * 60 * 1000).toISOString() }, // 5分前
+      { name: '佐藤花子', status: 'busy', lastUpdated: new Date(Date.now() - 2 * 60 * 1000).toISOString() }, // 2分前
+      { name: '鈴木次郎', status: 'want-lunch', lastUpdated: new Date(Date.now() - 15 * 60 * 1000).toISOString() }, // 15分前
+      { name: '田中美咲', status: 'available', lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString() }, // 30分前
+      { name: '高橋健太', status: 'out', lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() }, // 2時間前
+      { name: '伊藤優子', status: 'going-home', lastUpdated: new Date(Date.now() - 45 * 60 * 1000).toISOString() }, // 45分前
+      { name: '渡辺誠', status: 'available', lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() }, // 昨日（未更新）
+      { name: '中村結衣', status: 'busy', lastUpdated: new Date(Date.now() - 1 * 60 * 1000).toISOString() }, // 1分前
     ]
   },
   '2': { // デザインチーム
     name: 'デザインチーム',
     members: [
-      { name: '加藤愛美', status: 'available', lastUpdated: new Date(Date.now() - 5 * 60 * 1000).toISOString() },
-      { name: '小林優斗', status: 'busy', lastUpdated: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
-      { name: '山本さくら', status: 'want-to-talk', lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() },
-      { name: '森田大輔', status: 'going-home', lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString() },
+      { name: '加藤愛美', status: 'available', lastUpdated: new Date(Date.now() - 5 * 60 * 1000).toISOString() }, // 5分前
+      { name: '小林優斗', status: 'busy', lastUpdated: new Date(Date.now() - 10 * 60 * 1000).toISOString() }, // 10分前
+      { name: '山本さくら', status: 'want-lunch', lastUpdated: new Date(Date.now() - 20 * 60 * 1000).toISOString() }, // 20分前
+      { name: '森田大輔', status: 'going-home', lastUpdated: new Date(Date.now() - 30 * 60 * 1000).toISOString() }, // 30分前
     ]
   },
   '3': { // 営業チーム
     name: '営業チーム',
     members: [
-      { name: '松本健一', status: 'available', lastUpdated: new Date(Date.now() - 20 * 60 * 1000).toISOString() },
-      { name: '井上麻衣', status: 'out', lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
-      { name: '木村雄一', status: 'busy', lastUpdated: new Date(Date.now() - 8 * 60 * 1000).toISOString() },
-      { name: '斉藤なつみ', status: 'want-lunch', lastUpdated: new Date(Date.now() - 25 * 60 * 1000).toISOString() },
-      { name: '清水直樹', status: 'available', lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() },
-      { name: '前田真理子', status: 'leaving', lastUpdated: new Date(Date.now() - 50 * 60 * 1000).toISOString() },
+      { name: '松本健一', status: 'available', lastUpdated: new Date(Date.now() - 3 * 60 * 1000).toISOString() }, // 3分前
+      { name: '井上麻衣', status: 'out', lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() }, // 2時間前
+      { name: '木村雄一', status: 'busy', lastUpdated: new Date(Date.now() - 8 * 60 * 1000).toISOString() }, // 8分前
+      { name: '斉藤なつみ', status: 'want-lunch', lastUpdated: new Date(Date.now() - 25 * 60 * 1000).toISOString() }, // 25分前
+      { name: '清水直樹', status: 'available', lastUpdated: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() }, // 昨日（未更新）
+      { name: '前田真理子', status: 'going-home', lastUpdated: new Date(Date.now() - 50 * 60 * 1000).toISOString() }, // 50分前
     ]
   }
 }

@@ -61,36 +61,37 @@ export default function DemoPage() {
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      {/* デモバナー */}
-      <div className="relative bg-ink-yellow/90 text-splat-dark py-2 px-4 text-center text-sm border-b-2 border-ink-yellow z-20">
+      {/* デモバナー - コンパクト版 */}
+      <div className="relative bg-ink-yellow/90 text-splat-dark py-1.5 px-4 text-center text-xs sm:text-sm border-b-2 border-ink-yellow z-20">
         <div className="font-bold">
-          <i className="ri-eye-line mr-2"></i>
-          デモモード - 組織切り替えとステータス選択を体験できます
+          <i className="ri-eye-line mr-1"></i>
+          <span className="hidden sm:inline">デモモード - 組織切り替えとステータス選択を体験できます</span>
+          <span className="sm:hidden">デモモード - カスタマイズ機能は登録後</span>
         </div>
-        <div className="text-xs mt-0.5 text-splat-dark/80">
+        <div className="text-xs text-splat-dark/80 hidden sm:block">
           カスタマイズ機能は登録後に利用可能です
         </div>
       </div>
 
       {/* ヘッダー */}
-      <header className="relative px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm z-30">
+      <header className="relative px-4 sm:px-6 py-2 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm z-30">
         {/* 左側：ユーザー情報 */}
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className={`w-10 h-10 ${demoUser.avatarColor} rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg`}>
-            <span className="text-white font-bold text-lg">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 ${demoUser.avatarColor} rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg`}>
+            <span className="text-white font-bold text-sm sm:text-lg">
               {demoUser.name[0]}
             </span>
           </div>
           
           <div className="flex flex-col min-w-0">
-            <div className="text-white text-base sm:text-lg font-bold truncate">
+            <div className="text-white text-sm sm:text-base font-bold truncate">
               {demoUser.name}
             </div>
             <button
               onClick={() => setShowOrgMenu(true)}
-              className="flex items-center gap-1 text-xs sm:text-sm text-white/70 hover:text-white truncate transition-colors group cursor-pointer"
+              className="flex items-center gap-1 text-xs text-white/70 hover:text-white truncate transition-colors group cursor-pointer"
             >
-              <i className="ri-team-line flex-shrink-0"></i>
+              <i className="ri-team-line flex-shrink-0 text-xs"></i>
               <span className="truncate">{currentOrg.name}</span>
               <i className="ri-arrow-down-s-line flex-shrink-0 group-hover:text-ink-yellow transition-colors"></i>
             </button>
@@ -98,58 +99,54 @@ export default function DemoPage() {
         </div>
 
         {/* 右側：アクションボタン */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => router.push('/signup')}
-            className="px-3 sm:px-4 py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-xs sm:text-sm rounded-lg transition-all shadow-lg flex items-center gap-1 sm:gap-2"
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-xs rounded-lg transition-all shadow-lg flex items-center gap-1"
           >
-            <i className="ri-user-add-line text-base sm:text-lg"></i>
-            <span className="hidden xs:inline">無料登録</span>
-            <span className="xs:hidden">登録</span>
+            <i className="ri-user-add-line text-sm sm:text-base"></i>
+            <span className="hidden xs:inline">登録</span>
           </button>
           <button
             onClick={() => router.push('/demo/team')}
-            className="hidden sm:flex px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-sm rounded-lg transition-all border border-white/20 items-center gap-2"
+            className="hidden sm:flex px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-all border border-white/20 items-center gap-1.5"
           >
-            <i className="ri-group-line text-lg"></i>
+            <i className="ri-group-line text-sm"></i>
             <span>チーム</span>
           </button>
           <button
             onClick={() => router.push('/landing')}
-            className="px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs sm:text-sm rounded-lg transition-all border border-white/20"
+            className="px-2.5 sm:px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-all border border-white/20"
           >
-            <i className="ri-close-line"></i>
-            <span className="hidden sm:inline ml-1">終了</span>
+            <i className="ri-close-line text-sm"></i>
           </button>
         </div>
       </header>
 
-      <main className="relative flex-1 flex flex-col items-center justify-center p-4 gap-4">
-        {/* チーム画面へのリンク - 目立つように */}
-        <div className="w-full max-w-4xl bg-ink-cyan/20 border-2 border-ink-cyan/50 rounded-xl p-4 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-ink-cyan rounded-full flex items-center justify-center">
-                <i className="ri-group-line text-2xl text-splat-dark"></i>
-              </div>
-              <div>
-                <h3 className="text-white font-bold text-base sm:text-lg">チーム状況を確認</h3>
-                <p className="text-white/70 text-xs sm:text-sm">メンバーのステータスを一覧で見る</p>
-              </div>
+      <main className="relative flex-1 flex flex-col items-center p-4 gap-3 overflow-y-auto">
+        {/* チーム画面へのリンク - コンパクト版 */}
+        <div className="w-full max-w-4xl bg-ink-cyan/20 border-2 border-ink-cyan/50 rounded-xl p-3 backdrop-blur-sm flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-10 h-10 bg-ink-cyan rounded-full flex items-center justify-center flex-shrink-0">
+              <i className="ri-group-line text-xl text-splat-dark"></i>
             </div>
-            <button
-              onClick={() => router.push('/demo/team')}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold text-sm sm:text-base rounded-lg transition-all shadow-lg whitespace-nowrap"
-            >
-              <i className="ri-arrow-right-line mr-1"></i>
-              開く
-            </button>
+            <div className="min-w-0">
+              <h3 className="text-white font-bold text-sm sm:text-base truncate">チーム状況を確認</h3>
+              <p className="text-white/70 text-xs hidden sm:block">メンバーのステータスを一覧で見る</p>
+            </div>
           </div>
+          <button
+            onClick={() => router.push('/demo/team')}
+            className="px-3 sm:px-4 py-2 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold text-xs sm:text-sm rounded-lg transition-all shadow-lg whitespace-nowrap flex-shrink-0"
+          >
+            <i className="ri-arrow-right-line"></i>
+            <span className="ml-1 hidden sm:inline">開く</span>
+          </button>
         </div>
 
-        <div className="w-full flex-1 overflow-visible relative">
+        <div className="w-full max-w-4xl pb-4">
           {/* ステータスボタングリッド */}
-          <div className="grid grid-cols-2 auto-rows-fr gap-3 sm:gap-4 md:gap-5 h-full overflow-visible max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {STATUS_OPTIONS.map((option) => (
               <div key={option.status}>
                 <StatusButton
@@ -196,21 +193,18 @@ export default function DemoPage() {
         </div>
       </main>
 
-      {/* フッター */}
-      <footer className="relative py-4 px-4 border-t border-white/10 bg-gradient-to-b from-white/5 to-white/10 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto text-center space-y-3">
-          <div className="flex items-center justify-center gap-2 text-ink-yellow font-bold text-sm">
-            <i className="ri-gift-line text-lg"></i>
+      {/* フッター - コンパクト版 */}
+      <footer className="relative py-3 px-4 border-t border-white/10 bg-gradient-to-b from-white/5 to-white/10 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto text-center space-y-2">
+          <div className="flex items-center justify-center gap-2 text-ink-yellow font-bold text-xs">
+            <i className="ri-gift-line"></i>
             <span>完全無料・クレジットカード不要</span>
           </div>
-          <p className="text-white/70 text-sm">
-            チーム全員のステータスをリアルタイムで共有
-          </p>
           <button
             onClick={() => router.push('/signup')}
-            className="w-full sm:w-auto px-8 py-3 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-base rounded-xl transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto"
+            className="w-full sm:w-auto px-6 py-2.5 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-sm rounded-xl transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto"
           >
-            <i className="ri-user-add-line text-xl"></i>
+            <i className="ri-user-add-line text-lg"></i>
             今すぐ無料で始める
           </button>
           <p className="text-white/40 text-xs">

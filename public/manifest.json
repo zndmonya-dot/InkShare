@@ -1,6 +1,6 @@
 {
-  "name": "InkLink - 話しかけやすさを可視化",
-  "short_name": "InkLink",
+  "name": "Inkshare - 話しかけやすさを可視化",
+  "short_name": "Inkshare",
   "description": "チームの今をリアルタイムで共有する、ステータス管理ツール。話しかけて良いかがすぐわかる。",
   "start_url": "/",
   "display": "standalone",
@@ -37,7 +37,7 @@
   "lang": "ja",
   "dir": "ltr",
   "scope": "/",
-  "id": "com.inklink.app",
+  "id": "com.inkshare.app",
   "shortcuts": [
     {
       "name": "ステータス変更",

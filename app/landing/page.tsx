@@ -21,17 +21,17 @@ export default function LandingPage() {
             </div>
             
             {/* ブランド名 */}
-            <h1 className="text-7xl font-black text-white tracking-tight">
-              InkLink
+            <h1 className="text-7xl font-black text-white tracking-wider" style={{fontWeight: 900}}>
+              Inkshare
             </h1>
           </div>
 
           {/* キャッチコピー */}
           <div className="mt-10 space-y-4">
-            <p className="text-3xl text-ink-yellow font-bold">
+            <p className="text-3xl text-ink-yellow font-black" style={{fontWeight: 900}}>
               話しかけやすさを、可視化する
             </p>
-            <p className="text-lg text-white/70">
+            <p className="text-lg text-white/70 font-medium">
               チームの今をリアルタイムで共有する、ステータス管理ツール
             </p>
           </div>
@@ -41,24 +41,24 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-yellow/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-yellow">
             <i className="ri-chat-check-line text-5xl text-ink-yellow mb-4"></i>
-            <h3 className="text-ink-yellow font-bold text-lg mb-3">リアルタイムステータス</h3>
-            <p className="text-white/70 text-sm">
+            <h3 className="text-ink-yellow font-black text-lg mb-3" style={{fontWeight: 800}}>リアルタイムステータス</h3>
+            <p className="text-white/70 text-sm font-medium">
               10種類のステータスで、今話しかけていいかすぐわかる
             </p>
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-cyan/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-cyan">
             <i className="ri-team-line text-5xl text-ink-cyan mb-4"></i>
-            <h3 className="text-ink-cyan font-bold text-lg mb-3">プロアクティブな交流</h3>
-            <p className="text-white/70 text-sm">
+            <h3 className="text-ink-cyan font-black text-lg mb-3" style={{fontWeight: 800}}>プロアクティブな交流</h3>
+            <p className="text-white/70 text-sm font-medium">
               積極的なコミュニケーションを促進
             </p>
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-magenta/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-magenta">
             <i className="ri-smartphone-line text-5xl text-ink-magenta mb-4"></i>
-            <h3 className="text-ink-magenta font-bold text-lg mb-3">PWA対応</h3>
-            <p className="text-white/70 text-sm">
+            <h3 className="text-ink-magenta font-black text-lg mb-3" style={{fontWeight: 800}}>PWA対応</h3>
+            <p className="text-white/70 text-sm font-medium">
               スマホにインストールして使える
             </p>
           </div>
@@ -66,24 +66,6 @@ export default function LandingPage() {
 
         {/* CTA - デモボタン追加 */}
         <div className="text-center space-y-6">
-          {/* デモボタン - 最上部に移動 */}
-          <div className="bg-ink-cyan/10 border-2 border-ink-cyan/30 rounded-2xl p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-center gap-2 text-ink-cyan font-bold text-sm mb-2">
-              <i className="ri-eye-line text-lg"></i>
-              <span>まずは試してみる</span>
-            </div>
-            <Link
-              href="/demo"
-              className="inline-block px-10 py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark text-lg font-black rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg border-2 border-ink-cyan"
-            >
-              <i className="ri-play-circle-fill mr-2 text-xl"></i>
-              デモを試す（ログイン不要）
-            </Link>
-            <p className="text-white/50 text-xs mt-2">
-              30秒で体験できます
-            </p>
-          </div>
-
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {/* サインアップボタン */}
             <Link
@@ -105,6 +87,20 @@ export default function LandingPage() {
           <p className="text-white/60 text-base font-bold">
             個人グループも法人組織も作成できます
           </p>
+
+          {/* デモボタン - 控えめに */}
+          <div className="pt-2">
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 text-ink-cyan hover:text-ink-cyan/80 text-base font-bold transition-all hover:scale-105 active:scale-95"
+            >
+              <i className="ri-play-circle-line text-xl"></i>
+              デモを試す（ログイン不要）
+            </Link>
+            <p className="text-white/40 text-xs mt-1">
+              30秒で体験できます
+            </p>
+          </div>
 
           {/* フッター */}
           <div className="mt-8 space-y-2">

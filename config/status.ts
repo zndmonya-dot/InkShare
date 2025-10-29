@@ -5,6 +5,7 @@ import { PresenceStatus, StatusConfig, NotificationType } from '@/types'
 // ========================================
 
 export const STATUS_OPTIONS: StatusConfig[] = [
+  // 基本ステータス（よく使う）
   {
     status: 'available',
     label: '話しかけてOK！',
@@ -19,26 +20,14 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     activeColor: 'bg-red-500',
     glowColor: 'shadow-red-500/50',
   },
-  {
-    status: 'want-to-talk',
-    label: 'はい！',
-    icon: 'ri-emotion-happy-fill',
-    activeColor: 'bg-green-500',
-    glowColor: 'shadow-green-500/50',
-  },
+  
+  // 日常的な離席・帰宅
   {
     status: 'want-lunch',
-    label: 'お昼いってきます！',
-    icon: 'ri-restaurant-2-fill',
-    activeColor: 'bg-orange-400',
-    glowColor: 'shadow-orange-400/50',
-  },
-  {
-    status: 'need-help',
-    label: '現在困ってます…',
-    icon: 'ri-error-warning-fill',
-    activeColor: 'bg-yellow-400',
-    glowColor: 'shadow-yellow-400/50',
+    label: '会議中です！',
+    icon: 'ri-slideshow-fill',
+    activeColor: 'bg-blue-500',
+    glowColor: 'shadow-blue-500/50',
   },
   {
     status: 'going-home',
@@ -48,18 +37,36 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     glowColor: 'shadow-indigo-400/50',
   },
   {
-    status: 'leaving',
-    label: 'いいえ…',
-    icon: 'ri-emotion-sad-fill',
-    activeColor: 'bg-sky-400',
-    glowColor: 'shadow-sky-400/50',
-  },
-  {
     status: 'out',
     label: '外出中です！',
     icon: 'ri-footprint-fill',
     activeColor: 'bg-slate-400',
     glowColor: 'shadow-slate-400/50',
+  },
+  
+  // 特殊な状態
+  {
+    status: 'need-help',
+    label: '現在困ってます…',
+    icon: 'ri-error-warning-fill',
+    activeColor: 'bg-yellow-400',
+    glowColor: 'shadow-yellow-400/50',
+  },
+  
+  // デモ用（質問への回答）
+  {
+    status: 'want-to-talk',
+    label: 'はい！',
+    icon: 'ri-emotion-happy-fill',
+    activeColor: 'bg-green-500',
+    glowColor: 'shadow-green-500/50',
+  },
+  {
+    status: 'leaving',
+    label: 'いいえ…',
+    icon: 'ri-emotion-sad-fill',
+    activeColor: 'bg-sky-400',
+    glowColor: 'shadow-sky-400/50',
   },
 ]
 
@@ -115,12 +122,12 @@ export const NOTIFICATION_MESSAGES = {
     icon: 'ri-chat-3-line',
   },
   lunch: {
-    request: 'ランチ行きましょう',
-    accepted: 'がランチOKしました！',
-    declined: 'は今回は難しいようです',
-    buttonText: 'ランチ行きましょう',
-    buttonColor: 'bg-orange-500 hover:bg-orange-400',
-    icon: 'ri-restaurant-line',
+    request: '会議中です',
+    accepted: 'が対応可能です',
+    declined: 'は現在対応できません',
+    buttonText: '確認する',
+    buttonColor: 'bg-blue-500 hover:bg-blue-400',
+    icon: 'ri-slideshow-line',
   },
   help: {
     request: '助けに行きます',

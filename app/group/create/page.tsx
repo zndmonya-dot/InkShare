@@ -136,7 +136,7 @@ export default function CreateGroupPage() {
               className={`w-full py-3 rounded-xl text-black font-bold text-lg ${bgColor} ${hoverBgColor} transition-all active:scale-95`}
             >
               <i className="ri-arrow-right-line mr-2"></i>
-              InkLinkを始める
+              Inkshareを始める
             </button>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function CreateGroupPage() {
                 <div className={`absolute -bottom-1 -left-1 w-3 h-3 rounded-full ${inkColor2} opacity-60 ink-drip`}></div>
               </div>
               <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(191,255,0,0.5)] splatoon-glow">
-                InkLink
+                Inkshare
               </h1>
             </div>
             <p className={`${textColor} text-sm font-bold`}>{title}</p>

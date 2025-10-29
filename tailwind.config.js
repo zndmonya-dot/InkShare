@@ -22,13 +22,12 @@ module.exports = {
       },
       fontFamily: {
         'splat': [
+          '"M PLUS Rounded 1c"',
+          '"Kosugi Maru"',
           '-apple-system',
           'BlinkMacSystemFont',
           'Helvetica Neue',
-          'Hiragino Kaku Gothic ProN',
-          'Hiragino Sans',
-          'BIZ UDPGothic',
-          'Meiryo',
+          'Hiragino Maru Gothic ProN',
           'sans-serif',
         ],
       },

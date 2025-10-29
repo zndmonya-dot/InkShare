@@ -117,7 +117,7 @@ export default function JoinGroupPage() {
                 <div className="absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-yellow-300 opacity-60 ink-drip"></div>
               </div>
               <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(191,255,0,0.5)] splatoon-glow">
-                InkLink
+                Inkshare
               </h1>
             </div>
             <p className="text-lime-400 text-sm font-bold">グループに参加</p>

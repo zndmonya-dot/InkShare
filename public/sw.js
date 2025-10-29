@@ -135,7 +135,7 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification('InkLink', options)
+    self.registration.showNotification('Inkshare', options)
   )
 })
 

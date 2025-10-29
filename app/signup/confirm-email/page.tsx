@@ -22,7 +22,7 @@ export default function ConfirmEmailPage() {
                 <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full bg-yellow-300 opacity-60 ink-drip"></div>
               </div>
               <h1 className="text-4xl font-bold text-white drop-shadow-[0_0_25px_rgba(191,255,0,0.6)] splatoon-glow">
-                InkLink
+                Inkshare
               </h1>
             </div>
           </div>

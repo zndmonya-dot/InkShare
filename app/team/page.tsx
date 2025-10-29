@@ -151,6 +151,31 @@ export default function TeamPage() {
     return updateDateJST >= todayJST
   }
 
+  // 最終更新時刻をフォーマット
+  const formatLastUpdated = (isoString: string) => {
+    const date = new Date(isoString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 0) {
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+      if (diffHours === 0) {
+        const diffMinutes = Math.floor(diffMs / (1000 * 60))
+        if (diffMinutes === 0) {
+          const diffSeconds = Math.floor(diffMs / 1000)
+          return diffSeconds < 10 ? '今' : `${diffSeconds}秒前`
+        }
+        return `${diffMinutes}分前`
+      }
+      return `${diffHours}時間前`
+    } else if (diffDays === 1) {
+      return '昨日'
+    } else {
+      return `${diffDays}日前`
+    }
+  }
+
   useEffect(() => {
     const fetchMembers = async () => {
       try {
@@ -313,7 +338,7 @@ export default function TeamPage() {
                   </div>
                   
                   {/* ステータス */}
-                  <div className="flex items-center justify-center gap-1.5">
+                  <div className="flex items-center justify-center gap-1.5 mb-1">
                     <i className={`${config.icon} text-base ${
                       updatedToday ? config.color : 'text-gray-500'
                     }`}></i>
@@ -322,6 +347,13 @@ export default function TeamPage() {
                     }`}>
                       {config.label}
                     </span>
+                  </div>
+
+                  {/* 最終更新時刻 */}
+                  <div className={`text-xs ${
+                    updatedToday ? 'text-white/50' : 'text-gray-500'
+                  }`}>
+                    {formatLastUpdated(member.lastUpdated)}
                   </div>
                 </button>
               )
