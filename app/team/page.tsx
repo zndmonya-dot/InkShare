@@ -1,15 +1,21 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PresenceStatus } from '@/app/page'
 
 interface Member {
   id: string
   name: string
   status: PresenceStatus
-  lastUpdated: Date
+  lastUpdated: string
   avatarColor: string
+  custom1_label?: string
+  custom1_icon?: string
+  custom1_color?: string
+  custom2_label?: string
+  custom2_icon?: string
+  custom2_color?: string
 }
 
 const statusConfig: Record<PresenceStatus, {
@@ -23,8 +29,8 @@ const statusConfig: Record<PresenceStatus, {
   inkDark: string
 }> = {
   available: { 
-    label: '話しかけてOK', 
-    icon: 'ri-checkbox-circle-line', 
+    label: '話しかけてOK！', 
+    icon: 'ri-chat-smile-3-fill', 
     color: 'text-lime-400',
     bgColor: 'bg-lime-400',
     glow: 'shadow-lime-400/50',
@@ -33,28 +39,28 @@ const statusConfig: Record<PresenceStatus, {
     inkDark: 'bg-yellow-300'
   },
   busy: { 
-    label: '取込中', 
-    icon: 'ri-focus-3-line', 
-    color: 'text-rose-500',
-    bgColor: 'bg-rose-500',
-    glow: 'shadow-rose-500/50',
-    inkLight: 'bg-rose-300',
-    inkMedium: 'bg-rose-400',
+    label: '取込中です！', 
+    icon: 'ri-stop-circle-fill', 
+    color: 'text-red-500',
+    bgColor: 'bg-red-500',
+    glow: 'shadow-red-500/50',
+    inkLight: 'bg-red-300',
+    inkMedium: 'bg-red-400',
     inkDark: 'bg-pink-400'
   },
   'want-to-talk': { 
-    label: '誰か雑談しましょう', 
-    icon: 'ri-chat-3-line', 
-    color: 'text-cyan-400',
-    bgColor: 'bg-cyan-400',
-    glow: 'shadow-cyan-400/50',
-    inkLight: 'bg-cyan-200',
-    inkMedium: 'bg-cyan-300',
-    inkDark: 'bg-blue-300'
+    label: 'はい！', 
+    icon: 'ri-emotion-happy-fill', 
+    color: 'text-green-500',
+    bgColor: 'bg-green-500',
+    glow: 'shadow-green-500/50',
+    inkLight: 'bg-green-200',
+    inkMedium: 'bg-green-300',
+    inkDark: 'bg-lime-300'
   },
   'want-lunch': { 
-    label: 'お昼誘ってください', 
-    icon: 'ri-restaurant-line', 
+    label: 'お昼いってきます！', 
+    icon: 'ri-restaurant-2-fill', 
     color: 'text-orange-400',
     bgColor: 'bg-orange-400',
     glow: 'shadow-orange-400/50',
@@ -63,8 +69,8 @@ const statusConfig: Record<PresenceStatus, {
     inkDark: 'bg-yellow-400'
   },
   'need-help': { 
-    label: '現在困っている', 
-    icon: 'ri-emotion-unhappy-line', 
+    label: '現在困ってます…', 
+    icon: 'ri-error-warning-fill', 
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-400',
     glow: 'shadow-yellow-400/50',
@@ -73,51 +79,51 @@ const statusConfig: Record<PresenceStatus, {
     inkDark: 'bg-amber-300'
   },
   'going-home': { 
-    label: '定時で帰りたい', 
-    icon: 'ri-time-line', 
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500',
-    glow: 'shadow-blue-500/50',
-    inkLight: 'bg-blue-300',
-    inkMedium: 'bg-blue-400',
-    inkDark: 'bg-sky-400'
+    label: '定時で帰ります！', 
+    icon: 'ri-logout-circle-fill', 
+    color: 'text-indigo-400',
+    bgColor: 'bg-indigo-400',
+    glow: 'shadow-indigo-400/50',
+    inkLight: 'bg-indigo-300',
+    inkMedium: 'bg-indigo-400',
+    inkDark: 'bg-purple-400'
   },
   'leaving': { 
-    label: '帰宅', 
-    icon: 'ri-home-heart-line', 
-    color: 'text-teal-400',
-    bgColor: 'bg-teal-400',
-    glow: 'shadow-teal-400/50',
-    inkLight: 'bg-teal-200',
-    inkMedium: 'bg-teal-300',
+    label: 'いいえ…', 
+    icon: 'ri-emotion-sad-fill', 
+    color: 'text-sky-400',
+    bgColor: 'bg-sky-400',
+    glow: 'shadow-sky-400/50',
+    inkLight: 'bg-sky-200',
+    inkMedium: 'bg-sky-300',
     inkDark: 'bg-cyan-300'
   },
   'out': { 
-    label: '外出中', 
-    icon: 'ri-walk-line', 
-    color: 'text-slate-500',
-    bgColor: 'bg-slate-500',
-    glow: 'shadow-slate-500/50',
+    label: '外出中です！', 
+    icon: 'ri-footprint-fill', 
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-400',
+    glow: 'shadow-slate-400/50',
     inkLight: 'bg-slate-300',
     inkMedium: 'bg-slate-400',
     inkDark: 'bg-gray-400'
   },
   'custom1': { 
     label: 'カスタム1', 
-    icon: 'ri-edit-line', 
-    color: 'text-fuchsia-500',
-    bgColor: 'bg-fuchsia-500',
-    glow: 'shadow-fuchsia-500/50',
+    icon: 'ri-star-smile-fill', 
+    color: 'text-fuchsia-400',
+    bgColor: 'bg-fuchsia-400',
+    glow: 'shadow-fuchsia-400/50',
     inkLight: 'bg-fuchsia-300',
     inkMedium: 'bg-fuchsia-400',
     inkDark: 'bg-pink-400'
   },
   'custom2': { 
     label: 'カスタム2', 
-    icon: 'ri-edit-line', 
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500',
-    glow: 'shadow-purple-500/50',
+    icon: 'ri-star-smile-fill', 
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-400',
+    glow: 'shadow-purple-400/50',
     inkLight: 'bg-purple-300',
     inkMedium: 'bg-purple-400',
     inkDark: 'bg-violet-400'
@@ -128,18 +134,39 @@ export default function TeamPage() {
   const router = useRouter()
   const [filterStatus, setFilterStatus] = useState<PresenceStatus | 'all'>('all')
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
+  const [members, setMembers] = useState<Member[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // サンプルデータ（後でLocalStorageやバックエンドと連携）
-  const members: Member[] = [
-    { id: '1', name: '山田太郎', status: 'available', lastUpdated: new Date(), avatarColor: 'from-lime-400 to-green-500' },
-    { id: '2', name: '佐藤花子', status: 'busy', lastUpdated: new Date(), avatarColor: 'from-rose-400 to-pink-500' },
-    { id: '3', name: '鈴木次郎', status: 'want-lunch', lastUpdated: new Date(), avatarColor: 'from-orange-400 to-yellow-500' },
-    { id: '4', name: '田中美咲', status: 'want-to-talk', lastUpdated: new Date(), avatarColor: 'from-cyan-400 to-blue-500' },
-    { id: '5', name: '高橋健太', status: 'need-help', lastUpdated: new Date(), avatarColor: 'from-yellow-400 to-amber-500' },
-    { id: '6', name: '伊藤優子', status: 'going-home', lastUpdated: new Date(), avatarColor: 'from-blue-400 to-indigo-500' },
-    { id: '7', name: '渡辺誠', status: 'out', lastUpdated: new Date(), avatarColor: 'from-slate-400 to-gray-500' },
-    { id: '8', name: '中村結衣', status: 'leaving', lastUpdated: new Date(), avatarColor: 'from-teal-400 to-cyan-500' },
-  ]
+  // チェック：最終更新が今日（JST）かどうか
+  const isUpdatedToday = (lastUpdated: string) => {
+    const now = new Date()
+    const jstOffset = 9 * 60 // JST = UTC+9
+    const jstNow = new Date(now.getTime() + jstOffset * 60 * 1000)
+    const todayJST = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate())
+    
+    const updated = new Date(lastUpdated)
+    const updatedJST = new Date(updated.getTime() + jstOffset * 60 * 1000)
+    const updateDateJST = new Date(updatedJST.getFullYear(), updatedJST.getMonth(), updatedJST.getDate())
+    
+    return updateDateJST >= todayJST
+  }
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const res = await fetch('/api/organization/members')
+        if (res.ok) {
+          const data = await res.json()
+          setMembers(data.members || [])
+        }
+      } catch (error) {
+        console.error('Failed to fetch members:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchMembers()
+  }, [])
 
   const filteredMembers = filterStatus === 'all' 
     ? members 
@@ -203,7 +230,12 @@ export default function TeamPage() {
 
       {/* メンバーリスト */}
       <main className="p-4 overflow-visible">
-        {filteredMembers.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-20 text-white/70">
+            <i className="ri-loader-4-line text-6xl mb-4 animate-spin"></i>
+            <p className="text-lg">読み込み中...</p>
+          </div>
+        ) : filteredMembers.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
             <i className="ri-user-search-line text-6xl mb-4"></i>
             <p className="text-lg">該当するメンバーがいません</p>
@@ -211,27 +243,70 @@ export default function TeamPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-visible">
             {filteredMembers.map((member) => {
-              const config = statusConfig[member.status]
+              let config = statusConfig[member.status]
+              const updatedToday = isUpdatedToday(member.lastUpdated)
+              
+              // カスタムステータスの場合、メンバー固有の設定を使用
+              if (member.status === 'custom1' && member.custom1_label) {
+                config = {
+                  ...config,
+                  label: member.custom1_label,
+                  icon: member.custom1_icon || config.icon,
+                  color: member.custom1_color ? `text-${member.custom1_color.replace('bg-', '')}` : config.color,
+                  bgColor: member.custom1_color || config.bgColor,
+                }
+              } else if (member.status === 'custom2' && member.custom2_label) {
+                config = {
+                  ...config,
+                  label: member.custom2_label,
+                  icon: member.custom2_icon || config.icon,
+                  color: member.custom2_color ? `text-${member.custom2_color.replace('bg-', '')}` : config.color,
+                  bgColor: member.custom2_color || config.bgColor,
+                }
+              }
+              
               return (
                 <button
                   key={member.id}
                   onClick={() => setSelectedMember(member)}
-                  className="relative bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-white/20 transition-all hover:scale-105 active:scale-95"
+                  className={`relative bg-white/5 border rounded-xl p-4 hover:bg-white/10 transition-all hover:scale-105 active:scale-95 ${
+                    updatedToday 
+                      ? 'border-white/10 hover:border-white/20' 
+                      : 'border-gray-500/30 hover:border-gray-500/50'
+                  }`}
                 >
+                  {/* 未更新バッジ */}
+                  {!updatedToday && (
+                    <div className="absolute -top-2 -right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full shadow-lg border border-gray-400 flex items-center gap-1">
+                      <i className="ri-time-line"></i>
+                      <span>未更新</span>
+                    </div>
+                  )}
+                  
                   {/* アバター */}
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${member.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg`}>
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${member.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg ${
+                    !updatedToday ? 'opacity-50 grayscale' : ''
+                  }`}>
                     <span className="text-white font-bold text-xl sm:text-2xl">
                       {member.name.charAt(0)}
                     </span>
                   </div>
                   
                   {/* 名前 */}
-                  <div className="text-white font-medium text-sm sm:text-base mb-2 truncate">{member.name}</div>
+                  <div className={`font-medium text-sm sm:text-base mb-2 truncate ${
+                    updatedToday ? 'text-white' : 'text-gray-400'
+                  }`}>
+                    {member.name}
+                  </div>
                   
                   {/* ステータス */}
                   <div className="flex items-center justify-center gap-1.5">
-                    <i className={`${config.icon} ${config.color} text-base`}></i>
-                    <span className={`${config.color} text-xs sm:text-sm font-medium`}>
+                    <i className={`${config.icon} text-base ${
+                      updatedToday ? config.color : 'text-gray-500'
+                    }`}></i>
+                    <span className={`text-xs sm:text-sm font-medium ${
+                      updatedToday ? config.color : 'text-gray-500'
+                    }`}>
                       {config.label}
                     </span>
                   </div>
@@ -253,88 +328,19 @@ export default function TeamPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* アバター＆ステータス */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${selectedMember.avatarColor} flex items-center justify-center flex-shrink-0`}>
-                <span className="text-white font-bold text-3xl">
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${selectedMember.avatarColor} flex items-center justify-center mb-4 shadow-lg`}>
+                <span className="text-white font-bold text-4xl">
                   {selectedMember.name.charAt(0)}
                 </span>
               </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">{selectedMember.name}</h3>
-                <div className="flex items-center gap-2">
-                  <i className={`${statusConfig[selectedMember.status].icon} ${statusConfig[selectedMember.status].color} text-xl`}></i>
-                  <span className={`${statusConfig[selectedMember.status].color} font-medium`}>
-                    {statusConfig[selectedMember.status].label}
-                  </span>
-                </div>
+              <h3 className="text-2xl font-bold text-white mb-3">{selectedMember.name}</h3>
+              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                <i className={`${statusConfig[selectedMember.status].icon} ${statusConfig[selectedMember.status].color} text-xl`}></i>
+                <span className={`${statusConfig[selectedMember.status].color} font-medium`}>
+                  {statusConfig[selectedMember.status].label}
+                </span>
               </div>
-            </div>
-
-            {/* アクションボタン（ステータス別） */}
-            <div className="space-y-3 mb-4">
-              {/* 帰宅・取込中・外出中・定時で帰りたいの場合はアクションなし */}
-              {['leaving', 'busy', 'out', 'going-home'].includes(selectedMember.status) && (
-                <div className="text-center py-4 text-gray-400">
-                  <i className="ri-time-line text-4xl mb-2"></i>
-                  <p className="text-sm">今は連絡を控えましょう</p>
-                </div>
-              )}
-
-              {/* 困っている → 助けに行くのみ */}
-              {selectedMember.status === 'need-help' && (
-                <button
-                  onClick={() => {
-                    alert(`${selectedMember.name}さんに「助けに行きます」通知を送信しました！`)
-                    setSelectedMember(null)
-                  }}
-                  className="w-full py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <i className="ri-emotion-happy-line text-2xl"></i>
-                  <span>助けに行きます</span>
-                </button>
-              )}
-
-              {/* お昼誘って → ランチ行きましょうのみ */}
-              {selectedMember.status === 'want-lunch' && (
-                <button
-                  onClick={() => {
-                    alert(`${selectedMember.name}さんに「ランチ行きましょう」通知を送信しました！`)
-                    setSelectedMember(null)
-                  }}
-                  className="w-full py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <i className="ri-restaurant-line text-2xl"></i>
-                  <span>ランチ行きましょう</span>
-                </button>
-              )}
-
-              {/* 雑談したい → 雑談しましょうのみ */}
-              {selectedMember.status === 'want-to-talk' && (
-                <button
-                  onClick={() => {
-                    alert(`${selectedMember.name}さんに「雑談しましょう」通知を送信しました！`)
-                    setSelectedMember(null)
-                  }}
-                  className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <i className="ri-message-3-line text-2xl"></i>
-                  <span>雑談しましょう</span>
-                </button>
-              )}
-
-              {/* その他（available, custom1, custom2）→ 話しかける */}
-              {!['leaving', 'busy', 'out', 'going-home', 'need-help', 'want-lunch', 'want-to-talk'].includes(selectedMember.status) && (
-                <button
-                  onClick={() => {
-                    alert(`${selectedMember.name}さんに「話しかけたい」通知を送信しました！`)
-                    setSelectedMember(null)
-                  }}
-                  className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg"
-                >
-                  <i className="ri-chat-3-line text-2xl"></i>
-                  <span>話しかける</span>
-                </button>
-              )}
             </div>
 
             {/* 閉じるボタン */}

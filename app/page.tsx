@@ -15,8 +15,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
   const [currentStatus, setCurrentStatus] = useState<any>('available')
-  const [customStatus1, setCustomStatus1] = useState<CustomStatus>(DEFAULT_CUSTOM_STATUS.custom1)
-  const [customStatus2, setCustomStatus2] = useState<CustomStatus>(DEFAULT_CUSTOM_STATUS.custom2)
+  const [customStatus1, setCustomStatus1] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom1, color: 'bg-fuchsia-400' })
+  const [customStatus2, setCustomStatus2] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom2, color: 'bg-purple-400' })
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
@@ -57,12 +57,19 @@ export default function Home() {
           setCurrentStatus(statusData.status.status)
           setCustomStatus1({
             label: statusData.status.custom1_label || 'カスタム1',
-            icon: statusData.status.custom1_icon || 'ri-edit-line',
+            icon: statusData.status.custom1_icon || 'ri-star-smile-fill',
+            color: statusData.status.custom1_color || 'bg-fuchsia-400',
           })
           setCustomStatus2({
             label: statusData.status.custom2_label || 'カスタム2',
-            icon: statusData.status.custom2_icon || 'ri-edit-line',
+            icon: statusData.status.custom2_icon || 'ri-star-smile-fill',
+            color: statusData.status.custom2_color || 'bg-purple-400',
           })
+          
+          // 0時を過ぎてリセットされた場合、通知を表示
+          if (statusData.wasReset) {
+            console.log('ステータスが0時にリセットされました')
+          }
         }
 
         setIsLoading(false)
@@ -86,8 +93,8 @@ export default function Home() {
   }, [])
 
   // カスタムステータス保存
-  const handleCustomSave = useCallback(async (type: 'custom1' | 'custom2', label: string, icon: string) => {
-    const newCustomStatus = { label, icon }
+  const handleCustomSave = useCallback(async (type: 'custom1' | 'custom2', label: string, icon: string, color: string) => {
+    const newCustomStatus = { label, icon, color }
     if (type === 'custom1') {
       setCustomStatus1(newCustomStatus)
     } else {
@@ -98,7 +105,7 @@ export default function Home() {
     await fetch('/api/status/custom', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, label, icon }),
+      body: JSON.stringify({ type, label, icon, color }),
     })
   }, [])
 

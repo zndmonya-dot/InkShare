@@ -34,8 +34,10 @@ export async function GET(request: Request) {
           status: 'available',
           custom1_label: DEFAULT_CUSTOM_STATUS.custom1.label,
           custom1_icon: DEFAULT_CUSTOM_STATUS.custom1.icon,
+          custom1_color: 'bg-fuchsia-400',
           custom2_label: DEFAULT_CUSTOM_STATUS.custom2.label,
-          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon
+          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon,
+          custom2_color: 'bg-purple-400'
         }
       }, { status: 200 })
     }
@@ -43,7 +45,7 @@ export async function GET(request: Request) {
     // 2. 該当組織のステータスを取得
     const { data: status, error } = await supabase
       .from('user_status')
-      .select('status, custom1_label, custom1_icon, custom2_label, custom2_icon, updated_at')
+      .select('status, custom1_label, custom1_icon, custom1_color, custom2_label, custom2_icon, custom2_color, updated_at')
       .eq('user_id', user.id)
       .eq('organization_id', activeOrg.organization_id)
       .maybeSingle()
@@ -63,10 +65,12 @@ export async function GET(request: Request) {
           status: 'available',
           custom1_label: DEFAULT_CUSTOM_STATUS.custom1.label,
           custom1_icon: DEFAULT_CUSTOM_STATUS.custom1.icon,
+          custom1_color: 'bg-fuchsia-400',
           custom2_label: DEFAULT_CUSTOM_STATUS.custom2.label,
-          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon
+          custom2_icon: DEFAULT_CUSTOM_STATUS.custom2.icon,
+          custom2_color: 'bg-purple-400'
         })
-        .select('status, custom1_label, custom1_icon, custom2_label, custom2_icon, updated_at')
+        .select('status, custom1_label, custom1_icon, custom1_color, custom2_label, custom2_icon, custom2_color, updated_at')
         .single()
 
       if (createError) {
@@ -77,7 +81,38 @@ export async function GET(request: Request) {
       return NextResponse.json({ status: newStatus }, { status: 200 })
     }
 
-    return NextResponse.json({ status }, { status: 200 })
+    // 3. 日付をチェックして、前日以前の更新なら自動リセット
+    const now = new Date()
+    const jstOffset = 9 * 60 // JST = UTC+9
+    const jstNow = new Date(now.getTime() + jstOffset * 60 * 1000)
+    const todayJST = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate())
+    
+    const updatedAt = new Date(status.updated_at)
+    const updatedJST = new Date(updatedAt.getTime() + jstOffset * 60 * 1000)
+    const updateDateJST = new Date(updatedJST.getFullYear(), updatedJST.getMonth(), updatedJST.getDate())
+    
+    // 最終更新が今日以前の場合、ステータスをリセット
+    if (updateDateJST < todayJST) {
+      const { data: resetStatus, error: resetError } = await supabase
+        .from('user_status')
+        .update({ 
+          status: 'available',
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id)
+        .eq('organization_id', activeOrg.organization_id)
+        .select('status, custom1_label, custom1_icon, custom1_color, custom2_label, custom2_icon, custom2_color, updated_at')
+        .single()
+
+      if (resetError) {
+        console.error('Status reset error:', resetError)
+        return NextResponse.json({ error: resetError.message }, { status: 500 })
+      }
+
+      return NextResponse.json({ status: resetStatus, wasReset: true }, { status: 200 })
+    }
+
+    return NextResponse.json({ status, wasReset: false }, { status: 200 })
   } catch (error: any) {
     console.error('Status GET error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

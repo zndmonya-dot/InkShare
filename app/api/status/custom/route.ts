@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'ログインが必要です' }, { status: 401 })
     }
 
-    const { type, label, icon } = await request.json()
+    const { type, label, icon, color } = await request.json()
     const supabase = getSupabaseAdmin()
 
     // 1. アクティブな組織を取得
@@ -36,9 +36,11 @@ export async function POST(request: Request) {
     if (type === 'custom1') {
       updateData.custom1_label = label
       updateData.custom1_icon = icon
+      updateData.custom1_color = color
     } else if (type === 'custom2') {
       updateData.custom2_label = label
       updateData.custom2_icon = icon
+      updateData.custom2_color = color
     } else {
       return NextResponse.json({ error: '無効なカスタムタイプです' }, { status: 400 })
     }
