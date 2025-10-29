@@ -11,6 +11,10 @@ export default function SettingsPage() {
   const [inviteLink, setInviteLink] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [members, setMembers] = useState<any[]>([])
+  const [showTransferModal, setShowTransferModal] = useState(false)
+  const [showDissolveModal, setShowDissolveModal] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<any>(null)
+  const [dissolveConfirmText, setDissolveConfirmText] = useState('')
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +60,58 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(inviteLink)
     setCopySuccess(true)
     setTimeout(() => setCopySuccess(false), 2000)
+  }
+
+  const handleTransferAdmin = async () => {
+    if (!selectedMember) return
+    
+    if (!confirm(`${selectedMember.name}さんに管理者権限を移譲しますか？\n\nあなたは一般メンバーになります。`)) {
+      return
+    }
+
+    try {
+      const res = await fetch('/api/organization/transfer-admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newAdminId: selectedMember.id }),
+      })
+
+      if (res.ok) {
+        alert('管理者権限を移譲しました')
+        router.push('/')
+      } else {
+        const data = await res.json()
+        alert(data.error || '移譲に失敗しました')
+      }
+    } catch (error) {
+      alert('移譲に失敗しました')
+    }
+  }
+
+  const handleDissolve = async () => {
+    if (dissolveConfirmText !== userProfile?.currentOrganization?.name) {
+      alert('組織名が一致しません')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/organization/dissolve', {
+        method: 'POST',
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        alert('組織を解散しました')
+        router.push('/landing')
+      } else {
+        console.error('Dissolve error:', data)
+        alert(`解散に失敗しました\n\nエラー: ${data.error}\n\n詳細: ${JSON.stringify(data.details || {})}`)
+      }
+    } catch (error: any) {
+      console.error('Dissolve error:', error)
+      alert(`解散に失敗しました\n\nエラー: ${error.message}`)
+    }
   }
 
   if (isLoading) {
@@ -189,12 +245,173 @@ export default function SettingsPage() {
                   >
                     {member.role === 'admin' ? '管理者' : 'メンバー'}
                   </span>
+                  {member.role !== 'admin' && member.id !== userProfile?.id && (
+                    <button
+                      onClick={() => {
+                        setSelectedMember(member)
+                        setShowTransferModal(true)
+                      }}
+                      className="px-3 py-1 bg-ink-yellow/20 hover:bg-ink-yellow/30 text-ink-yellow text-sm font-medium rounded-lg transition-all border border-ink-yellow/30"
+                    >
+                      管理者に任命
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </div>
+
+        {/* 管理者移譲 */}
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 mb-6 shadow-xl mt-6">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <i className="ri-user-shared-line"></i>
+            管理者移譲
+          </h2>
+          <p className="text-white/60 mb-4 text-sm">
+            他のメンバーに管理者権限を移譲できます。移譲後、あなたは一般メンバーになります。
+          </p>
+          <button
+            onClick={() => setShowTransferModal(true)}
+            className="w-full py-3 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg"
+          >
+            <i className="ri-arrow-left-right-line mr-2"></i>
+            管理者を移譲
+          </button>
+        </div>
+
+        {/* 組織解散 */}
+        <div className="bg-red-500/10 backdrop-blur-sm border border-red-500/30 rounded-2xl p-6 shadow-xl">
+          <h2 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
+            <i className="ri-delete-bin-line"></i>
+            組織解散（危険な操作）
+          </h2>
+          <p className="text-white/60 mb-4 text-sm">
+            組織を完全に削除します。この操作は取り消せません。全メンバーのデータが削除されます。
+          </p>
+          <button
+            onClick={() => setShowDissolveModal(true)}
+            className="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-all shadow-lg"
+          >
+            <i className="ri-alert-line mr-2"></i>
+            組織を解散
+          </button>
+        </div>
       </div>
+
+      {/* 管理者移譲モーダル */}
+      {showTransferModal && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setShowTransferModal(false)
+            setSelectedMember(null)
+          }}
+        >
+          <div
+            className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold text-white mb-4">管理者を移譲</h3>
+            <p className="text-white/60 mb-4 text-sm">
+              移譲するメンバーを選択してください
+            </p>
+            <div className="space-y-2 mb-6 max-h-60 overflow-y-auto">
+              {members.filter(m => m.role !== 'admin' && m.id !== userProfile?.id).map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() => setSelectedMember(member)}
+                  className={`w-full p-4 rounded-xl transition-all text-left ${
+                    selectedMember?.id === member.id
+                      ? 'bg-ink-yellow/20 border-2 border-ink-yellow'
+                      : 'bg-white/5 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 ${member.avatar_color} rounded-lg flex items-center justify-center`}>
+                      <i className="ri-user-line text-xl text-white"></i>
+                    </div>
+                    <div>
+                      <div className="text-white font-medium">{member.name}</div>
+                      <div className="text-white/60 text-xs">{member.email}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowTransferModal(false)
+                  setSelectedMember(null)
+                }}
+                className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleTransferAdmin}
+                disabled={!selectedMember}
+                className="flex-1 py-3 bg-ink-yellow hover:bg-ink-yellow/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark font-bold rounded-xl transition-all shadow-lg"
+              >
+                移譲する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 組織解散モーダル */}
+      {showDissolveModal && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => {
+            setShowDissolveModal(false)
+            setDissolveConfirmText('')
+          }}
+        >
+          <div
+            className="bg-red-500/10 backdrop-blur-sm border border-red-500/30 rounded-2xl p-6 w-full max-w-md shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+              <i className="ri-alert-line"></i>
+              組織解散の確認
+            </h3>
+            <p className="text-white/80 mb-4 text-sm">
+              この操作は取り消せません。組織「<strong className="text-white">{userProfile?.currentOrganization?.name}</strong>」とすべてのメンバーのデータが完全に削除されます。
+            </p>
+            <p className="text-white/60 mb-4 text-sm">
+              続行するには、組織名を正確に入力してください：
+            </p>
+            <input
+              type="text"
+              value={dissolveConfirmText}
+              onChange={(e) => setDissolveConfirmText(e.target.value)}
+              placeholder={userProfile?.currentOrganization?.name}
+              className="w-full px-4 py-3 bg-white/5 text-white border border-red-500/30 rounded-xl focus:outline-none focus:border-red-500 mb-6"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDissolveModal(false)
+                  setDissolveConfirmText('')
+                }}
+                className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleDissolve}
+                disabled={dissolveConfirmText !== userProfile?.currentOrganization?.name}
+                className="flex-1 py-3 bg-red-500 hover:bg-red-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-all shadow-lg"
+              >
+                解散する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

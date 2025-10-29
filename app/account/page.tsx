@@ -90,7 +90,23 @@ export default function AccountSettingsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
-        <div className="text-white text-lg">読み込み中...</div>
+        <div className="text-center relative">
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            {/* 外側のリング */}
+            <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+            {/* 回転するインク */}
+            <div className="absolute inset-0 ink-spinner">
+              <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+            </div>
+            {/* 中央のロゴ */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-12 h-12 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
+                <i className="ri-paint-brush-fill text-2xl text-splat-dark"></i>
+              </div>
+            </div>
+          </div>
+          <p className="text-white/70 text-lg font-medium">読み込み中...</p>
+        </div>
       </div>
     )
   }

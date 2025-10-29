@@ -504,7 +504,20 @@ export default function Home() {
                 ) : (
                   // グループがある場合の通常表示
                   <Suspense fallback={
-                    <div className="text-white text-lg">読み込み中...</div>
+                    <div className="text-center relative py-20">
+                      <div className="relative w-16 h-16 mx-auto mb-4">
+                        <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+                        <div className="absolute inset-0 ink-spinner">
+                          <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-8 h-8 bg-ink-yellow rounded-full flex items-center justify-center">
+                            <i className="ri-paint-brush-fill text-lg text-splat-dark"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-white/70 text-sm font-medium">読み込み中...</p>
+                    </div>
                   }>
                     <StatusPanel
                       currentStatus={currentStatus}
@@ -522,7 +535,7 @@ export default function Home() {
                   <CustomStatusModal
                     isOpen={!!showCustomModal}
                     onClose={() => setShowCustomModal(null)}
-                    onSave={(label, icon) => handleCustomSave(showCustomModal, label, icon)}
+                    onSave={(label, icon, color) => handleCustomSave(showCustomModal, label, icon, color)}
                     currentStatus={showCustomModal === 'custom1' ? customStatus1 : customStatus2}
                   />
                 </Suspense>

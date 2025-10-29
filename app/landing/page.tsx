@@ -100,9 +100,14 @@ export default function LandingPage() {
           </p>
 
           {/* フッター */}
-          <p className="text-white/50 text-sm mt-8">
-            無料プラン: 最大10名まで
-          </p>
+          <div className="mt-8 space-y-2">
+            <p className="text-white/50 text-sm">
+              無料プラン: 最大10名まで
+            </p>
+            <p className="text-white/40 text-xs">
+              Created by <span className="text-white/60 font-medium">Kenya Okada</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

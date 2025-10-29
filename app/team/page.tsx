@@ -231,9 +231,22 @@ export default function TeamPage() {
       {/* メンバーリスト */}
       <main className="p-4 overflow-visible">
         {loading ? (
-          <div className="text-center py-20 text-white/70">
-            <i className="ri-loader-4-line text-6xl mb-4 animate-spin"></i>
-            <p className="text-lg">読み込み中...</p>
+          <div className="text-center py-20">
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              {/* 外側のリング */}
+              <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+              {/* 回転するインク */}
+              <div className="absolute inset-0 ink-spinner">
+                <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+              </div>
+              {/* 中央のロゴ */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
+                  <i className="ri-paint-brush-fill text-2xl text-splat-dark"></i>
+                </div>
+              </div>
+            </div>
+            <p className="text-white/70 text-lg font-medium">読み込み中...</p>
           </div>
         ) : filteredMembers.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
