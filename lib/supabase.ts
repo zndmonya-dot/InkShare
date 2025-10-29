@@ -24,9 +24,9 @@ export function createClient() {
         set(name: string, value: string, options: any) {
           if (typeof document === 'undefined') return
           let cookie = `${name}=${encodeURIComponent(value)}`
-          if (options?.maxAge) {
-            cookie += `; max-age=${options.maxAge}`
-          }
+          // セッションを30日間永続化
+          const maxAge = options?.maxAge || 60 * 60 * 24 * 30 // 30日
+          cookie += `; max-age=${maxAge}`
           if (options?.path) {
             cookie += `; path=${options.path}`
           }
