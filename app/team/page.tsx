@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { PresenceStatus } from '@/app/page'
+import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 interface Member {
   id: string
@@ -18,117 +19,47 @@ interface Member {
   custom2_color?: string
 }
 
-const statusConfig: Record<PresenceStatus, {
-  label: string
-  icon: string
-  color: string
-  bgColor: string
-  glow: string
-  inkLight: string
-  inkMedium: string
-  inkDark: string
-}> = {
-  available: { 
-    label: '話しかけてOK！', 
-    icon: 'ri-chat-smile-3-fill', 
-    color: 'text-lime-400',
-    bgColor: 'bg-lime-400',
-    glow: 'shadow-lime-400/50',
-    inkLight: 'bg-lime-200',
-    inkMedium: 'bg-lime-300',
-    inkDark: 'bg-yellow-300'
-  },
-  busy: { 
-    label: '取込中です！', 
-    icon: 'ri-stop-circle-fill', 
-    color: 'text-red-500',
-    bgColor: 'bg-red-500',
-    glow: 'shadow-red-500/50',
-    inkLight: 'bg-red-300',
-    inkMedium: 'bg-red-400',
-    inkDark: 'bg-pink-400'
-  },
-  'want-to-talk': { 
-    label: 'はい！', 
-    icon: 'ri-emotion-happy-fill', 
-    color: 'text-green-500',
-    bgColor: 'bg-green-500',
-    glow: 'shadow-green-500/50',
-    inkLight: 'bg-green-200',
-    inkMedium: 'bg-green-300',
-    inkDark: 'bg-lime-300'
-  },
-  'want-lunch': { 
-    label: 'お昼いってきます！', 
-    icon: 'ri-restaurant-2-fill', 
-    color: 'text-orange-400',
-    bgColor: 'bg-orange-400',
-    glow: 'shadow-orange-400/50',
-    inkLight: 'bg-orange-200',
-    inkMedium: 'bg-orange-300',
-    inkDark: 'bg-yellow-400'
-  },
-  'need-help': { 
-    label: '現在困ってます…', 
-    icon: 'ri-error-warning-fill', 
-    color: 'text-yellow-400',
-    bgColor: 'bg-yellow-400',
-    glow: 'shadow-yellow-400/50',
-    inkLight: 'bg-yellow-200',
-    inkMedium: 'bg-yellow-300',
-    inkDark: 'bg-amber-300'
-  },
-  'going-home': { 
-    label: '定時で帰ります！', 
-    icon: 'ri-logout-circle-fill', 
-    color: 'text-indigo-400',
-    bgColor: 'bg-indigo-400',
-    glow: 'shadow-indigo-400/50',
-    inkLight: 'bg-indigo-300',
-    inkMedium: 'bg-indigo-400',
-    inkDark: 'bg-purple-400'
-  },
-  'leaving': { 
-    label: 'いいえ…', 
-    icon: 'ri-emotion-sad-fill', 
-    color: 'text-sky-400',
-    bgColor: 'bg-sky-400',
-    glow: 'shadow-sky-400/50',
-    inkLight: 'bg-sky-200',
-    inkMedium: 'bg-sky-300',
-    inkDark: 'bg-cyan-300'
-  },
-  'out': { 
-    label: '外出中です！', 
-    icon: 'ri-footprint-fill', 
-    color: 'text-slate-400',
-    bgColor: 'bg-slate-400',
-    glow: 'shadow-slate-400/50',
-    inkLight: 'bg-slate-300',
-    inkMedium: 'bg-slate-400',
-    inkDark: 'bg-gray-400'
-  },
-  'custom1': { 
-    label: 'カスタム1', 
-    icon: 'ri-star-smile-fill', 
-    color: 'text-fuchsia-400',
-    bgColor: 'bg-fuchsia-400',
-    glow: 'shadow-fuchsia-400/50',
-    inkLight: 'bg-fuchsia-300',
-    inkMedium: 'bg-fuchsia-400',
-    inkDark: 'bg-pink-400'
-  },
-  'custom2': { 
-    label: 'カスタム2', 
-    icon: 'ri-star-smile-fill', 
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-400',
-    glow: 'shadow-purple-400/50',
-    inkLight: 'bg-purple-300',
-    inkMedium: 'bg-purple-400',
-    inkDark: 'bg-violet-400'
-  },
+// config/status.tsからステータス設定を動的に生成
+const createStatusConfig = () => {
+  const config: Record<PresenceStatus, {
+    label: string
+    icon: string
+    color: string
+    bgColor: string
+    glow: string
+  }> = {} as any
+
+  // プリセットステータス
+  STATUS_OPTIONS.forEach(option => {
+    config[option.status] = {
+      label: option.label,
+      icon: option.icon,
+      color: option.activeColor.replace('bg-', 'text-'),
+      bgColor: option.activeColor,
+      glow: option.glowColor,
+    }
+  })
+
+  // カスタムステータス
+  config['custom1'] = {
+    label: CUSTOM_STATUS_CONFIG.custom1.defaultLabel,
+    icon: CUSTOM_STATUS_CONFIG.custom1.defaultIcon,
+    color: CUSTOM_STATUS_CONFIG.custom1.activeColor.replace('bg-', 'text-'),
+    bgColor: CUSTOM_STATUS_CONFIG.custom1.activeColor,
+    glow: CUSTOM_STATUS_CONFIG.custom1.glowColor,
+  }
+  config['custom2'] = {
+    label: CUSTOM_STATUS_CONFIG.custom2.defaultLabel,
+    icon: CUSTOM_STATUS_CONFIG.custom2.defaultIcon,
+    color: CUSTOM_STATUS_CONFIG.custom2.activeColor.replace('bg-', 'text-'),
+    bgColor: CUSTOM_STATUS_CONFIG.custom2.activeColor,
+    glow: CUSTOM_STATUS_CONFIG.custom2.glowColor,
+  }
+
+  return config
 }
+
+const statusConfig = createStatusConfig()
 
 export default function TeamPage() {
   const router = useRouter()
@@ -363,41 +294,64 @@ export default function TeamPage() {
       </main>
 
       {/* メンバー詳細モーダル */}
-      {selectedMember && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
-          onClick={() => setSelectedMember(null)}
-        >
+      {selectedMember && (() => {
+        let modalConfig = statusConfig[selectedMember.status]
+        
+        // カスタムステータスの場合、メンバー固有の設定を使用
+        if (selectedMember.status === 'custom1' && selectedMember.custom1_label) {
+          modalConfig = {
+            ...modalConfig,
+            label: selectedMember.custom1_label,
+            icon: selectedMember.custom1_icon || modalConfig.icon,
+            color: selectedMember.custom1_color ? selectedMember.custom1_color.replace('bg-', 'text-') : modalConfig.color,
+            bgColor: selectedMember.custom1_color || modalConfig.bgColor,
+          }
+        } else if (selectedMember.status === 'custom2' && selectedMember.custom2_label) {
+          modalConfig = {
+            ...modalConfig,
+            label: selectedMember.custom2_label,
+            icon: selectedMember.custom2_icon || modalConfig.icon,
+            color: selectedMember.custom2_color ? selectedMember.custom2_color.replace('bg-', 'text-') : modalConfig.color,
+            bgColor: selectedMember.custom2_color || modalConfig.bgColor,
+          }
+        }
+        
+        return (
           <div
-            className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setSelectedMember(null)}
           >
-            {/* アバター＆ステータス */}
-            <div className="flex flex-col items-center text-center mb-6">
-              <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${selectedMember.avatarColor} flex items-center justify-center mb-4 shadow-lg`}>
-                <span className="text-white font-bold text-4xl">
-                  {selectedMember.name.charAt(0)}
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-3">{selectedMember.name}</h3>
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                <i className={`${statusConfig[selectedMember.status].icon} ${statusConfig[selectedMember.status].color} text-xl`}></i>
-                <span className={`${statusConfig[selectedMember.status].color} font-medium`}>
-                  {statusConfig[selectedMember.status].label}
-                </span>
-              </div>
-            </div>
-
-            {/* 閉じるボタン */}
-            <button
-              onClick={() => setSelectedMember(null)}
-              className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              閉じる
-            </button>
+              {/* アバター＆ステータス */}
+              <div className="flex flex-col items-center text-center mb-6">
+                <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${selectedMember.avatarColor} flex items-center justify-center mb-4 shadow-lg`}>
+                  <span className="text-white font-bold text-4xl">
+                    {selectedMember.name.charAt(0)}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">{selectedMember.name}</h3>
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                  <i className={`${modalConfig.icon} ${modalConfig.color} text-xl`}></i>
+                  <span className={`${modalConfig.color} font-medium`}>
+                    {modalConfig.label}
+                  </span>
+                </div>
+              </div>
+
+              {/* 閉じるボタン */}
+              <button
+                onClick={() => setSelectedMember(null)}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+              >
+                閉じる
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }

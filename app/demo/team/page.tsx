@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 // 組織ごとのメンバーデータ
 const DEMO_TEAMS = {
@@ -61,24 +62,65 @@ const getInitialMembers = (myStatus: string = 'available', orgId: string = '1') 
   ]
 }
 
-const statusConfig: Record<string, {
-  label: string
-  icon: string
-  color: string
-  bgColor: string
-  avatarColor: string
-}> = {
-  available: { label: '話しかけてOK！', icon: 'ri-chat-smile-3-fill', color: 'text-lime-400', bgColor: 'bg-lime-400', avatarColor: 'from-lime-400 to-green-500' },
-  busy: { label: '取込中です！', icon: 'ri-stop-circle-fill', color: 'text-red-500', bgColor: 'bg-red-500', avatarColor: 'from-red-500 to-rose-500' },
-  'want-to-talk': { label: 'はい！', icon: 'ri-emotion-happy-fill', color: 'text-green-500', bgColor: 'bg-green-500', avatarColor: 'from-green-500 to-emerald-500' },
-  'want-lunch': { label: 'お昼いってきます！', icon: 'ri-restaurant-2-fill', color: 'text-orange-400', bgColor: 'bg-orange-400', avatarColor: 'from-orange-400 to-yellow-500' },
-  'need-help': { label: '現在困ってます…', icon: 'ri-error-warning-fill', color: 'text-yellow-400', bgColor: 'bg-yellow-400', avatarColor: 'from-yellow-400 to-amber-500' },
-  'going-home': { label: '定時で帰ります！', icon: 'ri-logout-circle-fill', color: 'text-indigo-400', bgColor: 'bg-indigo-400', avatarColor: 'from-indigo-400 to-purple-500' },
-  'leaving': { label: 'いいえ…', icon: 'ri-emotion-sad-fill', color: 'text-sky-400', bgColor: 'bg-sky-400', avatarColor: 'from-sky-400 to-blue-500' },
-  'out': { label: '外出中です！', icon: 'ri-footprint-fill', color: 'text-slate-400', bgColor: 'bg-slate-400', avatarColor: 'from-slate-400 to-gray-500' },
-  'custom1': { label: 'カスタム1', icon: 'ri-star-smile-fill', color: 'text-fuchsia-400', bgColor: 'bg-fuchsia-400', avatarColor: 'from-fuchsia-400 to-pink-500' },
-  'custom2': { label: 'カスタム2', icon: 'ri-star-smile-fill', color: 'text-purple-400', bgColor: 'bg-purple-400', avatarColor: 'from-purple-400 to-violet-500' },
+// アバター色マップ（ステータス色からグラデーションを生成）
+const getAvatarColor = (bgColor: string): string => {
+  const colorMap: Record<string, string> = {
+    'bg-lime-400': 'from-lime-400 to-green-500',
+    'bg-red-500': 'from-red-500 to-rose-500',
+    'bg-green-500': 'from-green-500 to-emerald-500',
+    'bg-blue-500': 'from-blue-500 to-indigo-500',
+    'bg-orange-400': 'from-orange-400 to-yellow-500',
+    'bg-yellow-400': 'from-yellow-400 to-amber-500',
+    'bg-indigo-400': 'from-indigo-400 to-purple-500',
+    'bg-sky-400': 'from-sky-400 to-blue-500',
+    'bg-slate-400': 'from-slate-400 to-gray-500',
+    'bg-fuchsia-400': 'from-fuchsia-400 to-pink-500',
+    'bg-purple-400': 'from-purple-400 to-violet-500',
+  }
+  return colorMap[bgColor] || 'from-gray-400 to-gray-500'
 }
+
+// config/status.tsからステータス設定を動的に生成
+const createStatusConfig = () => {
+  const config: Record<string, {
+    label: string
+    icon: string
+    color: string
+    bgColor: string
+    avatarColor: string
+  }> = {}
+
+  // プリセットステータス
+  STATUS_OPTIONS.forEach(option => {
+    config[option.status] = {
+      label: option.label,
+      icon: option.icon,
+      color: option.activeColor.replace('bg-', 'text-'),
+      bgColor: option.activeColor,
+      avatarColor: getAvatarColor(option.activeColor),
+    }
+  })
+
+  // カスタムステータス
+  config['custom1'] = {
+    label: CUSTOM_STATUS_CONFIG.custom1.defaultLabel,
+    icon: CUSTOM_STATUS_CONFIG.custom1.defaultIcon,
+    color: CUSTOM_STATUS_CONFIG.custom1.activeColor.replace('bg-', 'text-'),
+    bgColor: CUSTOM_STATUS_CONFIG.custom1.activeColor,
+    avatarColor: getAvatarColor(CUSTOM_STATUS_CONFIG.custom1.activeColor),
+  }
+  config['custom2'] = {
+    label: CUSTOM_STATUS_CONFIG.custom2.defaultLabel,
+    icon: CUSTOM_STATUS_CONFIG.custom2.defaultIcon,
+    color: CUSTOM_STATUS_CONFIG.custom2.activeColor.replace('bg-', 'text-'),
+    bgColor: CUSTOM_STATUS_CONFIG.custom2.activeColor,
+    avatarColor: getAvatarColor(CUSTOM_STATUS_CONFIG.custom2.activeColor),
+  }
+
+  return config
+}
+
+const statusConfig = createStatusConfig()
 
 const formatLastUpdated = (isoString: string) => {
   const date = new Date(isoString)
