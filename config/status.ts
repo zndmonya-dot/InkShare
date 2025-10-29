@@ -11,6 +11,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '話しかけてOK！',
     icon: 'ri-chat-smile-3-fill',
     activeColor: 'bg-lime-400',
+    textColor: 'text-lime-400',
     glowColor: 'shadow-lime-400/50',
   },
   {
@@ -18,6 +19,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '取込中です！',
     icon: 'ri-stop-circle-fill',
     activeColor: 'bg-red-500',
+    textColor: 'text-red-500',
     glowColor: 'shadow-red-500/50',
   },
   
@@ -27,6 +29,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '会議中です！',
     icon: 'ri-slideshow-fill',
     activeColor: 'bg-blue-500',
+    textColor: 'text-blue-500',
     glowColor: 'shadow-blue-500/50',
   },
   {
@@ -34,6 +37,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '定時で帰ります！',
     icon: 'ri-logout-circle-fill',
     activeColor: 'bg-indigo-400',
+    textColor: 'text-indigo-400',
     glowColor: 'shadow-indigo-400/50',
   },
   {
@@ -41,6 +45,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '外出中です！',
     icon: 'ri-footprint-fill',
     activeColor: 'bg-slate-400',
+    textColor: 'text-slate-400',
     glowColor: 'shadow-slate-400/50',
   },
   
@@ -50,6 +55,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: '現在困ってます…',
     icon: 'ri-error-warning-fill',
     activeColor: 'bg-yellow-400',
+    textColor: 'text-yellow-400',
     glowColor: 'shadow-yellow-400/50',
   },
   
@@ -59,6 +65,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: 'はい！',
     icon: 'ri-emotion-happy-fill',
     activeColor: 'bg-green-500',
+    textColor: 'text-green-500',
     glowColor: 'shadow-green-500/50',
   },
   {
@@ -66,6 +73,7 @@ export const STATUS_OPTIONS: StatusConfig[] = [
     label: 'いいえ…',
     icon: 'ri-emotion-sad-fill',
     activeColor: 'bg-sky-400',
+    textColor: 'text-sky-400',
     glowColor: 'shadow-sky-400/50',
   },
 ]
@@ -79,12 +87,14 @@ export const CUSTOM_STATUS_CONFIG = {
     defaultLabel: 'カスタム1',
     defaultIcon: 'ri-star-smile-fill',
     activeColor: 'bg-fuchsia-400',
+    textColor: 'text-fuchsia-400',
     glowColor: 'shadow-fuchsia-400/50',
   },
   custom2: {
     defaultLabel: 'カスタム2',
     defaultIcon: 'ri-star-smile-fill',
     activeColor: 'bg-purple-400',
+    textColor: 'text-purple-400',
     glowColor: 'shadow-purple-400/50',
   },
 }

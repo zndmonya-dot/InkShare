@@ -24,6 +24,7 @@ export interface StatusConfig {
   label: string
   icon: string
   activeColor: string
+  textColor: string
   glowColor: string
 }
 

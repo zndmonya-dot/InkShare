@@ -95,7 +95,7 @@ const createStatusConfig = () => {
     config[option.status] = {
       label: option.label,
       icon: option.icon,
-      color: option.activeColor.replace('bg-', 'text-'),
+      color: option.textColor,
       bgColor: option.activeColor,
       avatarColor: getAvatarColor(option.activeColor),
     }
@@ -105,14 +105,14 @@ const createStatusConfig = () => {
   config['custom1'] = {
     label: CUSTOM_STATUS_CONFIG.custom1.defaultLabel,
     icon: CUSTOM_STATUS_CONFIG.custom1.defaultIcon,
-    color: CUSTOM_STATUS_CONFIG.custom1.activeColor.replace('bg-', 'text-'),
+    color: CUSTOM_STATUS_CONFIG.custom1.textColor,
     bgColor: CUSTOM_STATUS_CONFIG.custom1.activeColor,
     avatarColor: getAvatarColor(CUSTOM_STATUS_CONFIG.custom1.activeColor),
   }
   config['custom2'] = {
     label: CUSTOM_STATUS_CONFIG.custom2.defaultLabel,
     icon: CUSTOM_STATUS_CONFIG.custom2.defaultIcon,
-    color: CUSTOM_STATUS_CONFIG.custom2.activeColor.replace('bg-', 'text-'),
+    color: CUSTOM_STATUS_CONFIG.custom2.textColor,
     bgColor: CUSTOM_STATUS_CONFIG.custom2.activeColor,
     avatarColor: getAvatarColor(CUSTOM_STATUS_CONFIG.custom2.activeColor),
   }
@@ -275,6 +275,20 @@ export default function DemoTeamPage() {
                   </div>
                 )}
                 
+                {/* 上部：名前と時間 */}
+                <div className="mb-3">
+                  <div className={`font-medium text-sm sm:text-base mb-0.5 truncate ${
+                    updatedToday ? 'text-white' : 'text-gray-400'
+                  }`}>
+                    {member.name}
+                  </div>
+                  <div className={`text-xs ${
+                    updatedToday ? 'text-white/50' : 'text-gray-500'
+                  }`}>
+                    {formatLastUpdated(member.lastUpdated)}
+                  </div>
+                </div>
+                
                 {/* アバター */}
                 <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${config.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg ${
                   !updatedToday ? 'opacity-50 grayscale' : ''
@@ -284,26 +298,12 @@ export default function DemoTeamPage() {
                   </span>
                 </div>
                 
-                {/* 名前 */}
-                <div className={`font-medium text-sm sm:text-base mb-1 truncate ${
-                  updatedToday ? 'text-white' : 'text-gray-400'
-                }`}>
-                  {member.name}
-                </div>
-                
-                {/* 最終更新 */}
-                <div className={`text-xs mb-2 ${
-                  updatedToday ? 'text-white/50' : 'text-gray-500'
-                }`}>
-                  {formatLastUpdated(member.lastUpdated)}
-                </div>
-                
                 {/* ステータス */}
                 <div className="flex items-center justify-center gap-1.5">
                   <i className={`${config.icon} text-base ${
                     updatedToday ? config.color : 'text-gray-500'
                   }`}></i>
-                  <span className={`text-xs sm:text-sm font-medium ${
+                  <span className={`text-xs sm:text-sm font-bold ${
                     updatedToday ? config.color : 'text-gray-500'
                   }`}>
                     {config.label}

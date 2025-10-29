@@ -5,6 +5,19 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // ステータスカラー（動的に使用されるため明示的に指定）
+    'text-lime-400',
+    'text-red-500',
+    'text-blue-500',
+    'text-indigo-400',
+    'text-slate-400',
+    'text-yellow-400',
+    'text-green-500',
+    'text-sky-400',
+    'text-fuchsia-400',
+    'text-purple-400',
+  ],
   theme: {
     extend: {
       colors: {
