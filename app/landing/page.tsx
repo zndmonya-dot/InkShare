@@ -66,6 +66,24 @@ export default function LandingPage() {
 
         {/* CTA - デモボタン追加 */}
         <div className="text-center space-y-6">
+          {/* デモボタン - 最上部に移動 */}
+          <div className="bg-ink-cyan/10 border-2 border-ink-cyan/30 rounded-2xl p-4 backdrop-blur-sm">
+            <div className="flex items-center justify-center gap-2 text-ink-cyan font-bold text-sm mb-2">
+              <i className="ri-eye-line text-lg"></i>
+              <span>まずは試してみる</span>
+            </div>
+            <Link
+              href="/demo"
+              className="inline-block px-10 py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark text-lg font-black rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg border-2 border-ink-cyan"
+            >
+              <i className="ri-play-circle-fill mr-2 text-xl"></i>
+              デモを試す（ログイン不要）
+            </Link>
+            <p className="text-white/50 text-xs mt-2">
+              30秒で体験できます
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {/* サインアップボタン */}
             <Link
@@ -81,17 +99,6 @@ export default function LandingPage() {
               className="inline-block px-12 py-4 bg-white/10 hover:bg-white/20 text-white text-xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 border-2 border-white/30 hover:border-white/50"
             >
               ログイン
-            </Link>
-          </div>
-
-          {/* デモボタン */}
-          <div>
-            <Link
-              href="/demo"
-              className="inline-block px-8 py-3 bg-ink-cyan/20 hover:bg-ink-cyan/30 text-ink-cyan text-base font-bold rounded-xl transition-all hover:scale-105 active:scale-95 border border-ink-cyan/50"
-            >
-              <i className="ri-play-circle-line mr-2"></i>
-              デモを試す（ログイン不要）
             </Link>
           </div>
 
