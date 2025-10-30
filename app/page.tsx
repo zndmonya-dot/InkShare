@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { getStatusConfig } from '@/config/status'
 import { CustomStatus, PresenceStatus, UserProfile } from '@/types'
 import { DEFAULT_CUSTOM_STATUS } from '@/lib/constants'
+import { StatusPanel } from '@/components/StatusPanel'
 
 // 遅延ロード（パフォーマンス最適化）
-const StatusPanel = lazy(() => import('@/components/StatusPanel').then(mod => ({ default: mod.StatusPanel })))
 const CustomStatusModal = lazy(() => import('@/components/CustomStatusModal').then(mod => ({ default: mod.CustomStatusModal })))
 
 export default function Home() {
@@ -473,30 +473,13 @@ export default function Home() {
       )}
 
       <main className="relative flex-1 flex items-center justify-center p-4">
-        <Suspense fallback={
-                    <div className="text-center relative py-20">
-                      <div className="relative w-16 h-16 mx-auto mb-4">
-                        <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
-                        <div className="absolute inset-0 ink-spinner">
-                          <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
-                            <i className="ri-paint-brush-fill text-lg text-splat-dark"></i>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-white/70 text-sm font-medium">読み込み中...</p>
-                    </div>
-                  }>
-                    <StatusPanel
-                      currentStatus={currentStatus}
-                      onStatusChange={handleStatusChange}
-                      customStatus1={customStatus1}
-                      customStatus2={customStatus2}
-                      onCustomClick={(type) => setShowCustomModal(type)}
-                    />
-                  </Suspense>
+        <StatusPanel
+          currentStatus={currentStatus}
+          onStatusChange={handleStatusChange}
+          customStatus1={customStatus1}
+          customStatus2={customStatus2}
+          onCustomClick={(type) => setShowCustomModal(type)}
+        />
       </main>
 
               {showCustomModal && (

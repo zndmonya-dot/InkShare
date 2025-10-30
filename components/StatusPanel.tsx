@@ -31,11 +31,18 @@ export const StatusPanel = memo(function StatusPanel({
   const [statusItems, setStatusItems] = useState<StatusItem[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
-  const [isReady, setIsReady] = useState(false)
+  const [shouldAnimate, setShouldAnimate] = useState(false)
   
-  // マウント時にアニメーションを開始
+  // 初回マウント時のみアニメーションを表示
   useEffect(() => {
-    setIsReady(true)
+    // sessionStorageで初回表示かチェック
+    const hasShownBefore = sessionStorage.getItem('statusPanelShown')
+    if (!hasShownBefore) {
+      // 初回表示：アニメーションあり
+      setShouldAnimate(true)
+      sessionStorage.setItem('statusPanelShown', 'true')
+    }
+    // 常に即座に表示
   }, [])
 
   // 初期化：localStorageから順序を読み込むか、デフォルト順序を使用
@@ -140,7 +147,7 @@ export const StatusPanel = memo(function StatusPanel({
   }
 
   return (
-    <div className={`w-full h-full overflow-visible relative ${isReady ? 'animate-fade-in-scale' : 'opacity-0'}`}>
+    <div className={`w-full h-full overflow-visible relative ${shouldAnimate ? 'animate-fade-in-scale' : ''}`}>
       {/* ドラッグ中のヒント */}
       {draggedIndex !== null && (
         <div className="absolute top-0 left-0 right-0 text-center py-2 bg-ink-yellow/80 text-splat-dark text-sm font-bold rounded-lg shadow-lg z-50 animate-pulse">
