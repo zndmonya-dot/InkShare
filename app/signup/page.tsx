@@ -65,23 +65,23 @@ export default function SignupPage() {
 
       <div className="relative w-full max-w-md z-10">
         {/* ロゴ */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-fade-in-scale">
           <div className="inline-block">
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-16 h-16 bg-ink-cyan rounded-full flex items-center justify-center shadow-xl">
-                <i className="ri-paint-brush-fill text-4xl text-splat-dark"></i>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-20 h-20 bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50">
+                <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
               <h1 className="text-5xl font-black text-white">
                 Inkshare
               </h1>
             </div>
-            <p className="text-white/70 text-base font-bold">アカウントを作成して始めよう</p>
+            <p className="text-white/60 text-base font-bold">アカウントを作成して始めよう</p>
           </div>
         </div>
 
         {/* サインアップフォーム */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border-2 border-white/20">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center">
             アカウント作成
           </h2>
 
@@ -157,7 +157,8 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark text-lg font-bold rounded-xl transition-all shadow-lg mt-2"
+              className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark text-lg font-bold rounded-xl shadow-lg mt-2"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">

@@ -172,10 +172,10 @@ function CreateGroupContent() {
         <div className="text-center mb-10 animate-fade-in-scale">
           <div className="inline-block">
             <div className="flex items-center justify-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50">
-                <i className="ri-paint-brush-fill text-4xl text-splat-dark"></i>
+              <div className="w-20 h-20 bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50">
+                <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
-              <h1 className="text-4xl font-black text-white">
+              <h1 className="text-5xl font-black text-white">
                 Inkshare
               </h1>
             </div>
@@ -185,7 +185,7 @@ function CreateGroupContent() {
 
         {/* グループ作成フォーム */}
         <div className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
             <i className="ri-team-line"></i>
             グループ作成
           </h2>

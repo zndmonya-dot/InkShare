@@ -137,10 +137,10 @@ export default function JoinGroupPage() {
         <div className="text-center mb-10 animate-fade-in-scale">
           <div className="inline-block">
             <div className="flex items-center justify-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50">
-                <i className="ri-paint-brush-fill text-4xl text-splat-dark"></i>
+              <div className="w-20 h-20 bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50">
+                <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
-              <h1 className="text-4xl font-black text-white">
+              <h1 className="text-5xl font-black text-white">
                 Inkshare
               </h1>
             </div>
@@ -150,7 +150,7 @@ export default function JoinGroupPage() {
 
         {/* 参加フォーム */}
         <div className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
+          <h2 className="text-3xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
             <i className="ri-key-2-line"></i>
             招待コードを入力
           </h2>

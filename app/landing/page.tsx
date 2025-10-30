@@ -16,8 +16,8 @@ export default function LandingPage() {
         <div className="text-center mb-16">
           <div className="inline-flex flex-col items-center gap-6 relative">
             {/* ロゴアイコン - シンプル版 */}
-            <div className="relative w-28 h-28 bg-ink-yellow rounded-full flex items-center justify-center shadow-xl">
-              <i className="ri-paint-brush-fill text-7xl text-splat-dark relative z-10"></i>
+            <div className="relative w-20 h-20 bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50">
+              <i className="ri-paint-brush-fill text-5xl text-splat-dark relative z-10"></i>
             </div>
             
             {/* ブランド名 */}
