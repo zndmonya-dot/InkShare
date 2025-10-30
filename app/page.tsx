@@ -49,7 +49,12 @@ export default function Home() {
           return
         }
 
-        // グループがなくてもホーム画面は表示する
+        // グループがない場合はonboarding画面へ
+        if (!profileData.user.currentOrganization) {
+          router.push('/onboarding')
+          return
+        }
+
         setUserProfile(profileData.user)
 
         // ステータス設定
@@ -468,38 +473,7 @@ export default function Home() {
       )}
 
       <main className="relative flex-1 flex items-center justify-center p-4">
-        {!userProfile?.currentOrganization ? (
-          // グループがない場合 - クリーン版
-          <div className="max-w-md w-full text-center p-8 bg-white/10 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20">
-            <div className="mb-8">
-              <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/20">
-                <i className="ri-inbox-line text-5xl text-white/60"></i>
-              </div>
-              <p className="text-white text-xl font-bold">グループがありません</p>
-              <p className="text-white/60 text-sm mt-2">グループを作成するか、招待コードで参加しましょう</p>
-            </div>
-            <button
-              onClick={() => router.push('/join')}
-              className="w-full px-6 py-4 bg-ink-magenta hover:bg-ink-magenta/90 text-white font-bold text-lg rounded-xl transition-all mb-3 shadow-lg"
-            >
-              <span className="flex items-center justify-center gap-2">
-                <i className="ri-key-2-line text-xl"></i>
-                招待コードで参加
-              </span>
-            </button>
-            <button
-              onClick={() => router.push('/group/create')}
-              className="w-full px-6 py-4 bg-white/10 hover:bg-white/20 text-ink-cyan font-bold text-lg rounded-xl transition-all border border-ink-cyan/50 hover:border-ink-cyan"
-            >
-              <span className="flex items-center justify-center gap-2">
-                <i className="ri-add-line text-xl"></i>
-                グループを作成
-              </span>
-            </button>
-          </div>
-                ) : (
-                  // グループがある場合の通常表示
-                  <Suspense fallback={
+        <Suspense fallback={
                     <div className="text-center relative py-20">
                       <div className="relative w-16 h-16 mx-auto mb-4">
                         <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
@@ -523,7 +497,6 @@ export default function Home() {
                       onCustomClick={(type) => setShowCustomModal(type)}
                     />
                   </Suspense>
-                )}
       </main>
 
               {showCustomModal && (

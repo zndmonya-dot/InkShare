@@ -46,7 +46,8 @@ export default function SignupPage() {
         throw new Error('ログインに失敗しました')
       }
 
-      router.push('/')
+      // サインアップ後は必ずonboarding画面へ
+      router.push('/onboarding')
       router.refresh()
     } catch (err: any) {
       setError(err.message || 'サインアップに失敗しました')
