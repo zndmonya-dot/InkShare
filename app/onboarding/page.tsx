@@ -39,57 +39,91 @@ export default function OnboardingPage() {
 
         {/* ウェルカムメッセージ */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Inkshareを始めましょう
+          <h2 className="text-4xl font-black text-white mb-4 tracking-tight">
+            さあ、始めよう！
           </h2>
-          <p className="text-white/70 text-lg">
-            グループを作成するか、既存のグループに参加してください
+          <p className="text-white/60 text-lg">
+            新しいグループを作るか、招待コードで参加
           </p>
         </div>
 
         {/* アクション選択 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* グループを作成 */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-2xl p-8 hover:border-ink-yellow hover:shadow-2xl hover:shadow-ink-yellow/20 transition-all group">
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-ink-yellow rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-ink-yellow/50 group-hover:scale-110 transition-transform">
-                <i className="ri-add-circle-fill text-4xl text-splat-dark"></i>
+          <Link
+            href="/group/create"
+            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-3xl p-10 hover:border-ink-yellow hover:shadow-2xl hover:shadow-ink-yellow/30 transition-all duration-300 group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            style={{ 
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              willChange: 'transform, box-shadow, border-color'
+            }}
+          >
+            {/* 光るエフェクト */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-ink-yellow/0 via-ink-yellow/5 to-ink-yellow/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative text-center">
+              {/* アイコン */}
+              <div className="relative w-28 h-28 mx-auto mb-6">
+                <div className="absolute inset-0 bg-ink-yellow rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+                <div className="relative w-full h-full bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50 group-hover:scale-110 group-hover:rotate-[5deg] transition-all duration-300">
+                  <i className="ri-add-circle-fill text-6xl text-splat-dark"></i>
+                </div>
               </div>
-              <h3 className="text-ink-yellow font-bold text-2xl mb-3">グループを作成</h3>
-              <p className="text-white/70 text-sm">
-                新しいグループを作成して<br />メンバーを招待しましょう
+              
+              {/* テキスト */}
+              <h3 className="text-ink-yellow font-black text-3xl mb-3 group-hover:scale-105 transition-transform">
+                グループを作成
+              </h3>
+              <p className="text-white/60 text-base leading-relaxed">
+                新しいグループを作成して<br />
+                メンバーを招待
               </p>
+              
+              {/* 矢印アイコン */}
+              <div className="mt-6 flex items-center justify-center gap-2 text-ink-yellow font-bold">
+                <span>作成する</span>
+                <i className="ri-arrow-right-line text-xl group-hover:translate-x-2 transition-transform"></i>
+              </div>
             </div>
-            <Link
-              href="/group/create"
-              className="block w-full py-4 rounded-xl text-splat-dark font-bold text-lg bg-ink-yellow hover:bg-ink-yellow/90 shadow-lg"
-              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
-            >
-              <i className="ri-add-line mr-2 text-xl"></i>
-              作成する
-            </Link>
-          </div>
+          </Link>
 
           {/* 招待コードで参加 */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-2xl p-8 hover:border-ink-cyan hover:shadow-2xl hover:shadow-ink-cyan/20 transition-all group">
-            <div className="text-center mb-6">
-              <div className="w-20 h-20 bg-ink-cyan rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-ink-cyan/50 group-hover:scale-110 transition-transform">
-                <i className="ri-key-2-fill text-4xl text-splat-dark"></i>
+          <Link
+            href="/join"
+            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-3xl p-10 hover:border-ink-cyan hover:shadow-2xl hover:shadow-ink-cyan/30 transition-all duration-300 group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            style={{ 
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              willChange: 'transform, box-shadow, border-color'
+            }}
+          >
+            {/* 光るエフェクト */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-ink-cyan/0 via-ink-cyan/5 to-ink-cyan/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            
+            <div className="relative text-center">
+              {/* アイコン */}
+              <div className="relative w-28 h-28 mx-auto mb-6">
+                <div className="absolute inset-0 bg-ink-cyan rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+                <div className="relative w-full h-full bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50 group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-300">
+                  <i className="ri-key-2-fill text-6xl text-splat-dark"></i>
+                </div>
               </div>
-              <h3 className="text-ink-cyan font-bold text-2xl mb-3">招待で参加</h3>
-              <p className="text-white/70 text-sm">
-                既存のグループに<br />招待コードで参加します
+              
+              {/* テキスト */}
+              <h3 className="text-ink-cyan font-black text-3xl mb-3 group-hover:scale-105 transition-transform">
+                招待で参加
+              </h3>
+              <p className="text-white/60 text-base leading-relaxed">
+                既存のグループに<br />
+                招待コードで参加
               </p>
+              
+              {/* 矢印アイコン */}
+              <div className="mt-6 flex items-center justify-center gap-2 text-ink-cyan font-bold">
+                <span>参加する</span>
+                <i className="ri-arrow-right-line text-xl group-hover:translate-x-2 transition-transform"></i>
+              </div>
             </div>
-            <Link
-              href="/join"
-              className="block w-full py-4 rounded-xl text-splat-dark font-bold text-lg bg-ink-cyan hover:bg-ink-cyan/90 shadow-lg"
-              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
-            >
-              <i className="ri-login-box-line mr-2 text-xl"></i>
-              参加する
-            </Link>
-          </div>
+          </Link>
         </div>
       </div>
     </div>
