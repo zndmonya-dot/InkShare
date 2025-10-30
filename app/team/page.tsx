@@ -277,11 +277,11 @@ export default function TeamPage() {
                     </div>
                   </div>
                   
-                  {/* アバター */}
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${member.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg ${
-                    !updatedToday ? 'opacity-50 grayscale' : ''
+                  {/* アバター（ステータスの色で表示） */}
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${config.bgColor} flex items-center justify-center mx-auto mb-3 shadow-lg transition-all ${
+                    !updatedToday ? 'opacity-50 grayscale' : 'shadow-xl'
                   }`}>
-                    <span className="text-white font-bold text-xl sm:text-2xl">
+                    <span className="text-white font-bold text-xl sm:text-2xl drop-shadow-lg">
                       {member.name.charAt(0)}
                     </span>
                   </div>
@@ -349,8 +349,8 @@ export default function TeamPage() {
             >
               {/* アバター＆ステータス */}
               <div className="flex flex-col items-center text-center mb-6">
-                <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${selectedMember.avatarColor} flex items-center justify-center mb-4 shadow-lg`}>
-                  <span className="text-white font-bold text-4xl">
+                <div className={`w-24 h-24 rounded-full ${modalConfig.bgColor} flex items-center justify-center mb-4 shadow-2xl`}>
+                  <span className="text-white font-bold text-4xl drop-shadow-lg">
                     {selectedMember.name.charAt(0)}
                   </span>
                 </div>
