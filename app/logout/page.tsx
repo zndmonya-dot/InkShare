@@ -71,10 +71,10 @@ export default function LogoutPage() {
                   </div>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-3xl font-bold text-white mb-4">
                 ログアウト中...
               </h2>
-              <p className="text-white/70">
+              <p className="text-white/60">
                 セッションをクリアしています
               </p>
             </>
@@ -82,15 +82,15 @@ export default function LogoutPage() {
             <>
               {/* エラー */}
               <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-rose-500/50">
-                <i className="ri-error-warning-line text-4xl text-white"></i>
+                <i className="ri-error-warning-line text-5xl text-white"></i>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-3xl font-bold text-white mb-4">
                 エラーが発生しました
               </h2>
               <p className="text-rose-300 mb-6">{error}</p>
               <Link
                 href="/login"
-                className="inline-block px-6 py-3 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl shadow-lg"
+                className="inline-block px-8 py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl shadow-lg"
                 style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
                 <i className="ri-arrow-left-line mr-2"></i>
@@ -103,15 +103,15 @@ export default function LogoutPage() {
               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/50 animate-bounce">
                 <i className="ri-check-line text-5xl text-white"></i>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-3xl font-bold text-white mb-4">
                 ログアウト完了！
               </h2>
-              <p className="text-white/70 mb-6">
+              <p className="text-white/60 mb-6">
                 またのご利用をお待ちしています
               </p>
               <Link
                 href="/login"
-                className="inline-block px-6 py-3 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl shadow-lg"
+                className="inline-block px-8 py-4 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl shadow-lg"
                 style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
                 <i className="ri-login-box-line mr-2"></i>
