@@ -98,7 +98,7 @@ export function PWAInstallPrompt() {
           
           <div className="flex-1">
             <h3 className="text-white font-bold text-base mb-1">
-              Inkshareをインストール
+              InkShareをインストール
             </h3>
             <p className="text-gray-300 text-sm mb-3">
               {isIOS 

@@ -1,6 +1,6 @@
 {
-  "name": "Inkshare - 話しかけやすさを可視化",
-  "short_name": "Inkshare",
+  "name": "InkShare - 話しかけやすさを可視化",
+  "short_name": "InkShare",
   "description": "チームの今をリアルタイムで共有する、ステータス管理ツール。話しかけて良いかがすぐわかる。",
   "start_url": "/",
   "display": "standalone",

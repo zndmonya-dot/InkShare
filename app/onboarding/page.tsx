@@ -31,7 +31,7 @@ export default function OnboardingPage() {
                 <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
               <h1 className="text-5xl font-black text-white">
-                Inkshare
+                InkShare
               </h1>
             </div>
           </div>

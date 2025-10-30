@@ -141,7 +141,7 @@ export default function JoinGroupPage() {
                 <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
               <h1 className="text-5xl font-black text-white">
-                Inkshare
+                InkShare
               </h1>
             </div>
             <p className="text-ink-cyan text-base font-bold">招待コードで参加</p>

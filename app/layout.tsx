@@ -6,13 +6,13 @@ import { NotificationPermissionPrompt } from '@/components/NotificationPermissio
 import { mPlusRounded, kosugiMaru } from './fonts'
 
 export const metadata: Metadata = {
-  title: 'Inkshare - 話しかけやすさを可視化',
+  title: 'InkShare - 話しかけやすさを可視化',
   description: 'チームの今をリアルタイムで共有する、ステータス管理ツール。話しかけて良いかがすぐわかる。',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Inkshare',
+    title: 'InkShare',
   },
   icons: {
     icon: '/icon.svg',

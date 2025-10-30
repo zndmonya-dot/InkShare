@@ -141,7 +141,7 @@ function CreateGroupContent() {
               style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <i className="ri-arrow-right-line mr-2"></i>
-              Inkshareを始める
+              InkShareを始める
             </button>
           </div>
         </div>
@@ -176,7 +176,7 @@ function CreateGroupContent() {
                 <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
               </div>
               <h1 className="text-5xl font-black text-white">
-                Inkshare
+                InkShare
               </h1>
             </div>
             <p className="text-ink-yellow text-base font-bold">新しいグループを作成</p>

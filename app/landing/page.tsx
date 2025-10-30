@@ -22,7 +22,7 @@ export default function LandingPage() {
             
             {/* ブランド名 */}
             <h1 className="text-7xl font-black text-white tracking-wider" style={{fontWeight: 900}}>
-              Inkshare
+              InkShare
             </h1>
           </div>
 
