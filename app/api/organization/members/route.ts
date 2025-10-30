@@ -17,12 +17,17 @@ export async function GET(request: Request) {
     }
 
     const supabase = getSupabaseAdmin()
+    const orgId = profile.currentOrganization?.id
+
+    if (!orgId) {
+      return NextResponse.json({ error: '組織が見つかりません' }, { status: 404 })
+    }
 
     // 組織のメンバー一覧を取得
     const { data: userOrgs, error: orgsError } = await supabase
       .from('user_organizations')
       .select('user_id, role')
-      .eq('organization_id', profile.currentOrganization.id)
+      .eq('organization_id', orgId)
       .order('role', { ascending: false })
 
     if (orgsError) {
@@ -41,7 +46,7 @@ export async function GET(request: Request) {
           .from('user_status')
           .select('status, custom1_label, custom1_icon, custom1_color, custom2_label, custom2_icon, custom2_color, updated_at')
           .eq('user_id', uo.user_id)
-          .eq('organization_id', profile.currentOrganization.id)
+          .eq('organization_id', orgId)
           .maybeSingle()
       ])
 
