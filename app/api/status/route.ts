@@ -81,18 +81,34 @@ export async function GET(request: Request) {
       return NextResponse.json({ status: newStatus }, { status: 200 })
     }
 
-    // 3. 日付をチェックして、前日以前の更新なら自動リセット
+    // 3. 組織のreset_timeを取得
+    const { data: orgSettings, error: orgSettingsError } = await supabase
+      .from('organizations')
+      .select('reset_time')
+      .eq('id', activeOrg.organization_id)
+      .single()
+
+    if (orgSettingsError) {
+      console.error('Org settings fetch error:', orgSettingsError)
+    }
+
+    const resetHour = orgSettings?.reset_time ?? 0 // デフォルトは0時
+
+    // 4. 日付と時刻をチェックして、reset_time以降に更新されていなければ自動リセット
     const now = new Date()
     const jstOffset = 9 * 60 // JST = UTC+9
     const jstNow = new Date(now.getTime() + jstOffset * 60 * 1000)
-    const todayJST = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate())
     
     const updatedAt = new Date(status.updated_at)
     const updatedJST = new Date(updatedAt.getTime() + jstOffset * 60 * 1000)
-    const updateDateJST = new Date(updatedJST.getFullYear(), updatedJST.getMonth(), updatedJST.getDate())
     
-    // 最終更新が今日以前の場合、ステータスをリセット
-    if (updateDateJST < todayJST) {
+    // 今日のreset_timeの時刻を計算
+    const todayResetTime = new Date(jstNow.getFullYear(), jstNow.getMonth(), jstNow.getDate(), resetHour, 0, 0)
+    
+    // 最終更新が今日のreset_time以前の場合、ステータスをリセット
+    const shouldReset = updatedJST < todayResetTime && jstNow >= todayResetTime
+    
+    if (shouldReset) {
       const { data: resetStatus, error: resetError } = await supabase
         .from('user_status')
         .update({ 

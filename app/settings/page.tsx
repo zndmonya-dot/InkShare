@@ -15,6 +15,8 @@ export default function SettingsPage() {
   const [showDissolveModal, setShowDissolveModal] = useState(false)
   const [selectedMember, setSelectedMember] = useState<any>(null)
   const [dissolveConfirmText, setDissolveConfirmText] = useState('')
+  const [resetTime, setResetTime] = useState(0)
+  const [isSavingResetTime, setIsSavingResetTime] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,6 +47,11 @@ export default function SettingsPage() {
         const membersRes = await fetch('/api/organization/members')
         const membersData = await membersRes.json()
         setMembers(membersData.members || [])
+
+        // ステータス初期化時刻を取得
+        const resetTimeRes = await fetch('/api/organization/reset-time')
+        const resetTimeData = await resetTimeRes.json()
+        setResetTime(resetTimeData.resetTime ?? 0)
 
         setIsLoading(false)
       } catch (error) {
@@ -85,6 +92,28 @@ export default function SettingsPage() {
       }
     } catch (error) {
       alert('移譲に失敗しました')
+    }
+  }
+
+  const handleSaveResetTime = async () => {
+    setIsSavingResetTime(true)
+    try {
+      const res = await fetch('/api/organization/reset-time', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resetTime }),
+      })
+
+      if (res.ok) {
+        alert(`ステータス初期化時刻を${resetTime}時に設定しました`)
+      } else {
+        const data = await res.json()
+        alert(data.error || '設定に失敗しました')
+      }
+    } catch (error) {
+      alert('設定に失敗しました')
+    } finally {
+      setIsSavingResetTime(false)
     }
   }
 
@@ -213,6 +242,62 @@ export default function SettingsPage() {
             </div>
           </div>
         )}
+
+        {/* ステータス初期化時刻設定 */}
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 mb-6 shadow-xl">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <i className="ri-time-line"></i>
+            ステータス自動初期化設定
+          </h2>
+          <p className="text-white/60 mb-4 text-sm">
+            毎日指定した時刻にすべてのメンバーのステータスを自動的に「話しかけてOK！」にリセットします
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="flex-1 max-w-xs">
+              <label className="text-white/80 text-sm mb-2 block">初期化時刻（JST）</label>
+              <div className="relative">
+                <select
+                  value={resetTime}
+                  onChange={(e) => setResetTime(Number(e.target.value))}
+                  className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:outline-none focus:border-ink-yellow appearance-none cursor-pointer pr-10"
+                >
+                  {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                    <option key={hour} value={hour} className="bg-gray-800">
+                      {hour}:00 {hour === 0 ? '（深夜0時）' : hour === 9 ? '（始業時）' : hour === 12 ? '（お昼）' : ''}
+                    </option>
+                  ))}
+                </select>
+                <i className="ri-arrow-down-s-line absolute right-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none text-xl"></i>
+              </div>
+            </div>
+            <button
+              onClick={handleSaveResetTime}
+              disabled={isSavingResetTime}
+              className="px-6 py-3 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            >
+              {isSavingResetTime ? (
+                <>
+                  <i className="ri-loader-4-line animate-spin mr-2"></i>
+                  保存中...
+                </>
+              ) : (
+                <>
+                  <i className="ri-save-line mr-2"></i>
+                  保存
+                </>
+              )}
+            </button>
+          </div>
+          <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-xl">
+            <p className="text-blue-300 text-sm flex items-start gap-2">
+              <i className="ri-information-line text-lg flex-shrink-0 mt-0.5"></i>
+              <span>
+                現在の設定: <strong>{resetTime}:00</strong> に自動リセット
+                {resetTime === 0 && '（深夜0時）'}
+              </span>
+            </p>
+          </div>
+        </div>
 
         {/* メンバー一覧 */}
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-xl">
