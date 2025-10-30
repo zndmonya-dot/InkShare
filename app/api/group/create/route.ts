@@ -34,31 +34,26 @@ export async function POST(request: Request) {
 
     // 3. リクエストボディ取得
     const body = await request.json()
-    const { groupName, type } = body
+    const { groupName } = body
 
     if (!groupName || !groupName.trim()) {
       return NextResponse.json({ error: 'グループ名を入力してください' }, { status: 400 })
     }
 
     const supabase = getSupabaseAdmin()
-    const organizationType = type === 'business' ? 'business' : 'personal'
-    const isPersonal = organizationType === 'personal'
 
-    // 3. 招待コード生成（個人グループのみ）
-    let inviteCode: string | null = null
-    if (isPersonal) {
-      inviteCode = generateInviteCode()
-    }
+    // 3. 招待コード生成
+    const inviteCode = generateInviteCode()
 
     // 4. 組織作成
     const { data: newOrg, error: orgError } = await supabase
       .from('organizations')
       .insert({
         name: groupName.trim(),
-        type: organizationType,
+        type: 'personal',
         plan: 'free',
         invite_code: inviteCode,
-        is_open: isPersonal
+        is_open: true
       })
       .select('id')
       .single()
@@ -105,7 +100,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       organizationId: newOrg.id,
-      inviteCode: inviteCode
+      inviteCode
     }, { status: 200 })
 
   } catch (error: any) {

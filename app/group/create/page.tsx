@@ -1,13 +1,11 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 function CreateGroupContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const type = searchParams.get('type') || 'personal' // 'personal' or 'business'
   
   const [groupName, setGroupName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -15,9 +13,6 @@ function CreateGroupContent() {
   const [error, setError] = useState('')
   const [showInviteCode, setShowInviteCode] = useState(false)
   const [generatedInviteCode, setGeneratedInviteCode] = useState('')
-
-  const isPersonal = type === 'personal'
-  const isBusiness = type === 'business'
 
   // 認証チェック
   useEffect(() => {
@@ -54,8 +49,7 @@ function CreateGroupContent() {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ 
-          groupName, 
-          type: type // 'personal' or 'business'
+          groupName
         }),
       })
 
@@ -65,8 +59,8 @@ function CreateGroupContent() {
         throw new Error(data.error || '作成に失敗しました')
       }
 
-      // 招待コードを表示（個人グループのみ）
-      if (isPersonal && data.inviteCode) {
+      // 招待コードを表示
+      if (data.inviteCode) {
         setGeneratedInviteCode(data.inviteCode)
       }
       setShowInviteCode(true)
@@ -84,56 +78,67 @@ function CreateGroupContent() {
   // 認証チェック中はローディング表示
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center text-lime-400 text-2xl splatoon-glow">
-        <div className="flex items-center gap-3">
-          <i className="ri-loader-4-line animate-spin"></i>
-          Loading...
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+          <div className="absolute inset-0 ink-spinner">
+            <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-ink-yellow rounded-full ink-pulse-ring"></div>
+          </div>
         </div>
       </div>
     )
   }
 
   if (showInviteCode) {
-    const accentColor = isPersonal ? 'lime' : 'cyan'
-    const borderColor = isPersonal ? 'border-lime-400/30' : 'border-cyan-400/30'
-    const textColor = isPersonal ? 'text-lime-400' : 'text-cyan-400'
-    const bgColor = isPersonal ? 'bg-lime-400' : 'bg-cyan-400'
-    const hoverBgColor = isPersonal ? 'hover:bg-lime-300' : 'hover:bg-cyan-300'
-    
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6">
-        <div className={`relative w-full max-w-md bg-gray-800/60 border-2 ${borderColor} rounded-2xl p-8 backdrop-blur-sm`}>
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-6 relative overflow-hidden">
+        {/* 背景のインク */}
+        <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+          <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+          <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+        </div>
+
+        <div className="relative w-full max-w-md bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-2xl p-8 shadow-2xl z-10 animate-fade-in-scale">
           <div className="text-center">
-            <div className="mb-6">
-              <i className={`ri-check-line text-6xl ${textColor}`}></i>
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/50 animate-bounce">
+              <i className="ri-check-line text-5xl text-white"></i>
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              {isPersonal ? 'グループが作成されました！' : '組織が作成されました！'}
+              グループが作成されました！
             </h2>
             
-            {isPersonal && generatedInviteCode && (
+            {generatedInviteCode && (
               <>
-                <p className="text-gray-400 mb-6">
-                  友達を招待するには、以下のコードを共有してください
+                <p className="text-white/70 mb-6">
+                  メンバーを招待するには、以下のコードを共有してください
                 </p>
-                <div className={`bg-gray-900/80 border-2 ${borderColor.replace('/30', '')} rounded-xl p-6 mb-6`}>
-                  <div className={`text-sm ${textColor} mb-2`}>招待コード</div>
+                <div className="bg-white/5 border-2 border-ink-yellow rounded-xl p-6 mb-6">
+                  <div className="text-sm text-ink-yellow mb-2 font-medium">招待コード</div>
                   <div className="text-4xl font-bold text-white tracking-widest">
                     {generatedInviteCode}
                   </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(generatedInviteCode)
+                      alert('招待コードをコピーしました')
+                    }}
+                    className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm border border-white/20"
+                    style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                  >
+                    <i className="ri-clipboard-line mr-1"></i>
+                    コピー
+                  </button>
                 </div>
               </>
             )}
             
-            {isBusiness && (
-              <p className="text-gray-400 mb-6">
-                設定画面からメンバーを招待できます
-              </p>
-            )}
-            
             <button
               onClick={handleContinue}
-              className={`w-full py-3 rounded-xl text-black font-bold text-lg ${bgColor} ${hoverBgColor} transition-all active:scale-95`}
+              className="w-full py-4 rounded-xl text-splat-dark font-bold text-lg bg-ink-yellow hover:bg-ink-yellow/90 shadow-lg"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <i className="ri-arrow-right-line mr-2"></i>
               Inkshareを始める
@@ -144,127 +149,103 @@ function CreateGroupContent() {
     )
   }
 
-  const accentColor = isPersonal ? 'lime' : 'cyan'
-  const bgGlow1 = isPersonal ? 'bg-lime-400' : 'bg-cyan-400'
-  const bgGlow2 = isPersonal ? 'bg-green-500' : 'bg-blue-500'
-  const bgGlow3 = isPersonal ? 'bg-yellow-400' : 'bg-teal-400'
-  const borderColor = isPersonal ? 'border-lime-400/30' : 'border-cyan-400/30'
-  const textColor = isPersonal ? 'text-lime-400' : 'text-cyan-400'
-  const bgColor = isPersonal ? 'bg-lime-400' : 'bg-cyan-400'
-  const hoverBgColor = isPersonal ? 'hover:bg-lime-300' : 'hover:bg-cyan-300'
-  const inkColor1 = isPersonal ? 'bg-lime-300' : 'bg-cyan-300'
-  const inkColor2 = isPersonal ? 'bg-yellow-300' : 'bg-blue-300'
-  const shadowColor = isPersonal ? 'shadow-[0_0_30px_rgba(191,255,0,0.6)]' : 'shadow-[0_0_30px_rgba(34,211,238,0.6)]'
-  const shadowColor2 = isPersonal ? 'shadow-[0_0_50px_rgba(191,255,0,0.1)]' : 'shadow-[0_0_50px_rgba(34,211,238,0.1)]'
-  const iconClass = isPersonal ? 'ri-group-line' : 'ri-building-line'
-  const title = isPersonal ? '個人グループを作成' : '法人組織を作成'
-  const placeholder = isPersonal ? '友達の勉強会' : '株式会社サンプル'
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden relative">
-      {/* 背景のインク飛び散りエフェクト */}
-      <div className={`absolute top-20 left-20 w-96 h-96 ${bgGlow1} opacity-10 rounded-full blur-3xl ink-float`}></div>
-      <div className={`absolute bottom-20 right-20 w-80 h-80 ${bgGlow2} opacity-10 rounded-full blur-3xl ink-pulse`}></div>
-      <div className={`absolute top-1/2 left-1/3 w-64 h-64 ${bgGlow3} opacity-10 rounded-full blur-3xl ink-drip`}></div>
+    <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-6 overflow-hidden relative">
+      {/* 背景のインク */}
+      <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+        <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
+        <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+      </div>
 
       {/* ログアウトボタン（右上） */}
       <Link
         href="/logout"
-        className="absolute top-6 right-6 px-4 py-2 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white rounded-lg transition-all border border-gray-700 hover:border-gray-500 text-sm"
+        className="absolute top-6 right-6 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl border border-white/20"
+        style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', zIndex: 20 }}
       >
         <i className="ri-logout-box-line mr-1"></i>
         ログアウト
       </Link>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md z-10">
         {/* ロゴ */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 animate-fade-in-scale">
           <div className="inline-block">
-            <div className="flex items-center gap-4 mb-2">
-              <div className={`w-16 h-16 ${bgColor} rounded-2xl flex items-center justify-center ${shadowColor} relative overflow-visible`}>
-                <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
-                {/* インク飛び散り */}
-                <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${inkColor1} opacity-70 ink-splash`}></div>
-                <div className={`absolute -bottom-1 -left-1 w-3 h-3 rounded-full ${inkColor2} opacity-60 ink-drip`}></div>
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50">
+                <i className="ri-paint-brush-fill text-4xl text-splat-dark"></i>
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(191,255,0,0.5)] splatoon-glow">
+              <h1 className="text-4xl font-black text-white">
                 Inkshare
               </h1>
             </div>
-            <p className={`${textColor} text-sm font-bold`}>{title}</p>
+            <p className="text-ink-yellow text-base font-bold">新しいグループを作成</p>
           </div>
         </div>
 
         {/* グループ作成フォーム */}
-        <div className={`relative bg-gray-800/60 border-2 ${borderColor} rounded-2xl p-8 backdrop-blur-sm ${shadowColor2} overflow-visible`}>
-          {/* カードのインク飛び散り */}
-          <div className={`absolute -top-3 -right-3 w-8 h-8 rounded-full ${inkColor1} opacity-50 blur-md ink-splash`}></div>
-          <div className={`absolute -bottom-3 -left-3 w-6 h-6 rounded-full ${inkColor2} opacity-40 blur-sm ink-drip`}></div>
-
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            <i className={`${iconClass} mr-2`}></i>
-            {title}
+        <div className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
+            <i className="ri-team-line"></i>
+            グループ作成
           </h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-rose-500/20 border-2 border-rose-500 rounded-xl text-rose-300 text-sm relative overflow-visible">
-              <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-400 opacity-70 ink-pulse"></div>
+            <div className="mb-4 p-3 bg-rose-500/20 border border-rose-500 rounded-xl text-rose-300 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleCreate} className="space-y-5">
-            {/* グループ/組織名 */}
+            {/* グループ名 */}
             <div>
-              <label className={`block text-sm font-bold ${textColor} mb-2`}>
-                <i className={`${iconClass} mr-1`}></i>
-                {isPersonal ? 'グループ名' : '組織名'}
+              <label className="block text-sm font-bold text-ink-yellow mb-2">
+                <i className="ri-team-line mr-1"></i>
+                グループ名
               </label>
               <input
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 required
-                placeholder={placeholder}
+                placeholder="例: 友達の勉強会"
                 disabled={isLoading}
-                className={`w-full px-4 py-3 bg-gray-900/60 text-white border-2 border-gray-700 rounded-xl focus:${borderColor.replace('/30', '')} focus:outline-none transition-all placeholder:text-gray-500 disabled:opacity-50`}
+                className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none placeholder:text-white/40 disabled:opacity-50"
+                style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               />
             </div>
 
             {/* 作成ボタン */}
             <button
               type="submit"
-              className={`w-full py-3 rounded-xl text-black font-bold text-lg ${bgColor} ${hoverBgColor} transition-all active:scale-95 relative overflow-hidden group`}
+              className="w-full py-4 rounded-xl text-splat-dark font-bold text-lg bg-ink-yellow hover:bg-ink-yellow/90 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               disabled={isLoading}
             >
-              <span className="relative z-10 flex items-center justify-center">
-                {isLoading ? (
-                  <>
-                    <i className="ri-loader-4-line animate-spin mr-2"></i>
-                    作成中...
-                  </>
-                ) : (
-                  <>
-                    <i className={`${iconClass} mr-2`}></i>
-                    {isPersonal ? 'グループを作成' : '組織を作成'}
-                  </>
-                )}
-              </span>
-              <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-${accentColor}-300 to-${accentColor === 'lime' ? 'green' : 'blue'}-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-              <div className={`absolute inset-0 w-full h-full ${inkColor1} opacity-20 blur-xl animate-ink-pulse group-hover:opacity-0`}></div>
+              {isLoading ? (
+                <>
+                  <i className="ri-loader-4-line animate-spin mr-2"></i>
+                  作成中...
+                </>
+              ) : (
+                <>
+                  <i className="ri-add-circle-line mr-2"></i>
+                  グループを作成
+                </>
+              )}
             </button>
           </form>
 
           {/* リンク */}
           <div className="mt-6 text-center text-sm space-y-2">
             <div>
-              <Link href="/join" className="text-cyan-300 hover:underline">
-                招待コードでグループに参加
+              <Link href="/join" className="text-ink-cyan hover:underline">
+                招待コードで参加
               </Link>
             </div>
             <div>
-              <Link href="/" className="text-gray-400 hover:underline">
-                ホームに戻る
+              <Link href="/onboarding" className="text-white/60 hover:text-white hover:underline">
+                戻る
               </Link>
             </div>
           </div>
@@ -275,14 +256,6 @@ function CreateGroupContent() {
 }
 
 export default function CreateGroupPage() {
-  return (
-    <Suspense fallback={
-      <div className="h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
-        <div className="text-white text-lg">読み込み中...</div>
-      </div>
-    }>
-      <CreateGroupContent />
-    </Suspense>
-  )
+  return <CreateGroupContent />
 }
 
