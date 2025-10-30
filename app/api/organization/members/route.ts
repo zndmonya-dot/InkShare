@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerUser } from '@/lib/auth-server'
 import { getUserProfile } from '@/lib/auth'
-import { query } from '@/lib/db'
+import { getSupabaseAdmin } from '@/lib/db'
 
 export async function GET(request: Request) {
   try {
@@ -16,21 +16,41 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: '組織が見つかりません' }, { status: 404 })
     }
 
+    const supabase = getSupabaseAdmin()
+
     // 組織のメンバー一覧を取得
-    const members = await query<{
-      id: string
-      name: string
-      email: string
-      avatar_color: string
-      role: 'admin' | 'member'
-    }>(
-      `SELECT u.id, u.name, u.email, u.avatar_color, uo.role
-       FROM users u
-       JOIN user_organizations uo ON u.id = uo.user_id
-       WHERE uo.organization_id = $1
-       ORDER BY uo.role DESC, u.name ASC`,
-      [profile.currentOrganization.id]
-    )
+    const { data: userOrgs, error: orgsError } = await supabase
+      .from('user_organizations')
+      .select('user_id, role')
+      .eq('organization_id', profile.currentOrganization.id)
+      .order('role', { ascending: false })
+
+    if (orgsError) {
+      return NextResponse.json({ error: orgsError.message }, { status: 500 })
+    }
+
+    // ユーザー情報を並列取得
+    const memberPromises = (userOrgs || []).map(async (uo) => {
+      const { data: user } = await supabase
+        .from('users')
+        .select('id, name, email, avatar_color')
+        .eq('id', uo.user_id)
+        .single()
+
+      if (user) {
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          avatar_color: user.avatar_color,
+          role: uo.role,
+        }
+      }
+      return null
+    })
+
+    const memberResults = await Promise.all(memberPromises)
+    const members = memberResults.filter((m): m is NonNullable<typeof m> => m !== null)
 
     return NextResponse.json({ members }, { status: 200 })
   } catch (error: any) {

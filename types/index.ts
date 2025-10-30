@@ -59,12 +59,43 @@ export interface UserStatus {
 // 組織関連の型定義
 // ========================================
 
+export type OrganizationType = 'business' | 'personal'
+
 export interface Organization {
   id: string
   name: string
-  inviteCode: string
+  type: OrganizationType
+  inviteCode?: string
   createdAt: Date
   createdBy: string
+}
+
+export interface OrganizationInfo {
+  id: string
+  name: string
+  type: OrganizationType
+  role: 'admin' | 'member'
+  isActive?: boolean
+}
+
+export interface UserProfile {
+  id: string
+  email: string
+  name: string
+  avatarColor: string
+  currentOrganization?: OrganizationInfo
+  organizations: OrganizationInfo[]
+}
+
+export interface UserStatusData {
+  status: PresenceStatus
+  custom1_label?: string
+  custom1_icon?: string
+  custom1_color?: string
+  custom2_label?: string
+  custom2_icon?: string
+  custom2_color?: string
+  updated_at?: string
 }
 
 // ========================================

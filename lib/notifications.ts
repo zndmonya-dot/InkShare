@@ -31,9 +31,8 @@ export async function showLocalNotification(
     await registration.showNotification(title, {
       icon: '/icon.svg',
       badge: '/icon.svg',
-      vibrate: [200, 100, 200],
       ...options,
-    })
+    } as any) // vibrate は型定義にないが、ブラウザでサポートされている
   } else {
     // Service Workerが使えない場合は通常の通知
     new Notification(title, {

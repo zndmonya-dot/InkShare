@@ -62,22 +62,31 @@ export function errorResponse(message: string, status: number = 500) {
 /**
  * 成功レスポンスを生成
  */
-export function successResponse(data: any = { success: true }, status: number = 200) {
+export function successResponse(data: unknown = { success: true }, status: number = 200) {
   return NextResponse.json(data, { status })
+}
+
+/**
+ * エラーメッセージを取得
+ */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  return '予期しないエラーが発生しました'
 }
 
 /**
  * try-catchでラップされたAPIハンドラー
  */
 export function withErrorHandler(
-  handler: (request: Request, ...args: any[]) => Promise<Response>
+  handler: (request: Request, ...args: unknown[]) => Promise<Response>
 ) {
-  return async (request: Request, ...args: any[]): Promise<Response> => {
+  return async (request: Request, ...args: unknown[]): Promise<Response> => {
     try {
       return await handler(request, ...args)
-    } catch (error: any) {
+    } catch (error) {
       console.error('API error:', error)
-      return errorResponse(error.message || '予期しないエラーが発生しました')
+      return errorResponse(getErrorMessage(error))
     }
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useMemo, memo } from 'react'
 import type { PresenceStatus, CustomStatus } from '@/types'
 import { StatusButton } from './StatusButton'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
@@ -20,7 +20,7 @@ interface StatusItem {
   customId?: 'custom1' | 'custom2'
 }
 
-export function StatusPanel({
+export const StatusPanel = memo(function StatusPanel({
   currentStatus,
   customStatus1,
   customStatus2,
@@ -80,8 +80,8 @@ export function StatusPanel({
     [onStatusChange, onCustomClick]
   )
 
-  const custom1Handlers = createCustomHandlers('custom1')
-  const custom2Handlers = createCustomHandlers('custom2')
+  const custom1Handlers = useMemo(() => createCustomHandlers('custom1'), [createCustomHandlers])
+  const custom2Handlers = useMemo(() => createCustomHandlers('custom2'), [createCustomHandlers])
 
   // ドラッグ開始
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -231,4 +231,4 @@ export function StatusPanel({
       </div>
     </div>
   )
-}
+})

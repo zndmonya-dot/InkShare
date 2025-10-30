@@ -1,5 +1,7 @@
 'use client'
 
+import { memo } from 'react'
+
 interface StatusButtonProps {
   label: string
   icon: string
@@ -59,7 +61,7 @@ const getTextColor = (activeColor: string): string => {
   return darkColors.includes(activeColor) ? 'text-white' : 'text-splat-dark'
 }
 
-export function StatusButton({
+export const StatusButton = memo(function StatusButton({
   label,
   icon,
   activeColor,
@@ -102,5 +104,5 @@ export function StatusButton({
       </div>
     </button>
   )
-}
+})
 

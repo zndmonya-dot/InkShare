@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { getStatusConfig } from '@/config/status'
-import { CustomStatus } from '@/types'
+import { CustomStatus, PresenceStatus, UserProfile } from '@/types'
 import { DEFAULT_CUSTOM_STATUS } from '@/lib/constants'
 
 // 遅延ロード（パフォーマンス最適化）
@@ -13,8 +13,8 @@ const CustomStatusModal = lazy(() => import('@/components/CustomStatusModal').th
 export default function Home() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
-  const [userProfile, setUserProfile] = useState<any>(null)
-  const [currentStatus, setCurrentStatus] = useState<any>('available')
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [currentStatus, setCurrentStatus] = useState<PresenceStatus>('available')
   const [customStatus1, setCustomStatus1] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom1, color: 'bg-fuchsia-400' })
   const [customStatus2, setCustomStatus2] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom2, color: 'bg-purple-400' })
   const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
@@ -83,7 +83,7 @@ export default function Home() {
   }, [router])
 
   // ステータス変更
-  const handleStatusChange = useCallback(async (newStatus: any) => {
+  const handleStatusChange = useCallback(async (newStatus: PresenceStatus) => {
     setCurrentStatus(newStatus)
     await fetch('/api/status', {
       method: 'POST',
@@ -430,7 +430,7 @@ export default function Home() {
             </div>
             
             <div className="space-y-2">
-              {userProfile.organizations.map((org: any) => (
+              {userProfile.organizations.map((org) => (
                 <button
                   key={org.id}
                   onClick={() => {

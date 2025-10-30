@@ -3,6 +3,8 @@ import { getServerUser } from '@/lib/auth-server'
 import { getUserProfile } from '@/lib/auth'
 import { getSupabaseAdmin } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
   try {
     const cookieHeader = request.headers.get('cookie') || ''

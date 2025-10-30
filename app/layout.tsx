@@ -3,6 +3,7 @@ import './globals.css'
 import { RegisterServiceWorker } from './register-sw'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { NotificationPermissionPrompt } from '@/components/NotificationPermissionPrompt'
+import { mPlusRounded, kosugiMaru } from './fonts'
 
 export const metadata: Metadata = {
   title: 'Inkshare - 話しかけやすさを可視化',
@@ -33,14 +34,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className={`${mPlusRounded.variable} ${kosugiMaru.variable}`}>
       <head>
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon.svg" />
         <link href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css" rel="stylesheet" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Kosugi+Maru&display=swap" rel="stylesheet" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />

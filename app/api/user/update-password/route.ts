@@ -18,6 +18,11 @@ export const POST = withErrorHandler(async (request: Request) => {
   // クライアント側のSupabaseインスタンスでパスワード更新
   const supabase = createClient()
 
+  // メールアドレスが存在することを確認
+  if (!user!.email) {
+    return errorResponse('ユーザー情報が不正です', 400)
+  }
+
   // 現在のパスワードで再認証
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: user!.email,

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { CustomStatus } from '@/types/status'
+import type { CustomStatus } from '@/types'
 import { AVAILABLE_ICONS } from '@/constants/icons'
 
 interface CustomStatusModalProps {

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function CreateGroupPage() {
+function CreateGroupContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type') || 'personal' // 'personal' or 'business'
@@ -271,6 +271,18 @@ export default function CreateGroupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CreateGroupPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
+        <div className="text-white text-lg">読み込み中...</div>
+      </div>
+    }>
+      <CreateGroupContent />
+    </Suspense>
   )
 }
 

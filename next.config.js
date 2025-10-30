@@ -14,7 +14,6 @@ const nextConfig = {
   
   // 実験的機能（パフォーマンス向上）
   experimental: {
-    optimizeCss: true, // CSS最適化
     optimizePackageImports: ['@/components', '@/lib'], // インポート最適化
   },
   

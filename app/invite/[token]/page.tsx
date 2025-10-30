@@ -5,13 +5,42 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 
+import type { Organization } from '@/types'
+
 export default function InvitePage({ params }: { params: { token: string } }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [organization, setOrganization] = useState<any>(null)
+  const [organization, setOrganization] = useState<Organization | null>(null)
   const [error, setError] = useState('')
   const [isJoining, setIsJoining] = useState(false)
+
+  const handleJoinOrganization = async () => {
+    setIsJoining(true)
+    setError('')
+
+    try {
+      const res = await fetch(`/api/organization/join-by-invite`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inviteCode: params.token }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || '参加に失敗しました')
+      }
+
+      // 成功したらメインページへ
+      router.push('/')
+      router.refresh()
+    } catch (err) {
+      const error = err instanceof Error ? err.message : '予期しないエラーが発生しました'
+      setError(error)
+      setIsJoining(false)
+    }
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -36,40 +65,16 @@ export default function InvitePage({ params }: { params: { token: string } }) {
         } else {
           setIsLoading(false)
         }
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err) {
+        const error = err instanceof Error ? err.message : '予期しないエラーが発生しました'
+        setError(error)
         setIsLoading(false)
       }
     }
 
     init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.token])
-
-  const handleJoinOrganization = async () => {
-    setIsJoining(true)
-    setError('')
-
-    try {
-      const res = await fetch(`/api/organization/join-by-invite`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ inviteCode: params.token }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.error || '参加に失敗しました')
-      }
-
-      // 成功したらメインページへ
-      router.push('/')
-      router.refresh()
-    } catch (err: any) {
-      setError(err.message)
-      setIsJoining(false)
-    }
-  }
 
   if (isLoading) {
     return (
