@@ -11,9 +11,7 @@ export default function SettingsPage() {
   const [inviteLink, setInviteLink] = useState('')
   const [copySuccess, setCopySuccess] = useState(false)
   const [members, setMembers] = useState<any[]>([])
-  const [showTransferModal, setShowTransferModal] = useState(false)
   const [showDissolveModal, setShowDissolveModal] = useState(false)
-  const [selectedMember, setSelectedMember] = useState<any>(null)
   const [dissolveConfirmText, setDissolveConfirmText] = useState('')
   const [resetTime, setResetTime] = useState(0)
   const [isSavingResetTime, setIsSavingResetTime] = useState(false)
@@ -31,12 +29,6 @@ export default function SettingsPage() {
         }
 
         setUserProfile(profileData.user)
-
-        // 管理者かチェック
-        if (profileData.user.currentOrganization.role !== 'admin') {
-          router.push('/')
-          return
-        }
 
         // 招待リンク生成
         const inviteRes = await fetch('/api/organization/invite-link')
@@ -67,32 +59,6 @@ export default function SettingsPage() {
     navigator.clipboard.writeText(inviteLink)
     setCopySuccess(true)
     setTimeout(() => setCopySuccess(false), 2000)
-  }
-
-  const handleTransferAdmin = async () => {
-    if (!selectedMember) return
-    
-    if (!confirm(`${selectedMember.name}さんに管理者権限を移譲しますか？\n\nあなたは一般メンバーになります。`)) {
-      return
-    }
-
-    try {
-      const res = await fetch('/api/organization/transfer-admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newAdminId: selectedMember.id }),
-      })
-
-      if (res.ok) {
-        alert('管理者権限を移譲しました')
-        router.push('/')
-      } else {
-        const data = await res.json()
-        alert(data.error || '移譲に失敗しました')
-      }
-    } catch (error) {
-      alert('移譲に失敗しました')
-    }
   }
 
   const handleSaveResetTime = async () => {
@@ -321,48 +287,13 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span
-                    className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                      member.role === 'admin'
-                        ? 'bg-ink-cyan/20 text-ink-cyan border border-ink-cyan/30'
-                        : 'bg-white/10 text-white/70 border border-white/20'
-                    }`}
-                  >
-                    {member.role === 'admin' ? '管理者' : 'メンバー'}
+                  <span className="px-3 py-1 rounded-lg text-sm font-medium bg-white/10 text-white/70 border border-white/20">
+                    メンバー
                   </span>
-                  {member.role !== 'admin' && member.id !== userProfile?.id && (
-                    <button
-                      onClick={() => {
-                        setSelectedMember(member)
-                        setShowTransferModal(true)
-                      }}
-                      className="px-3 py-1 bg-ink-yellow/20 hover:bg-ink-yellow/30 text-ink-yellow text-sm font-medium rounded-lg transition-all border border-ink-yellow/30"
-                    >
-                      管理者に任命
-                    </button>
-                  )}
                 </div>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* 管理者移譲 */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 mb-6 shadow-xl mt-6">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <i className="ri-user-shared-line"></i>
-            管理者移譲
-          </h2>
-          <p className="text-white/60 mb-4 text-sm">
-            他のメンバーに管理者権限を移譲できます。移譲後、あなたは一般メンバーになります。
-          </p>
-          <button
-            onClick={() => setShowTransferModal(true)}
-            className="w-full py-3 bg-ink-cyan hover:bg-ink-cyan/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg"
-          >
-            <i className="ri-arrow-left-right-line mr-2"></i>
-            管理者を移譲
-          </button>
         </div>
 
         {/* 組織解散 */}
@@ -383,68 +314,6 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
-
-      {/* 管理者移譲モーダル */}
-      {showTransferModal && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => {
-            setShowTransferModal(false)
-            setSelectedMember(null)
-          }}
-        >
-          <div
-            className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold text-white mb-4">管理者を移譲</h3>
-            <p className="text-white/60 mb-4 text-sm">
-              移譲するメンバーを選択してください
-            </p>
-            <div className="space-y-2 mb-6 max-h-60 overflow-y-auto">
-              {members.filter(m => m.role !== 'admin' && m.id !== userProfile?.id).map((member) => (
-                <button
-                  key={member.id}
-                  onClick={() => setSelectedMember(member)}
-                  className={`w-full p-4 rounded-xl transition-all text-left ${
-                    selectedMember?.id === member.id
-                      ? 'bg-ink-yellow/20 border-2 border-ink-yellow'
-                      : 'bg-white/5 border border-white/10 hover:bg-white/10'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 ${member.avatar_color} rounded-lg flex items-center justify-center`}>
-                      <i className="ri-user-line text-xl text-white"></i>
-                    </div>
-                    <div>
-                      <div className="text-white font-medium">{member.name}</div>
-                      <div className="text-white/60 text-xs">{member.email}</div>
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowTransferModal(false)
-                  setSelectedMember(null)
-                }}
-                className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleTransferAdmin}
-                disabled={!selectedMember}
-                className="flex-1 py-3 bg-ink-yellow hover:bg-ink-yellow/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark font-bold rounded-xl transition-all shadow-lg"
-              >
-                移譲する
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* 組織解散モーダル */}
       {showDissolveModal && (

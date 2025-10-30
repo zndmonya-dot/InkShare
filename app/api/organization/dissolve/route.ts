@@ -24,18 +24,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '組織が見つかりません' }, { status: 404 })
     }
 
-    // 現在のユーザーが管理者か確認
-    const { data: currentUserOrg, error: currentUserError } = await supabase
-      .from('user_organizations')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('organization_id', activeOrg.organization_id)
-      .maybeSingle()
-
-    if (currentUserError || !currentUserOrg || currentUserOrg.role !== 'admin') {
-      return NextResponse.json({ error: '管理者権限がありません' }, { status: 403 })
-    }
-
     // デバッグ用：組織の詳細を確認
     const { data: orgData, error: orgFetchError } = await supabase
       .from('organizations')

@@ -141,13 +141,13 @@ export async function signUpBusiness(email: string, password: string, name: stri
 
   if (userError) throw userError
 
-  // 5. ユーザーを組織に紐づけ（管理者として）
+  // 5. ユーザーを組織に紐づけ
   const { error: linkError } = await supabaseAdmin
     .from('user_organizations')
     .insert({
       user_id: authData.user.id,
       organization_id: orgResult.id,
-      role: 'admin',
+      role: 'member',
       is_active: true
     })
 

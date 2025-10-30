@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       .insert({
         user_id: user.id,
         organization_id: newOrg.id,
-        role: 'admin',
+        role: 'member',
         is_active: true
       })
 

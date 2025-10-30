@@ -78,7 +78,8 @@ export const StatusButton = memo(function StatusButton({
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       style={{
-        transition: 'all 0.3s ease-out',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'transform, background-color, box-shadow',
       }}
       className={`
         relative w-full h-full rounded-2xl p-4 sm:p-5 md:p-6
@@ -86,7 +87,7 @@ export const StatusButton = memo(function StatusButton({
         ${
           isActive
             ? `${activeColor} shadow-2xl scale-105 border-2 border-splat-dark/20`
-            : 'bg-white/5 shadow-lg hover:bg-white/10 hover:scale-[1.02] active:scale-95 border-2 border-white/15 hover:border-white/25 backdrop-blur-sm'
+            : 'bg-white/5 shadow-lg hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98] border-2 border-white/15 hover:border-white/25 backdrop-blur-sm'
         }
       `}
     >

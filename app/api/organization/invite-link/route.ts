@@ -18,10 +18,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: '組織が見つかりません' }, { status: 404 })
     }
 
-    if (profile.currentOrganization.role !== 'admin') {
-      return NextResponse.json({ error: '管理者のみアクセス可能です' }, { status: 403 })
-    }
-
     const supabase = getSupabaseAdmin()
 
     // 招待コードを取得または生成

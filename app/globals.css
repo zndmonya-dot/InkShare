@@ -27,16 +27,17 @@
            transform shadow-lg hover:shadow-2xl;
     font-weight: 900;
     letter-spacing: 0.05em;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
   }
   
   .btn-splat:hover {
-    transform: scale(1.05) translateY(-2px);
+    transform: scale(1.03) translateY(-2px);
   }
   
   .btn-splat:active {
-    transform: scale(0.95) translateY(0);
-    transition: all 0.1s ease-out;
+    transform: scale(0.97) translateY(0);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-splat::before {
@@ -206,6 +207,37 @@
   }
 }
 
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* スプラトゥーン風スピナー */
 @keyframes ink-spin {
   0% {
@@ -219,11 +251,9 @@
 @keyframes ink-pulse-spin {
   0%, 100% {
     opacity: 1;
-    transform: scale(1);
   }
   50% {
-    opacity: 0.6;
-    transform: scale(0.9);
+    opacity: 0.7;
   }
 }
 
@@ -245,6 +275,18 @@
 
 .animate-slide-down {
   animation: slide-down 0.4s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale 0.2s ease-out forwards;
 }
 
 .ink-drip {

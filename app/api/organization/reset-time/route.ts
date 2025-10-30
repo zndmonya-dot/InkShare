@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   }
 }
 
-// ステータス初期化時刻を更新（管理者のみ）
+// ステータス初期化時刻を更新
 export async function POST(request: Request) {
   try {
     const cookieHeader = request.headers.get('cookie') || ''
@@ -51,10 +51,6 @@ export async function POST(request: Request) {
     const profile = await getUserProfile(user.id)
     if (!profile || !profile.currentOrganization) {
       return NextResponse.json({ error: '組織が見つかりません' }, { status: 404 })
-    }
-
-    if (profile.currentOrganization.role !== 'admin') {
-      return NextResponse.json({ error: '管理者のみアクセス可能です' }, { status: 403 })
     }
 
     const { resetTime } = await request.json()

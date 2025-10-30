@@ -75,7 +75,7 @@ export default function OnboardingPage() {
               <i className="ri-building-line text-5xl text-cyan-400 mb-3 block"></i>
               <h3 className="text-cyan-400 font-bold text-xl mb-2">法人組織作成</h3>
               <p className="text-gray-400 text-xs">
-                会社やチームで使える組織（管理者として）
+                会社やチームで使える組織
               </p>
             </div>
             <Link

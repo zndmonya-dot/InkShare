@@ -79,12 +79,14 @@ export function CustomStatusModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={handleOverlayClick}
+      style={{ animationDuration: '0.2s' }}
     >
       <div
-        className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl"
+        className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl animate-fade-in-scale"
         onClick={handleContentClick}
+        style={{ animationDuration: '0.25s' }}
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-white">
@@ -109,7 +111,8 @@ export function CustomStatusModal({
               value={customLabel}
               onChange={(e) => setCustomLabel(e.target.value)}
               placeholder="例: 勉強中、コーヒー休憩"
-              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40"
+              className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none placeholder:text-white/40"
+              style={{ transition: 'border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             />
           </div>
 
@@ -124,12 +127,13 @@ export function CustomStatusModal({
                   key={color.class}
                   onClick={() => setCustomColor(color.class)}
                   className={`
-                    w-8 h-8 rounded-lg transition-all ${color.class}
+                    w-8 h-8 rounded-lg ${color.class}
                     ${customColor === color.class
                       ? 'ring-2 ring-white ring-offset-2 ring-offset-splat-dark scale-110'
                       : 'hover:scale-105'
                     }
                   `}
+                  style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
                   title={color.name}
                 />
               ))}
@@ -147,12 +151,13 @@ export function CustomStatusModal({
                   key={icon}
                   onClick={() => setCustomIcon(icon)}
                   className={`
-                    p-3 rounded-lg transition-all
+                    p-3 rounded-lg
                     ${customIcon === icon
                       ? 'bg-ink-yellow text-splat-dark scale-105'
                       : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
                     }
                   `}
+                  style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
                 >
                   <i className={`${icon} text-xl`}></i>
                 </button>
@@ -166,7 +171,8 @@ export function CustomStatusModal({
               value={customIcon}
               onChange={(e) => setCustomIcon(e.target.value)}
               placeholder="ri-star-line"
-              className="w-full px-3 py-2 mt-2 bg-white/5 text-white border border-white/20 rounded-lg focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 text-sm"
+              className="w-full px-3 py-2 mt-2 bg-white/5 text-white border border-white/20 rounded-lg focus:border-ink-yellow focus:outline-none placeholder:text-white/40 text-sm"
+              style={{ transition: 'border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             />
           </div>
 
@@ -183,14 +189,16 @@ export function CustomStatusModal({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+            className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl border border-white/20"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             キャンセル
           </button>
           <button
             onClick={handleSave}
             disabled={!customLabel.trim()}
-            className="flex-1 py-3 bg-ink-yellow hover:bg-ink-yellow/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark font-bold rounded-xl transition-all shadow-lg"
+            className="flex-1 py-3 bg-ink-yellow hover:bg-ink-yellow/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark font-bold rounded-xl shadow-lg"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             保存
           </button>

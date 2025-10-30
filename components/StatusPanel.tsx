@@ -31,6 +31,12 @@ export const StatusPanel = memo(function StatusPanel({
   const [statusItems, setStatusItems] = useState<StatusItem[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [isReady, setIsReady] = useState(false)
+  
+  // マウント時にアニメーションを開始
+  useEffect(() => {
+    setIsReady(true)
+  }, [])
 
   // 初期化：localStorageから順序を読み込むか、デフォルト順序を使用
   useEffect(() => {
@@ -134,7 +140,7 @@ export const StatusPanel = memo(function StatusPanel({
   }
 
   return (
-    <div className="w-full h-full overflow-visible relative">
+    <div className={`w-full h-full overflow-visible relative ${isReady ? 'animate-fade-in-scale' : 'opacity-0'}`}>
       {/* ドラッグ中のヒント */}
       {draggedIndex !== null && (
         <div className="absolute top-0 left-0 right-0 text-center py-2 bg-ink-yellow/80 text-splat-dark text-sm font-bold rounded-lg shadow-lg z-50 animate-pulse">
@@ -158,14 +164,18 @@ export const StatusPanel = memo(function StatusPanel({
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
-                className={`cursor-move transition-all select-none ${
+                className={`cursor-move select-none ${
                   draggedIndex === index 
                     ? 'opacity-50 scale-95' 
                     : dragOverIndex === index && draggedIndex !== null
                     ? 'ring-4 ring-ink-yellow scale-105'
-                    : 'hover:scale-[1.02]'
+                    : 'hover:scale-[1.01]'
                 }`}
-                style={{ touchAction: 'none' }}
+                style={{ 
+                  touchAction: 'none',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: 'transform, opacity'
+                }}
               >
                 <StatusButton
                   label={option.label}
@@ -193,11 +203,15 @@ export const StatusPanel = memo(function StatusPanel({
             return (
               <div
                 key={item.id}
-                className={`cursor-default transition-all relative ${
+                className={`cursor-default relative ${
                   dragOverIndex === index && draggedIndex !== null
                     ? 'ring-2 ring-red-500/50 opacity-50'
                     : ''
                 }`}
+                style={{ 
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  willChange: 'opacity'
+                }}
                 onDragOver={(e) => {
                   e.preventDefault()
                   e.dataTransfer.dropEffect = 'none'

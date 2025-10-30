@@ -299,15 +299,13 @@ export default function Home() {
               <i className="ri-user-settings-line text-lg text-white/80"></i>
             </button>
             
-            {userProfile?.currentOrganization?.role === 'admin' && (
-              <button
-                onClick={() => router.push('/settings')}
-                className="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
-                title="組織設定"
-              >
-                <i className="ri-settings-3-line text-lg text-white/80"></i>
-              </button>
-            )}
+            <button
+              onClick={() => router.push('/settings')}
+              className="w-9 h-9 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all border border-white/20"
+              title="組織設定"
+            >
+              <i className="ri-settings-3-line text-lg text-white/80"></i>
+            </button>
             
             <button
               onClick={() => router.push('/logout')}
@@ -371,19 +369,17 @@ export default function Home() {
                 <span>アカウント設定</span>
               </button>
               
-              {/* 組織設定（管理者のみ） */}
-              {userProfile?.currentOrganization?.role === 'admin' && (
-                <button
-                  onClick={() => {
-                    setShowMobileMenu(false)
-                    router.push('/settings')
-                  }}
-                  className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
-                >
-                  <i className="ri-settings-3-line text-xl"></i>
-                  <span>組織設定</span>
-                </button>
-              )}
+              {/* 組織設定 */}
+              <button
+                onClick={() => {
+                  setShowMobileMenu(false)
+                  router.push('/settings')
+                }}
+                className="w-full px-5 py-4 bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-all border border-white/20 flex items-center gap-3"
+              >
+                <i className="ri-settings-3-line text-xl"></i>
+                <span>組織設定</span>
+              </button>
               
               {/* ログアウト */}
               <button
@@ -450,7 +446,7 @@ export default function Home() {
                     <div>
                       <div className="font-medium">{org.name}</div>
                       <div className="text-xs text-white/50 mt-0.5">
-                        {org.role === 'admin' ? '管理者' : 'メンバー'} · {org.type === 'business' ? '法人' : '個人'}
+                        メンバー · {org.type === 'business' ? '法人' : '個人'}
                       </div>
                     </div>
                     {org.id === userProfile.currentOrganization?.id && (
@@ -511,7 +507,7 @@ export default function Home() {
                           <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 bg-ink-yellow rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
                             <i className="ri-paint-brush-fill text-lg text-splat-dark"></i>
                           </div>
                         </div>
