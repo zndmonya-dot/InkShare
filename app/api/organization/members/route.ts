@@ -29,21 +29,40 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: orgsError.message }, { status: 500 })
     }
 
-    // ユーザー情報を並列取得
+    // ユーザー情報とステータスを並列取得
     const memberPromises = (userOrgs || []).map(async (uo) => {
-      const { data: user } = await supabase
-        .from('users')
-        .select('id, name, email, avatar_color')
-        .eq('id', uo.user_id)
-        .single()
+      const [userResult, statusResult] = await Promise.all([
+        supabase
+          .from('users')
+          .select('id, name, email, avatar_color')
+          .eq('id', uo.user_id)
+          .single(),
+        supabase
+          .from('user_status')
+          .select('status, custom1_label, custom1_icon, custom1_color, custom2_label, custom2_icon, custom2_color, updated_at')
+          .eq('user_id', uo.user_id)
+          .eq('organization_id', profile.currentOrganization.id)
+          .maybeSingle()
+      ])
+
+      const user = userResult.data
+      const status = statusResult.data
 
       if (user) {
         return {
           id: user.id,
           name: user.name,
           email: user.email,
-          avatar_color: user.avatar_color,
+          avatarColor: user.avatar_color,
           role: uo.role,
+          status: status?.status || 'available',
+          lastUpdated: status?.updated_at || new Date().toISOString(),
+          custom1_label: status?.custom1_label,
+          custom1_icon: status?.custom1_icon,
+          custom1_color: status?.custom1_color,
+          custom2_label: status?.custom2_label,
+          custom2_icon: status?.custom2_icon,
+          custom2_color: status?.custom2_color,
         }
       }
       return null
