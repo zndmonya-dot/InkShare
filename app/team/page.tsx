@@ -215,6 +215,17 @@ export default function TeamPage() {
               let config = statusConfig[member.status]
               const updatedToday = isUpdatedToday(member.lastUpdated)
               
+              // configが存在しない場合のデフォルト値
+              if (!config) {
+                config = {
+                  label: 'ステータス不明',
+                  icon: 'ri-question-line',
+                  color: 'text-gray-400',
+                  bgColor: 'bg-gray-500',
+                  glow: 'shadow-gray-500/50',
+                }
+              }
+              
               // カスタムステータスの場合、メンバー固有の設定を使用
               if (member.status === 'custom1' && member.custom1_label) {
                 config = {
@@ -296,6 +307,17 @@ export default function TeamPage() {
       {/* メンバー詳細モーダル */}
       {selectedMember && (() => {
         let modalConfig = statusConfig[selectedMember.status]
+        
+        // modalConfigが存在しない場合のデフォルト値
+        if (!modalConfig) {
+          modalConfig = {
+            label: 'ステータス不明',
+            icon: 'ri-question-line',
+            color: 'text-gray-400',
+            bgColor: 'bg-gray-500',
+            glow: 'shadow-gray-500/50',
+          }
+        }
         
         // カスタムステータスの場合、メンバー固有の設定を使用
         if (selectedMember.status === 'custom1' && selectedMember.custom1_label) {
