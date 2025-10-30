@@ -39,26 +39,35 @@ export default function LandingPage() {
 
         {/* 特徴 - クリーン版 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-yellow/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-yellow">
+          <div 
+            className="bg-white/5 backdrop-blur-sm border-2 border-ink-yellow/50 rounded-2xl p-8 text-center hover:bg-white/10 hover:border-ink-yellow"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+          >
             <i className="ri-chat-check-line text-5xl text-ink-yellow mb-4"></i>
             <h3 className="text-ink-yellow font-black text-lg mb-3" style={{fontWeight: 800}}>リアルタイムステータス</h3>
-            <p className="text-white/70 text-sm font-medium">
+            <p className="text-white/60 text-sm font-medium">
               10種類のステータスで、今話しかけていいかすぐわかる
             </p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-cyan/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-cyan">
+          <div 
+            className="bg-white/5 backdrop-blur-sm border-2 border-ink-cyan/50 rounded-2xl p-8 text-center hover:bg-white/10 hover:border-ink-cyan"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+          >
             <i className="ri-team-line text-5xl text-ink-cyan mb-4"></i>
             <h3 className="text-ink-cyan font-black text-lg mb-3" style={{fontWeight: 800}}>プロアクティブな交流</h3>
-            <p className="text-white/70 text-sm font-medium">
+            <p className="text-white/60 text-sm font-medium">
               積極的なコミュニケーションを促進
             </p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border-2 border-ink-magenta/50 rounded-2xl p-8 text-center transition-all hover:bg-white/10 hover:border-ink-magenta">
+          <div 
+            className="bg-white/5 backdrop-blur-sm border-2 border-ink-magenta/50 rounded-2xl p-8 text-center hover:bg-white/10 hover:border-ink-magenta"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+          >
             <i className="ri-smartphone-line text-5xl text-ink-magenta mb-4"></i>
             <h3 className="text-ink-magenta font-black text-lg mb-3" style={{fontWeight: 800}}>PWA対応</h3>
-            <p className="text-white/70 text-sm font-medium">
+            <p className="text-white/60 text-sm font-medium">
               スマホにインストールして使える
             </p>
           </div>
@@ -70,7 +79,8 @@ export default function LandingPage() {
             {/* サインアップボタン */}
             <Link
               href="/signup"
-              className="inline-block px-12 py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark text-xl font-black rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+              className="inline-block px-12 py-4 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark text-xl font-black rounded-2xl hover:scale-105 active:scale-95 shadow-xl"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               無料で始める
             </Link>
@@ -78,21 +88,23 @@ export default function LandingPage() {
             {/* ログインボタン - 目立つように */}
             <Link
               href="/login"
-              className="inline-block px-12 py-4 bg-white/10 hover:bg-white/20 text-white text-xl font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 border-2 border-white/30 hover:border-white/50"
+              className="inline-block px-12 py-4 bg-white/10 hover:bg-white/20 text-white text-xl font-bold rounded-2xl hover:scale-105 active:scale-95 border-2 border-white/30 hover:border-white/50"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               ログイン
             </Link>
           </div>
 
           <p className="text-white/60 text-base font-bold">
-            個人グループも法人組織も作成できます
+            アカウント作成は無料、今すぐ始められます
           </p>
 
           {/* デモボタン - 控えめに */}
           <div className="pt-2">
             <Link
               href="/demo"
-              className="inline-flex items-center gap-2 text-ink-cyan hover:text-ink-cyan/80 text-base font-bold transition-all hover:scale-105 active:scale-95"
+              className="inline-flex items-center gap-2 text-ink-cyan hover:text-ink-cyan/80 text-base font-bold hover:scale-105 active:scale-95"
+              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
               <i className="ri-play-circle-line text-xl"></i>
               デモを試す（ログイン不要）

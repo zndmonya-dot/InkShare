@@ -78,24 +78,37 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center text-lime-400 text-2xl splatoon-glow">
-        Loading...
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-ink-cyan/30"></div>
+          <div className="absolute inset-0 ink-spinner">
+            <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-cyan border-r-ink-cyan"></div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-ink-cyan rounded-full ink-pulse-ring"></div>
+          </div>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6">
-        <div className="relative w-full max-w-md bg-gray-800/60 border-2 border-rose-400/30 rounded-2xl p-8 backdrop-blur-sm text-center">
-          <div className="mb-6">
-            <i className="ri-error-warning-line text-6xl text-rose-400"></i>
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+          <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-magenta ink-blob blur-[100px]"></div>
+          <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+        </div>
+        <div className="relative w-full max-w-md bg-white/10 backdrop-blur-sm border-2 border-ink-magenta/40 rounded-2xl p-8 shadow-2xl z-10 text-center animate-fade-in-scale">
+          <div className="w-20 h-20 bg-ink-magenta rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-ink-magenta/50">
+            <i className="ri-error-warning-line text-5xl text-white"></i>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-4">エラー</h2>
-          <p className="text-gray-400 mb-6">{error}</p>
+          <h2 className="text-3xl font-bold text-white mb-4">エラー</h2>
+          <p className="text-white/60 mb-6">{error}</p>
           <Link
             href="/landing"
-            className="inline-block px-8 py-3 rounded-xl text-black font-bold bg-lime-400 hover:bg-lime-300 transition-all"
+            className="inline-block px-8 py-4 rounded-xl text-splat-dark font-bold bg-ink-yellow hover:bg-ink-yellow/90 shadow-lg"
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
             トップページへ
           </Link>
@@ -106,8 +119,16 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
   if (isJoining) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center text-lime-400 text-2xl splatoon-glow">
-        参加中...
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center">
+        <div className="relative w-16 h-16">
+          <div className="absolute inset-0 rounded-full border-4 border-ink-cyan/30"></div>
+          <div className="absolute inset-0 ink-spinner">
+            <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-cyan border-r-ink-cyan"></div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-ink-cyan rounded-full ink-pulse-ring"></div>
+          </div>
+        </div>
       </div>
     )
   }
@@ -115,34 +136,41 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   // ログインしていない場合
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6 overflow-hidden relative">
-        {/* 背景のインク飛び散りエフェクト */}
-        <div className="absolute top-20 right-20 w-96 h-96 bg-cyan-400 opacity-10 rounded-full blur-3xl ink-float"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-blue-500 opacity-10 rounded-full blur-3xl ink-pulse"></div>
+      <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark flex items-center justify-center p-6 overflow-hidden relative">
+        {/* 背景のインク */}
+        <div className="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+          <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]"></div>
+          <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
+        </div>
 
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-w-md z-10">
           {/* ロゴ */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-4 mb-2">
-              <div className="w-16 h-16 bg-cyan-400 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.6)]">
-                <i className="ri-paint-brush-fill text-4xl text-gray-900"></i>
+          <div className="text-center mb-10 animate-fade-in-scale">
+            <div className="inline-block">
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="w-20 h-20 bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50">
+                  <i className="ri-paint-brush-fill text-5xl text-splat-dark"></i>
+                </div>
+                <h1 className="text-5xl font-black text-white">
+                  Inkshare
+                </h1>
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)] splatoon-glow">
-                Inkshare
-              </h1>
+              <p className="text-ink-cyan text-base font-bold">招待リンク</p>
             </div>
           </div>
 
-          <div className="relative bg-gray-800/60 border-2 border-cyan-400/30 rounded-2xl p-8 backdrop-blur-sm">
+          <div className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-2xl p-8 shadow-2xl">
             <div className="text-center mb-6">
-              <i className="ri-mail-open-line text-6xl text-cyan-400 mb-4 block"></i>
-              <h2 className="text-2xl font-bold text-white mb-2">組織への招待</h2>
-              <p className="text-gray-400 mb-4">
+              <div className="w-20 h-20 bg-ink-cyan rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-ink-cyan/50">
+                <i className="ri-mail-open-line text-5xl text-splat-dark"></i>
+              </div>
+              <h2 className="text-3xl font-bold text-white mb-4">グループへの招待</h2>
+              <p className="text-white/60 mb-4">
                 {organization?.name} から招待されています
               </p>
-              <div className="bg-cyan-400/10 border border-cyan-400/30 rounded-xl p-4 mb-6">
-                <div className="text-cyan-400 font-bold text-lg">{organization?.name}</div>
-                <div className="text-gray-400 text-sm mt-1">
+              <div className="bg-white/5 border-2 border-ink-cyan rounded-xl p-4 mb-6">
+                <div className="text-ink-cyan font-bold text-xl">{organization?.name}</div>
+                <div className="text-white/50 text-sm mt-1">
                   {organization?.type === 'business' ? '法人向け' : '個人向け'}
                 </div>
               </div>
@@ -151,14 +179,16 @@ export default function InvitePage({ params }: { params: { token: string } }) {
             <div className="space-y-3">
               <Link
                 href={`/login?redirect=/invite/${params.token}`}
-                className="block w-full py-3 rounded-xl text-black font-bold text-lg bg-cyan-400 hover:bg-cyan-300 transition-all text-center"
+                className="block w-full py-4 rounded-xl text-splat-dark font-bold text-lg bg-ink-cyan hover:bg-ink-cyan/90 shadow-lg text-center"
+                style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
                 <i className="ri-login-box-line mr-2"></i>
                 ログインして参加
               </Link>
               <Link
-                href={`/signup/business?inviteToken=${params.token}`}
-                className="block w-full py-3 rounded-xl text-cyan-400 font-bold text-lg bg-white/10 hover:bg-white/20 transition-all border-2 border-cyan-400/50 hover:border-cyan-400 text-center"
+                href={`/signup?inviteToken=${params.token}`}
+                className="block w-full py-4 rounded-xl text-ink-cyan font-bold text-lg bg-white/10 hover:bg-white/20 border-2 border-ink-cyan/50 hover:border-ink-cyan text-center"
+                style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               >
                 <i className="ri-user-add-line mr-2"></i>
                 アカウントを作成して参加
