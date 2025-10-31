@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ToastContainer, ToastType } from '@/components/Toast'
 
 function CreateGroupContent() {
   const router = useRouter()
@@ -13,6 +14,7 @@ function CreateGroupContent() {
   const [error, setError] = useState('')
   const [showInviteCode, setShowInviteCode] = useState(false)
   const [generatedInviteCode, setGeneratedInviteCode] = useState('')
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: ToastType }>>([])
 
   // 認証チェック
   useEffect(() => {
@@ -101,6 +103,12 @@ function CreateGroupContent() {
           <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
         </div>
 
+        {/* トースト通知 */}
+        <ToastContainer 
+          toasts={toasts} 
+          onClose={(id) => setToasts(toasts.filter(t => t.id !== id))} 
+        />
+
         <div className="relative w-full max-w-md bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-2xl p-8 shadow-2xl z-10 animate-fade-in-scale">
           <div className="text-center">
             <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/50 animate-bounce">
@@ -123,7 +131,8 @@ function CreateGroupContent() {
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(generatedInviteCode)
-                      alert('招待コードをコピーしました')
+                      const id = Date.now().toString()
+                      setToasts([...toasts, { id, message: '招待コードをコピーしました', type: 'success' }])
                     }}
                     className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm border border-white/20"
                     style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -156,6 +165,12 @@ function CreateGroupContent() {
         <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
+
+      {/* トースト通知 */}
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={(id) => setToasts(toasts.filter(t => t.id !== id))} 
+      />
 
       {/* ログアウトボタン（右上） */}
       <Link

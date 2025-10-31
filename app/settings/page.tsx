@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Toast, ToastContainer, ToastType } from '@/components/Toast'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -15,6 +16,7 @@ export default function SettingsPage() {
   const [dissolveConfirmText, setDissolveConfirmText] = useState('')
   const [resetTime, setResetTime] = useState(0)
   const [isSavingResetTime, setIsSavingResetTime] = useState(false)
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: ToastType }>>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,13 +73,16 @@ export default function SettingsPage() {
       })
 
       if (res.ok) {
-        alert(`ステータス初期化時刻を${resetTime}時に設定しました`)
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: `ステータス初期化時刻を${resetTime}時に設定しました`, type: 'success' }])
       } else {
         const data = await res.json()
-        alert(data.error || '設定に失敗しました')
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: data.error || '設定に失敗しました', type: 'error' }])
       }
     } catch (error) {
-      alert('設定に失敗しました')
+      const id = Date.now().toString()
+      setToasts([...toasts, { id, message: '設定に失敗しました', type: 'error' }])
     } finally {
       setIsSavingResetTime(false)
     }
@@ -85,7 +90,8 @@ export default function SettingsPage() {
 
   const handleDissolve = async () => {
     if (dissolveConfirmText !== userProfile?.currentOrganization?.name) {
-      alert('組織名が一致しません')
+      const id = Date.now().toString()
+      setToasts([...toasts, { id, message: '組織名が一致しません', type: 'error' }])
       return
     }
 
@@ -97,15 +103,20 @@ export default function SettingsPage() {
       const data = await res.json()
 
       if (res.ok) {
-        alert('組織を解散しました')
-        router.push('/landing')
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: '組織を解散しました', type: 'success' }])
+        setTimeout(() => {
+          router.push('/landing')
+        }, 1500)
       } else {
         console.error('Dissolve error:', data)
-        alert(`解散に失敗しました\n\nエラー: ${data.error}\n\n詳細: ${JSON.stringify(data.details || {})}`)
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: `解散に失敗しました: ${data.error}`, type: 'error' }])
       }
     } catch (error: any) {
       console.error('Dissolve error:', error)
-      alert(`解散に失敗しました\n\nエラー: ${error.message}`)
+      const id = Date.now().toString()
+      setToasts([...toasts, { id, message: `解散に失敗しました: ${error.message}`, type: 'error' }])
     }
   }
 
@@ -366,6 +377,12 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
+      {/* トースト通知 */}
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={(id) => setToasts(toasts.filter(t => t.id !== id))} 
+      />
     </div>
   )
 }
