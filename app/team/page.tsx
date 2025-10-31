@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { PresenceStatus } from '@/types'
+import { PresenceStatus, UserProfile } from '@/types'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 interface Member {
@@ -67,6 +67,8 @@ export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
+  const [lastStatusUpdate, setLastStatusUpdate] = useState<string | null>(null)
 
   // チェック：最終更新が今日（JST）かどうか
   const isUpdatedToday = (lastUpdated: string) => {
@@ -108,20 +110,38 @@ export default function TeamPage() {
   }
 
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/api/organization/members')
-        if (res.ok) {
-          const data = await res.json()
-          setMembers(data.members || [])
+        // メンバーリストと現在のユーザー情報を並列取得
+        const [membersRes, userRes, statusRes] = await Promise.all([
+          fetch('/api/organization/members'),
+          fetch('/api/auth/me'),
+          fetch('/api/status')
+        ])
+        
+        if (membersRes.ok) {
+          const membersData = await membersRes.json()
+          setMembers(membersData.members || [])
+        }
+        
+        if (userRes.ok) {
+          const userData = await userRes.json()
+          setCurrentUser(userData.user)
+        }
+        
+        if (statusRes.ok) {
+          const statusData = await statusRes.json()
+          if (statusData.status?.updated_at) {
+            setLastStatusUpdate(statusData.status.updated_at)
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch members:', error)
+        console.error('Failed to fetch data:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchMembers()
+    fetchData()
   }, [])
 
   const filteredMembers = filterStatus === 'all' 
@@ -138,15 +158,30 @@ export default function TeamPage() {
 
       {/* ヘッダー */}
       <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
-        <button
-          onClick={() => router.back()}
-          className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20"
-        >
-          <i className="ri-arrow-left-line mr-1"></i>
-          戻る
-        </button>
-        <h1 className="text-xl font-bold text-white">チーム状況</h1>
-        <div className="w-16" /> {/* スペーサー */}
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <button
+            onClick={() => router.back()}
+            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20 flex-shrink-0"
+          >
+            <i className="ri-arrow-left-line mr-1"></i>
+            戻る
+          </button>
+          {/* 名前と時間を左上に表示 */}
+          {currentUser && (
+            <div className="flex flex-col min-w-0">
+              <div className="text-white text-sm sm:text-base font-bold truncate">
+                {currentUser.name}
+              </div>
+              {lastStatusUpdate && (
+                <div className="text-white/50 text-xs">
+                  {formatLastUpdated(lastStatusUpdate)}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <h1 className="text-xl font-bold text-white flex-shrink-0">チーム状況</h1>
+        <div className="w-16 flex-shrink-0" /> {/* スペーサー */}
       </header>
 
       {/* フィルター - クリーン版 */}
@@ -159,6 +194,10 @@ export default function TeamPage() {
                 ? 'bg-white/20 text-white border border-white/30' 
                 : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
             }`}
+            style={{
+              transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
+              willChange: 'background-color, border-color, transform'
+            }}
           >
             <i className="ri-group-line mr-1.5"></i>
             全員
@@ -175,6 +214,10 @@ export default function TeamPage() {
                     ? `${config.bgColor} text-splat-dark border border-splat-dark/20`
                     : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
                 }`}
+                style={{
+                  transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
+                  willChange: 'background-color, border-color, transform'
+                }}
               >
                 <i className={`${config.icon} mr-1.5`}></i>
                 {config.label}
@@ -263,17 +306,12 @@ export default function TeamPage() {
                     </div>
                   )}
                   
-                  {/* 上部：名前と時間 */}
+                  {/* 上部：名前のみ（時間はヘッダーに表示） */}
                   <div className="mb-3">
-                    <div className={`font-medium text-sm sm:text-base mb-0.5 truncate ${
+                    <div className={`font-medium text-sm sm:text-base truncate ${
                       updatedToday ? 'text-white' : 'text-gray-400'
                     }`}>
                       {member.name}
-                    </div>
-                    <div className={`text-xs ${
-                      updatedToday ? 'text-white/50' : 'text-gray-500'
-                    }`}>
-                      {formatLastUpdated(member.lastUpdated)}
                     </div>
                   </div>
                   

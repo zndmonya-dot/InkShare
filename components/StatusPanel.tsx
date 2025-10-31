@@ -180,7 +180,7 @@ export const StatusPanel = memo(function StatusPanel({
                 }`}
                 style={{ 
                   touchAction: 'none',
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
                   willChange: 'transform, opacity'
                 }}
               >
@@ -216,7 +216,7 @@ export const StatusPanel = memo(function StatusPanel({
                     : ''
                 }`}
                 style={{ 
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
                   willChange: 'opacity'
                 }}
                 onDragOver={(e) => {

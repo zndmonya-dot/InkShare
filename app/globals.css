@@ -27,7 +27,7 @@
            transform shadow-lg hover:shadow-2xl;
     font-weight: 900;
     letter-spacing: 0.05em;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s cubic-bezier(0.3, 0, 0.1, 1);
     will-change: transform, box-shadow;
   }
   
@@ -37,7 +37,7 @@
   
   .btn-splat:active {
     transform: scale(0.97) translateY(0);
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s cubic-bezier(0.3, 0, 0.1, 1);
   }
   
   .btn-splat::before {

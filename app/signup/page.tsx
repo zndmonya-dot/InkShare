@@ -158,7 +158,7 @@ export default function SignupPage() {
               type="submit"
               disabled={isLoading}
               className="w-full py-4 bg-ink-cyan hover:bg-ink-cyan/90 disabled:bg-gray-600 disabled:cursor-not-allowed text-splat-dark text-lg font-bold rounded-xl shadow-lg mt-2"
-              style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+              style={{ transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)', willChange: 'background-color' }}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -187,6 +187,7 @@ export default function SignupPage() {
             <Link
               href="/login"
               className="inline-block px-6 py-2 bg-white/10 hover:bg-white/20 text-ink-yellow font-medium rounded-lg transition-all border border-ink-yellow/50 hover:border-ink-yellow"
+              style={{ transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)', willChange: 'background-color, border-color' }}
             >
               ログイン
             </Link>
