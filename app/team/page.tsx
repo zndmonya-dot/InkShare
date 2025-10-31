@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
 import { PresenceStatus, UserProfile } from '@/types'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
+import { ToastContainer, ToastType } from '@/components/Toast'
 
 interface Member {
   id: string
@@ -72,6 +73,10 @@ export default function TeamPage() {
   const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [savedOrgName, setSavedOrgName] = useState<string | null>(null)
+  const [toasts, setToasts] = useState<Array<{ id: string; message: string; type: ToastType }>>([])
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false)
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [isSendingBroadcast, setIsSendingBroadcast] = useState(false)
 
   // チェック：最終更新が今日（JST）かどうか
   const isUpdatedToday = (lastUpdated: string) => {
@@ -254,6 +259,41 @@ export default function TeamPage() {
     ? members 
     : members.filter(m => m.status === filterStatus)
 
+  // 全員への通知送信
+  const handleBroadcast = async (type: string) => {
+    if (!broadcastMessage.trim()) {
+      const id = Date.now().toString()
+      setToasts([...toasts, { id, message: 'メッセージを入力してください', type: 'warning' }])
+      return
+    }
+
+    setIsSendingBroadcast(true)
+    try {
+      const res = await fetch('/api/notification/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: broadcastMessage, type }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: data.message || '通知を送信しました', type: 'success' }])
+        setShowBroadcastModal(false)
+        setBroadcastMessage('')
+      } else {
+        const id = Date.now().toString()
+        setToasts([...toasts, { id, message: data.error || '通知送信に失敗しました', type: 'error' }])
+      }
+    } catch (error: any) {
+      const id = Date.now().toString()
+      setToasts([...toasts, { id, message: '通知送信に失敗しました', type: 'error' }])
+    } finally {
+      setIsSendingBroadcast(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark overflow-hidden relative">
       {/* 背景のインク - スクロール防止版 */}
@@ -357,6 +397,18 @@ export default function TeamPage() {
               </button>
             )
           })}
+        </div>
+        
+        {/* 全員への通知送信ボタン */}
+        <div className="mt-3 flex justify-center">
+          <button
+            onClick={() => setShowBroadcastModal(true)}
+            disabled={loading || isSwitchingOrg || members.length === 0}
+            className="px-6 py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <i className="ri-notification-line text-lg"></i>
+            <span>全員に通知</span>
+          </button>
         </div>
       </div>
 
@@ -615,6 +667,96 @@ export default function TeamPage() {
           </div>
         )
       })()}
+
+      {/* 全員への通知モーダル */}
+      {showBroadcastModal && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+          onClick={() => {
+            setShowBroadcastModal(false)
+            setBroadcastMessage('')
+          }}
+        >
+          <div
+            className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+              <i className="ri-notification-line"></i>
+              全員に通知
+            </h3>
+            
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  メッセージ
+                </label>
+                <textarea
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  placeholder="例: お昼ごはん行きませんか？"
+                  disabled={isSendingBroadcast}
+                  className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:outline-none focus:border-ink-yellow placeholder:text-white/40 resize-none min-h-[100px] disabled:opacity-50"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleBroadcast('lunch')}
+                  disabled={isSendingBroadcast}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                >
+                  <i className="ri-restaurant-line"></i>
+                  ランチ
+                </button>
+                <button
+                  onClick={() => handleBroadcast('chat')}
+                  disabled={isSendingBroadcast}
+                  className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                >
+                  <i className="ri-chat-3-line"></i>
+                  雑談
+                </button>
+                <button
+                  onClick={() => handleBroadcast('want_to_talk')}
+                  disabled={isSendingBroadcast}
+                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                >
+                  <i className="ri-message-3-line"></i>
+                  話しかける
+                </button>
+                <button
+                  onClick={() => handleBroadcast('help')}
+                  disabled={isSendingBroadcast}
+                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                >
+                  <i className="ri-hand-heart-line"></i>
+                  助ける
+                </button>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowBroadcastModal(false)
+                  setBroadcastMessage('')
+                }}
+                disabled={isSendingBroadcast}
+                className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20 disabled:opacity-50"
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* トースト通知 */}
+      <ToastContainer 
+        toasts={toasts} 
+        onClose={(id) => setToasts(toasts.filter(t => t.id !== id))} 
+      />
     </div>
   )
 }
