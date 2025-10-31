@@ -472,14 +472,16 @@ export default function Home() {
         </div>
       )}
 
-      <main className="relative flex-1 flex items-center justify-center p-4 overflow-y-auto">
-        <StatusPanel
-          currentStatus={currentStatus}
-          onStatusChange={handleStatusChange}
-          customStatus1={customStatus1}
-          customStatus2={customStatus2}
-          onCustomClick={(type) => setShowCustomModal(type)}
-        />
+      <main className="relative flex-1 flex flex-col items-center p-4 overflow-y-auto">
+        <div className="w-full max-w-4xl flex-shrink-0">
+          <StatusPanel
+            currentStatus={currentStatus}
+            onStatusChange={handleStatusChange}
+            customStatus1={customStatus1}
+            customStatus2={customStatus2}
+            onCustomClick={(type) => setShowCustomModal(type)}
+          />
+        </div>
       </main>
 
               {showCustomModal && (
