@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { PresenceStatus, UserProfile } from '@/types'
+import { PresenceStatus } from '@/types'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 interface Member {
@@ -67,8 +67,6 @@ export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
-  const [lastStatusUpdate, setLastStatusUpdate] = useState<string | null>(null)
 
   // チェック：最終更新が今日（JST）かどうか
   const isUpdatedToday = (lastUpdated: string) => {
@@ -110,38 +108,20 @@ export default function TeamPage() {
   }
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMembers = async () => {
       try {
-        // メンバーリストと現在のユーザー情報を並列取得
-        const [membersRes, userRes, statusRes] = await Promise.all([
-          fetch('/api/organization/members'),
-          fetch('/api/auth/me'),
-          fetch('/api/status')
-        ])
-        
-        if (membersRes.ok) {
-          const membersData = await membersRes.json()
-          setMembers(membersData.members || [])
-        }
-        
-        if (userRes.ok) {
-          const userData = await userRes.json()
-          setCurrentUser(userData.user)
-        }
-        
-        if (statusRes.ok) {
-          const statusData = await statusRes.json()
-          if (statusData.status?.updated_at) {
-            setLastStatusUpdate(statusData.status.updated_at)
-          }
+        const res = await fetch('/api/organization/members')
+        if (res.ok) {
+          const data = await res.json()
+          setMembers(data.members || [])
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error)
+        console.error('Failed to fetch members:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchData()
+    fetchMembers()
   }, [])
 
   const filteredMembers = filterStatus === 'all' 
@@ -158,30 +138,15 @@ export default function TeamPage() {
 
       {/* ヘッダー */}
       <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <button
-            onClick={() => router.back()}
-            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20 flex-shrink-0"
-          >
-            <i className="ri-arrow-left-line mr-1"></i>
-            戻る
-          </button>
-          {/* 名前と時間を左上に表示 */}
-          {currentUser && (
-            <div className="flex flex-col min-w-0">
-              <div className="text-white text-sm sm:text-base font-bold truncate">
-                {currentUser.name}
-              </div>
-              {lastStatusUpdate && (
-                <div className="text-white/50 text-xs">
-                  {formatLastUpdated(lastStatusUpdate)}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <h1 className="text-xl font-bold text-white flex-shrink-0">チーム状況</h1>
-        <div className="w-16 flex-shrink-0" /> {/* スペーサー */}
+        <button
+          onClick={() => router.back()}
+          className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20"
+        >
+          <i className="ri-arrow-left-line mr-1"></i>
+          戻る
+        </button>
+        <h1 className="text-xl font-bold text-white">チーム状況</h1>
+        <div className="w-16" /> {/* スペーサー */}
       </header>
 
       {/* フィルター - クリーン版 */}
@@ -306,19 +271,24 @@ export default function TeamPage() {
                     </div>
                   )}
                   
-                  {/* 上部：名前のみ（時間はヘッダーに表示） */}
-                  <div className="mb-3">
-                    <div className={`font-medium text-sm sm:text-base truncate ${
+                  {/* 左上：名前と時間 */}
+                  <div className="absolute top-3 left-3 text-left">
+                    <div className={`font-medium text-xs sm:text-sm mb-0.5 truncate max-w-[calc(100%-1rem)] ${
                       updatedToday ? 'text-white' : 'text-gray-400'
                     }`}>
                       {member.name}
+                    </div>
+                    <div className={`text-xs truncate ${
+                      updatedToday ? 'text-white/50' : 'text-gray-500'
+                    }`}>
+                      {formatLastUpdated(member.lastUpdated)}
                     </div>
                   </div>
                   
                   {/* アバター（ステータスの色で表示） */}
                   <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${config.bgColor} flex items-center justify-center mx-auto mb-3 shadow-lg transition-all ${
                     !updatedToday ? 'opacity-50 grayscale' : 'shadow-xl'
-                  }`}>
+                  }`} style={{ marginTop: '2.5rem' }}>
                     <span className="text-white font-bold text-xl sm:text-2xl drop-shadow-lg">
                       {member.name.charAt(0)}
                     </span>
