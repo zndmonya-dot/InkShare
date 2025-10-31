@@ -159,6 +159,8 @@ export default function DemoTeamPage() {
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [selectedMember, setSelectedMember] = useState<any | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchBar, setShowSearchBar] = useState(false)
 
   // localStorageから自分のステータスと組織IDを読み込んでメンバーリストを作成
   useEffect(() => {
@@ -182,6 +184,12 @@ export default function DemoTeamPage() {
     const updated = new Date(lastUpdated)
     return now.toDateString() === updated.toDateString()
   }
+
+  // 検索フィルター
+  const filteredMembers = members.filter(m => {
+    if (!searchQuery) return true
+    return m.name.toLowerCase().includes(searchQuery.toLowerCase())
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark overflow-hidden relative">
@@ -232,8 +240,51 @@ export default function DemoTeamPage() {
 
       {/* メンバーリスト */}
       <main className="p-4 overflow-visible space-y-4">
+        {/* 検索バー */}
+        <div className="flex gap-2">
+          {showSearchBar ? (
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="メンバーを検索..."
+                className="w-full px-4 py-2 pl-10 bg-white/5 text-white border border-white/20 rounded-xl focus:outline-none focus:border-ink-yellow placeholder:text-white/40"
+                style={{ fontSize: '16px' }}
+              />
+              <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-white/60 text-lg"></i>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                >
+                  <i className="ri-close-circle-line text-xl"></i>
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowSearchBar(true)}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20 flex items-center gap-2"
+            >
+              <i className="ri-search-line text-lg"></i>
+            </button>
+          )}
+          {showSearchBar && (
+            <button
+              onClick={() => {
+                setShowSearchBar(false)
+                setSearchQuery('')
+              }}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20"
+            >
+              <i className="ri-close-line text-lg"></i>
+            </button>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-visible">
-          {members.map((member) => {
+          {filteredMembers.map((member) => {
             const config = statusConfig[member.status]
             const updatedToday = isUpdatedToday(member.lastUpdated)
             
