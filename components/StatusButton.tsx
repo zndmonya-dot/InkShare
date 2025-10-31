@@ -77,6 +77,8 @@ export const StatusButton = memo(function StatusButton({
     <button
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      aria-label={`ステータスを「${label}」に変更${isActive ? '（現在選択中）' : ''}`}
+      aria-pressed={isActive}
       style={{
         transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
         willChange: 'transform, background-color, box-shadow',
