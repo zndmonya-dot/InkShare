@@ -77,6 +77,8 @@ export default function TeamPage() {
   const [showBroadcastModal, setShowBroadcastModal] = useState(false)
   const [broadcastMessage, setBroadcastMessage] = useState('')
   const [isSendingBroadcast, setIsSendingBroadcast] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchBar, setShowSearchBar] = useState(false)
 
   // チェック：最終更新が今日（JST）かどうか
   const isUpdatedToday = (lastUpdated: string) => {
@@ -255,9 +257,13 @@ export default function TeamPage() {
     fetchData()
   }, [])
 
-  const filteredMembers = filterStatus === 'all' 
+  const filteredMembers = (filterStatus === 'all' 
     ? members 
     : members.filter(m => m.status === filterStatus)
+  ).filter(m => {
+    if (!searchQuery) return true
+    return m.name.toLowerCase().includes(searchQuery.toLowerCase())
+  })
 
   // 全員への通知送信
   const handleBroadcast = async () => {
@@ -399,16 +405,57 @@ export default function TeamPage() {
           })}
         </div>
         
-        {/* 全員への通知送信ボタン */}
-        <div className="mt-3 flex justify-center">
-          <button
-            onClick={() => setShowBroadcastModal(true)}
-            disabled={loading || isSwitchingOrg || members.length === 0}
-            className="px-6 py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-          >
-            <i className="ri-notification-line text-lg"></i>
-            <span>全員に通知</span>
-          </button>
+        {/* 検索バーと全員への通知送信ボタン */}
+        <div className="mt-3 flex gap-2">
+          {showSearchBar ? (
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="メンバーを検索..."
+                className="w-full px-4 py-2 pl-10 bg-white/5 text-white border border-white/20 rounded-xl focus:outline-none focus:border-ink-yellow placeholder:text-white/40"
+                style={{ fontSize: '16px' }}
+              />
+              <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-white/60 text-lg"></i>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                >
+                  <i className="ri-close-circle-line text-xl"></i>
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => setShowSearchBar(true)}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20 flex items-center gap-2"
+              >
+                <i className="ri-search-line text-lg"></i>
+              </button>
+              <button
+                onClick={() => setShowBroadcastModal(true)}
+                disabled={loading || isSwitchingOrg || members.length === 0}
+                className="flex-1 px-6 py-2 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <i className="ri-notification-line text-lg"></i>
+                <span>全員に通知</span>
+              </button>
+            </>
+          )}
+          {showSearchBar && (
+            <button
+              onClick={() => {
+                setShowSearchBar(false)
+                setSearchQuery('')
+              }}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/20"
+            >
+              <i className="ri-close-line text-lg"></i>
+            </button>
+          )}
         </div>
       </div>
 
