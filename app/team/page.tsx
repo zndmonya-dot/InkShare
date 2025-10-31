@@ -309,56 +309,58 @@ export default function TeamPage() {
       </div>
 
       {/* ヘッダー */}
-      <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10 min-h-[72px]">
+      <header className="relative p-4 flex items-center border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10 min-h-[72px]">
         <button
           onClick={() => router.back()}
-          className="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-xs sm:text-sm font-medium border border-white/20 flex items-center gap-1"
+          className="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-xs sm:text-sm font-medium border border-white/20 flex items-center gap-1 flex-shrink-0"
         >
           <i className="ri-arrow-left-line"></i>
           <span className="hidden xs:inline">戻る</span>
         </button>
-        <button
-          onClick={() => userProfile?.organizations && userProfile.organizations.length > 1 && !isSwitchingOrg && setShowOrgDropdown(!showOrgDropdown)}
-          className="text-center group"
-          disabled={!userProfile?.organizations || userProfile.organizations.length <= 1 || isSwitchingOrg}
-        >
-          <h1 className="text-lg sm:text-xl font-bold text-white">チーム状況</h1>
-          {/* サブラインの高さを固定してレイアウトシフトを防ぐ */}
-          <div className="h-5 sm:h-6 flex items-center justify-center">
-            {(() => {
-            // 表示用の組織名を取得（優先順位：userProfile → マウント後の保存値 → デフォルト）
-            const orgName = userProfile?.currentOrganization?.name || (mounted ? savedOrgName : null) || null
-              const hasMultipleOrgs = userProfile?.organizations && userProfile.organizations.length > 1
-              
-              if (hasMultipleOrgs) {
-                return (
-                  <div className={`flex items-center justify-center gap-1 text-xs sm:text-sm text-white/60 transition-colors ${
-                    isSwitchingOrg || loading ? '' : 'group-hover:text-ink-yellow'
-                  }`}>
-                    <span>{orgName || 'グループ未参加'}</span>
-                    {!isSwitchingOrg && !loading && <i className="ri-arrow-down-s-line"></i>}
-                    {(isSwitchingOrg || loading) && <i className="ri-loader-4-line animate-spin"></i>}
-                  </div>
-                )
-              } else if (orgName) {
-                return (
-                  <div className="text-xs sm:text-sm text-white/50">
-                    {orgName}
-                    {loading && <i className="ri-loader-4-line animate-spin ml-1 inline-block"></i>}
-                  </div>
-                )
-              } else if (loading) {
-                return (
-                  <div className="text-xs sm:text-sm text-white/50">
-                    読み込み中...
-                  </div>
-                )
-              }
-              return null
-            })()}
-          </div>
-        </button>
-        <div className="w-16 sm:w-16" /> {/* スペーサー */}
+        <div className="flex-1 flex justify-center">
+          <button
+            onClick={() => userProfile?.organizations && userProfile.organizations.length > 1 && !isSwitchingOrg && setShowOrgDropdown(!showOrgDropdown)}
+            className="text-center group"
+            disabled={!userProfile?.organizations || userProfile.organizations.length <= 1 || isSwitchingOrg}
+          >
+            <h1 className="text-lg sm:text-xl font-bold text-white">チーム状況</h1>
+            {/* サブラインの高さを固定してレイアウトシフトを防ぐ */}
+            <div className="h-5 sm:h-6 flex items-center justify-center">
+              {(() => {
+              // 表示用の組織名を取得（優先順位：userProfile → マウント後の保存値 → デフォルト）
+              const orgName = userProfile?.currentOrganization?.name || (mounted ? savedOrgName : null) || null
+                const hasMultipleOrgs = userProfile?.organizations && userProfile.organizations.length > 1
+                
+                if (hasMultipleOrgs) {
+                  return (
+                    <div className={`flex items-center justify-center gap-1 text-xs sm:text-sm text-white/60 transition-colors ${
+                      isSwitchingOrg || loading ? '' : 'group-hover:text-ink-yellow'
+                    }`}>
+                      <span>{orgName || 'グループ未参加'}</span>
+                      {!isSwitchingOrg && !loading && <i className="ri-arrow-down-s-line"></i>}
+                      {(isSwitchingOrg || loading) && <i className="ri-loader-4-line animate-spin"></i>}
+                    </div>
+                  )
+                } else if (orgName) {
+                  return (
+                    <div className="text-xs sm:text-sm text-white/50">
+                      {orgName}
+                      {loading && <i className="ri-loader-4-line animate-spin ml-1 inline-block"></i>}
+                    </div>
+                  )
+                } else if (loading) {
+                  return (
+                    <div className="text-xs sm:text-sm text-white/50">
+                      読み込み中...
+                    </div>
+                  )
+                }
+                return null
+              })()}
+            </div>
+          </button>
+        </div>
+        <div className="w-16 sm:w-16 flex-shrink-0" /> {/* スペーサー */}
       </header>
 
       {/* フィルター - クリーン版 */}

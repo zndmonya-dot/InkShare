@@ -211,27 +211,29 @@ export default function DemoTeamPage() {
       </div>
 
       {/* ヘッダー */}
-      <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
+      <header className="relative p-4 flex items-center border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
         <button
           onClick={() => router.push('/demo')}
-          className="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-xs sm:text-sm font-medium border border-white/20 flex items-center gap-1"
+          className="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-xs sm:text-sm font-medium border border-white/20 flex items-center gap-1 flex-shrink-0"
         >
           <i className="ri-arrow-left-line"></i>
           <span className="hidden xs:inline">戻る</span>
         </button>
-        <button
-          onClick={() => setShowOrgMenu(true)}
-          className="text-center group"
-        >
-          <h1 className="text-lg sm:text-xl font-bold text-white">チーム状況</h1>
-          <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-white/60 group-hover:text-ink-yellow transition-colors">
-            <span>{DEMO_TEAMS[currentOrgId as keyof typeof DEMO_TEAMS]?.name || '開発チーム'}</span>
-            <i className="ri-arrow-down-s-line"></i>
-          </div>
-        </button>
+        <div className="flex-1 flex justify-center">
+          <button
+            onClick={() => setShowOrgMenu(true)}
+            className="text-center group"
+          >
+            <h1 className="text-lg sm:text-xl font-bold text-white">チーム状況</h1>
+            <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-white/60 group-hover:text-ink-yellow transition-colors">
+              <span>{DEMO_TEAMS[currentOrgId as keyof typeof DEMO_TEAMS]?.name || '開発チーム'}</span>
+              <i className="ri-arrow-down-s-line"></i>
+            </div>
+          </button>
+        </div>
         <button
           onClick={() => router.push('/signup')}
-          className="px-3 sm:px-4 py-2.5 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg flex items-center gap-1"
+          className="px-3 sm:px-4 py-2.5 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-xs sm:text-sm rounded-xl transition-all shadow-lg flex items-center gap-1 flex-shrink-0"
         >
           <i className="ri-user-add-line"></i>
           <span className="hidden xs:inline">登録</span>
