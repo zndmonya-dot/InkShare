@@ -93,7 +93,7 @@ export const StatusButton = memo(function StatusButton({
     >
       {/* コンテンツ */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-3 h-full">
-        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? textColor : 'text-white/50'} flex-shrink-0 leading-[0]`}></i>
+        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? textColor : 'text-white/50'} flex-shrink-0`}></i>
         <span
           className={`
             text-sm sm:text-base md:text-lg font-bold text-center leading-tight px-2
