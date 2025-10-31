@@ -148,7 +148,7 @@ export default function DemoPage() {
           {/* ステータスボタングリッド */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {STATUS_OPTIONS.map((option) => (
-              <div key={option.status}>
+              <div key={option.status} className="aspect-square">
                 <StatusButton
                   label={option.label}
                   icon={option.icon}
@@ -161,7 +161,7 @@ export default function DemoPage() {
             ))}
 
             {/* カスタムステータス1 */}
-            <div className="relative">
+            <div className="relative aspect-square">
               <StatusButton
                 label={CUSTOM_STATUS_CONFIG.custom1.defaultLabel}
                 icon={CUSTOM_STATUS_CONFIG.custom1.defaultIcon}
@@ -176,7 +176,7 @@ export default function DemoPage() {
             </div>
 
             {/* カスタムステータス2 */}
-            <div className="relative">
+            <div className="relative aspect-square">
               <StatusButton
                 label={CUSTOM_STATUS_CONFIG.custom2.defaultLabel}
                 icon={CUSTOM_STATUS_CONFIG.custom2.defaultIcon}
