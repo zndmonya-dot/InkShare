@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default function LogoutPage() {
@@ -13,13 +12,15 @@ export default function LogoutPage() {
   useEffect(() => {
     const handleLogout = async () => {
       try {
-        const supabase = createClient()
-        
-        // Supabaseからサインアウト
-        const { error: signOutError } = await supabase.auth.signOut()
+        // API経由でログアウト
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include'
+        })
 
-        if (signOutError) {
-          throw new Error(signOutError.message)
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.error || 'ログアウトに失敗しました')
         }
 
         // すべてのSupabase関連Cookieをクリア

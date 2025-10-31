@@ -36,10 +36,8 @@ export default function Home() {
           fetch('/api/status')
         ])
 
-        const [profileData, statusData] = await Promise.all([
-          profileRes.json(),
-          statusRes.json()
-        ])
+        // レスポンスステータスをチェック
+        const profileData = await profileRes.json()
 
         console.log(`Data fetch completed in ${Math.round(performance.now() - startTime)}ms`)
 
@@ -57,23 +55,26 @@ export default function Home() {
 
         setUserProfile(profileData.user)
 
-        // ステータス設定
-        if (statusData.status) {
-          setCurrentStatus(statusData.status.status)
-          setCustomStatus1({
-            label: statusData.status.custom1_label || 'カスタム1',
-            icon: statusData.status.custom1_icon || 'ri-star-smile-fill',
-            color: statusData.status.custom1_color || 'bg-fuchsia-400',
-          })
-          setCustomStatus2({
-            label: statusData.status.custom2_label || 'カスタム2',
-            icon: statusData.status.custom2_icon || 'ri-star-smile-fill',
-            color: statusData.status.custom2_color || 'bg-purple-400',
-          })
-          
-          // 0時を過ぎてリセットされた場合、通知を表示
-          if (statusData.wasReset) {
-            console.log('ステータスが0時にリセットされました')
+        // ステータス設定（401エラーの場合は無視）
+        if (statusRes.ok) {
+          const statusData = await statusRes.json()
+          if (statusData.status) {
+            setCurrentStatus(statusData.status.status)
+            setCustomStatus1({
+              label: statusData.status.custom1_label || 'カスタム1',
+              icon: statusData.status.custom1_icon || 'ri-star-smile-fill',
+              color: statusData.status.custom1_color || 'bg-fuchsia-400',
+            })
+            setCustomStatus2({
+              label: statusData.status.custom2_label || 'カスタム2',
+              icon: statusData.status.custom2_icon || 'ri-star-smile-fill',
+              color: statusData.status.custom2_color || 'bg-purple-400',
+            })
+            
+            // 0時を過ぎてリセットされた場合、通知を表示
+            if (statusData.wasReset) {
+              console.log('ステータスが0時にリセットされました')
+            }
           }
         }
 
