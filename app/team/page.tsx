@@ -260,7 +260,7 @@ export default function TeamPage() {
     : members.filter(m => m.status === filterStatus)
 
   // 全員への通知送信
-  const handleBroadcast = async (type: string) => {
+  const handleBroadcast = async () => {
     if (!broadcastMessage.trim()) {
       const id = Date.now().toString()
       setToasts([...toasts, { id, message: 'メッセージを入力してください', type: 'warning' }])
@@ -272,7 +272,7 @@ export default function TeamPage() {
       const res = await fetch('/api/notification/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: broadcastMessage, type }),
+        body: JSON.stringify({ message: broadcastMessage, type: 'chat' }),
       })
 
       const data = await res.json()
@@ -697,42 +697,8 @@ export default function TeamPage() {
                   placeholder="例: お昼ごはん行きませんか？"
                   disabled={isSendingBroadcast}
                   className="w-full px-4 py-3 bg-white/5 text-white border border-white/20 rounded-xl focus:outline-none focus:border-ink-yellow placeholder:text-white/40 resize-none min-h-[100px] disabled:opacity-50"
+                  style={{ fontSize: '16px' }}
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleBroadcast('lunch')}
-                  disabled={isSendingBroadcast}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                >
-                  <i className="ri-restaurant-line"></i>
-                  ランチ
-                </button>
-                <button
-                  onClick={() => handleBroadcast('chat')}
-                  disabled={isSendingBroadcast}
-                  className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                >
-                  <i className="ri-chat-3-line"></i>
-                  雑談
-                </button>
-                <button
-                  onClick={() => handleBroadcast('want_to_talk')}
-                  disabled={isSendingBroadcast}
-                  className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                >
-                  <i className="ri-message-3-line"></i>
-                  話しかける
-                </button>
-                <button
-                  onClick={() => handleBroadcast('help')}
-                  disabled={isSendingBroadcast}
-                  className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
-                >
-                  <i className="ri-hand-heart-line"></i>
-                  助ける
-                </button>
               </div>
             </div>
 
@@ -746,6 +712,23 @@ export default function TeamPage() {
                 className="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20 disabled:opacity-50"
               >
                 キャンセル
+              </button>
+              <button
+                onClick={handleBroadcast}
+                disabled={isSendingBroadcast}
+                className="flex-1 py-3 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold rounded-xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSendingBroadcast ? (
+                  <>
+                    <i className="ri-loader-4-line animate-spin"></i>
+                    送信中...
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-send-plane-line"></i>
+                    送信
+                  </>
+                )}
               </button>
             </div>
           </div>
