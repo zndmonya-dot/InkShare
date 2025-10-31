@@ -157,7 +157,7 @@ export const StatusPanel = memo(function StatusPanel({
       )}
       
       {/* ステータスボタングリッド */}
-      <div className="grid grid-cols-2 auto-rows-fr gap-3 sm:gap-4 md:gap-5 h-full overflow-visible max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 overflow-visible max-w-4xl mx-auto">
         {statusItems.map((item, index) => {
           // プリセットステータス
           if (item.type === 'preset' && item.status) {
@@ -171,7 +171,7 @@ export const StatusPanel = memo(function StatusPanel({
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDragEnd={handleDragEnd}
-                className={`cursor-move select-none ${
+                className={`cursor-move select-none aspect-square ${
                   draggedIndex === index 
                     ? 'opacity-50 scale-95' 
                     : dragOverIndex === index && draggedIndex !== null
@@ -210,7 +210,7 @@ export const StatusPanel = memo(function StatusPanel({
             return (
               <div
                 key={item.id}
-                className={`cursor-default relative ${
+                className={`cursor-default relative aspect-square ${
                   dragOverIndex === index && draggedIndex !== null
                     ? 'ring-2 ring-red-500/50 opacity-50'
                     : ''
