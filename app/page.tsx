@@ -472,7 +472,7 @@ export default function Home() {
         </div>
       )}
 
-      <main className="relative flex-1 flex items-center justify-center p-4">
+      <main className="relative flex-1 flex items-center justify-center p-4 overflow-y-auto">
         <StatusPanel
           currentStatus={currentStatus}
           onStatusChange={handleStatusChange}
