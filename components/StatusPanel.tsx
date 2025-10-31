@@ -147,7 +147,7 @@ export const StatusPanel = memo(function StatusPanel({
   }
 
   return (
-    <div className={`w-full h-full overflow-visible relative ${shouldAnimate ? 'animate-fade-in-scale' : ''}`}>
+    <div className={`w-full overflow-visible relative ${shouldAnimate ? 'animate-fade-in-scale' : ''}`}>
       {/* ドラッグ中のヒント */}
       {draggedIndex !== null && (
         <div className="absolute top-0 left-0 right-0 text-center py-2 bg-ink-yellow/80 text-splat-dark text-sm font-bold rounded-lg shadow-lg z-50 animate-pulse">
