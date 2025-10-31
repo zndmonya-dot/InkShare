@@ -179,7 +179,7 @@ export const StatusPanel = memo(function StatusPanel({
                     : 'hover:scale-[1.01]'
                 }`}
                 style={{ 
-                  touchAction: 'none',
+                  touchAction: 'pan-y',
                   transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
                   willChange: 'transform, opacity'
                 }}
