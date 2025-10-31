@@ -234,7 +234,7 @@ export default function Home() {
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
       {/* ヘッダー - 改善版 */}
-      <header className="relative px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm">
+      <header className="relative px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 border-b border-white/10 bg-white/5 backdrop-blur-sm min-h-[72px]">
         {/* 左側：ユーザー＆グループ情報 */}
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* アバター */}
@@ -255,7 +255,7 @@ export default function Home() {
                 userProfile?.organizations && userProfile.organizations.length > 1
                   ? 'text-white/70 hover:text-white cursor-pointer'
                   : 'text-white/50 cursor-default'
-              } transition-all truncate max-w-[200px]`}
+              } transition-all truncate max-w-[200px] h-5 sm:h-6`}
               disabled={!userProfile?.organizations || userProfile.organizations.length <= 1}
               title={userProfile?.currentOrganization?.name || 'グループ未参加'}
             >

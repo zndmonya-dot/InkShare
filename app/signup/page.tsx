@@ -106,6 +106,10 @@ export default function SignupPage() {
                 placeholder="山田太郎"
                 disabled={isLoading}
                 autoComplete="name"
+                name="name"
+                inputMode="text"
+                spellCheck={false}
+                autoCapitalize="none"
                 className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
                 style={{ fontSize: '16px' }}
               />
@@ -124,7 +128,11 @@ export default function SignupPage() {
                 required
                 placeholder="your@email.com"
                 disabled={isLoading}
-                autoComplete="email"
+                autoComplete="username"
+                name="username"
+                inputMode="email"
+                spellCheck={false}
+                autoCapitalize="none"
                 className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
                 style={{ fontSize: '16px' }}
               />
@@ -145,6 +153,10 @@ export default function SignupPage() {
                 minLength={8}
                 disabled={isLoading}
                 autoComplete="new-password"
+                name="new-password"
+                inputMode="text"
+                spellCheck={false}
+                autoCapitalize="none"
                 className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-cyan focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
                 style={{ fontSize: '16px' }}
               />

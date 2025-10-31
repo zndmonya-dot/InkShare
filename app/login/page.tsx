@@ -73,7 +73,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
             {/* メールアドレス */}
             <div>
               <label className="block text-sm font-medium text-ink-yellow mb-2">
@@ -87,7 +87,10 @@ export default function LoginPage() {
                 required
                 placeholder="your@email.com"
                 disabled={isLoading}
-                autoComplete="email"
+                autoComplete="username"
+                name="username"
+                spellCheck={false}
+                autoCapitalize="none"
                 className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
                 style={{ fontSize: '16px' }}
               />
@@ -106,7 +109,11 @@ export default function LoginPage() {
                 required
                 placeholder="••••••••"
                 disabled={isLoading}
-                autoComplete="current-password"
+                // ブラウザの自動入力を抑止
+                autoComplete="new-password"
+                name="new-password"
+                spellCheck={false}
+                autoCapitalize="none"
                 className="w-full px-4 py-3 bg-white/5 text-white text-base border border-white/20 rounded-xl focus:border-ink-yellow focus:outline-none transition-all placeholder:text-white/40 disabled:opacity-50"
                 style={{ fontSize: '16px' }}
               />

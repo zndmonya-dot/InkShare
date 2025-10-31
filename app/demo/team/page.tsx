@@ -158,6 +158,7 @@ export default function DemoTeamPage() {
   const [members, setMembers] = useState<any[]>([])
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<any | null>(null)
 
   // localStorageから自分のステータスと組織IDを読み込んでメンバーリストを作成
   useEffect(() => {
@@ -231,53 +232,32 @@ export default function DemoTeamPage() {
 
       {/* メンバーリスト */}
       <main className="p-4 overflow-visible space-y-4">
-        {/* ステータス画面へのリンク */}
-        <div className="bg-ink-yellow/20 border-2 border-ink-yellow/50 rounded-xl p-4 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-ink-yellow rounded-full flex items-center justify-center">
-                <i className="ri-paint-brush-fill text-2xl text-splat-dark"></i>
-              </div>
-              <div>
-                <h3 className="text-white font-bold text-base sm:text-lg">ステータスを変更</h3>
-                <p className="text-white/70 text-xs sm:text-sm">自分のステータスを設定する</p>
-              </div>
-            </div>
-            <button
-              onClick={() => router.push('/demo')}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-ink-yellow hover:bg-ink-yellow/90 text-splat-dark font-bold text-sm sm:text-base rounded-lg transition-all shadow-lg whitespace-nowrap"
-            >
-              <i className="ri-arrow-right-line mr-1"></i>
-              開く
-            </button>
-          </div>
-        </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-visible">
           {members.map((member) => {
             const config = statusConfig[member.status]
             const updatedToday = isUpdatedToday(member.lastUpdated)
             
             return (
-              <div
+              <button
                 key={member.id}
-                className={`relative bg-white/5 border rounded-xl p-4 transition-all ${
+                onClick={() => setSelectedMember(member)}
+                className={`relative bg-white/5 border rounded-xl p-4 transition-all hover:bg-white/10 hover:scale-105 active:scale-95 ${
                   updatedToday 
-                    ? 'border-white/10' 
-                    : 'border-gray-500/30'
+                    ? 'border-white/10 hover:border-white/20' 
+                    : 'border-gray-500/30 hover:border-gray-500/50'
                 } ${(member as any).isMe ? 'ring-2 ring-ink-yellow/50' : ''}`}
               >
                 {/* 自分バッジ */}
                 {(member as any).isMe && (
-                  <div className="absolute -top-2 -left-2 bg-ink-yellow text-splat-dark text-xs px-2 py-1 rounded-full shadow-lg border border-ink-yellow/50 font-bold flex items-center gap-1">
+                  <div className="absolute -top-2 -left-2 bg-ink-yellow text-splat-dark text-xs px-2 py-1 rounded-full shadow-lg border border-ink-yellow/50 font-bold flex items-center gap-1 z-20">
                     <i className="ri-user-star-fill"></i>
                     <span>自分</span>
                   </div>
                 )}
                 
-                {/* 上部：名前と時間 */}
-                <div className="mb-3">
-                  <div className={`font-medium text-sm sm:text-base mb-0.5 truncate ${
+                {/* 左上：名前と時間 */}
+                <div className="absolute top-3 left-3 right-12 text-left z-10">
+                  <div className={`font-medium text-xs sm:text-sm mb-0.5 break-words ${
                     updatedToday ? 'text-white' : 'text-gray-400'
                   }`}>
                     {member.name}
@@ -289,27 +269,30 @@ export default function DemoTeamPage() {
                   </div>
                 </div>
                 
-                {/* アバター */}
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${config.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg ${
-                  !updatedToday ? 'opacity-50 grayscale' : ''
-                }`}>
-                  <span className="text-white font-bold text-xl sm:text-2xl">
-                    {member.name.charAt(0)}
-                  </span>
-                </div>
-                
-                {/* ステータス */}
-                <div className="flex items-center justify-center gap-1.5">
-                  <i className={`${config.icon} text-base ${
-                    updatedToday ? config.color : 'text-gray-500'
-                  }`}></i>
-                  <span className={`text-xs sm:text-sm font-bold ${
-                    updatedToday ? config.color : 'text-gray-500'
+                {/* アバターとステータスをカード中央に配置 */}
+                <div className="flex flex-col items-center justify-center h-full pt-8 pb-2">
+                  {/* アバター */}
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br ${config.avatarColor} flex items-center justify-center mx-auto mb-3 shadow-lg ${
+                    !updatedToday ? 'opacity-50 grayscale' : ''
                   }`}>
-                    {config.label}
-                  </span>
+                    <span className="text-white font-bold text-xl sm:text-2xl">
+                      {member.name.charAt(0)}
+                    </span>
+                  </div>
+                  
+                  {/* ステータス */}
+                  <div className="flex items-center justify-center gap-1.5">
+                    <i className={`${config.icon} text-base ${
+                      updatedToday ? config.color : 'text-gray-500'
+                    }`}></i>
+                    <span className={`text-xs sm:text-sm font-bold ${
+                      updatedToday ? config.color : 'text-gray-500'
+                    }`}>
+                      {config.label}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </button>
             )
           })}
         </div>
@@ -411,6 +394,72 @@ export default function DemoTeamPage() {
           </div>
         </div>
       )}
+
+      {/* メンバー詳細モーダル */}
+      {selectedMember && (() => {
+        const config = statusConfig[selectedMember.status]
+        
+        // configが存在しない場合のデフォルト値
+        if (!config) {
+          return null
+        }
+        
+        return (
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setSelectedMember(null)}
+          >
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* アバター＆ステータス */}
+              <div className="flex flex-col items-center text-center mb-6">
+                <div className={`w-24 h-24 rounded-full bg-gradient-to-br ${config.avatarColor} flex items-center justify-center mb-4 shadow-2xl`}>
+                  <span className="text-white font-bold text-4xl drop-shadow-lg">
+                    {selectedMember.name.charAt(0)}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-3">{selectedMember.name}</h3>
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
+                  <i className={`${config.icon} ${config.color} text-xl`}></i>
+                  <span className={`${config.color} font-medium`}>
+                    {config.label}
+                  </span>
+                </div>
+              </div>
+
+              {/* 詳細情報 */}
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                  <span className="text-white/60 text-sm">最終更新</span>
+                  <span className="text-white text-sm font-medium">
+                    {formatLastUpdated(selectedMember.lastUpdated)}
+                  </span>
+                </div>
+                {(selectedMember as any).isMe && (
+                  <div className="flex items-center justify-center gap-2 p-3 bg-ink-yellow/20 rounded-lg border border-ink-yellow/50">
+                    <i className="ri-user-star-fill text-ink-yellow"></i>
+                    <span className="text-ink-yellow font-medium text-sm">これはあなたです</span>
+                  </div>
+                )}
+              </div>
+
+              {/* 閉じるボタン */}
+              <button
+                onClick={() => setSelectedMember(null)}
+                className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-medium rounded-xl transition-all border border-white/20"
+                style={{
+                  transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
+                  willChange: 'background-color'
+                }}
+              >
+                閉じる
+              </button>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import { PresenceStatus } from '@/types'
+import { useState, useEffect, useCallback } from 'react'
+import { PresenceStatus, UserProfile } from '@/types'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
 
 interface Member {
@@ -67,6 +67,11 @@ export default function TeamPage() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [showOrgDropdown, setShowOrgDropdown] = useState(false)
+  const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [savedOrgName, setSavedOrgName] = useState<string | null>(null)
 
   // チェック：最終更新が今日（JST）かどうか
   const isUpdatedToday = (lastUpdated: string) => {
@@ -107,21 +112,142 @@ export default function TeamPage() {
     }
   }
 
+  // 組織切り替え
+  const handleOrgSwitch = useCallback(async (orgId: string) => {
+    // 既に切り替え中の場合は何もしない
+    if (isSwitchingOrg) {
+      console.log('Already switching, ignoring...')
+      return
+    }
+    
+    console.log('Switching organization to:', orgId)
+    
+    // 切り替え前のuserProfileを保持（表示を維持するため）
+    const previousUserProfile = userProfile
+    
+    setIsSwitchingOrg(true)
+    setShowOrgDropdown(false)
+    
+      // 切り替え先の組織名を一時的に設定（表示を維持するため）
+      if (previousUserProfile) {
+        const targetOrg = previousUserProfile.organizations?.find(org => org.id === orgId)
+        if (targetOrg) {
+          const newUserProfile = {
+            ...previousUserProfile,
+            currentOrganization: targetOrg
+          }
+          setUserProfile(newUserProfile)
+          
+          // sessionStorageに保存（リロード時の表示維持のため）
+          sessionStorage.setItem('last-org-name', targetOrg.name)
+          sessionStorage.setItem('last-org-id', targetOrg.id)
+        }
+      }
+    
+    try {
+      const response = await fetch('/api/organization/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ organizationId: orgId }),
+      })
+      
+      if (!response.ok) {
+        console.error('Failed to switch organization:', await response.text())
+        // エラー時は元のuserProfileに戻す
+        if (previousUserProfile) {
+          setUserProfile(previousUserProfile)
+        }
+        setIsSwitchingOrg(false)
+        return
+      }
+      
+      console.log('Organization switched successfully, fetching new data...')
+      // データを再取得（リロードせずに）
+      const [membersRes, userRes] = await Promise.all([
+        fetch('/api/organization/members'),
+        fetch('/api/auth/me')
+      ])
+      
+      if (membersRes.ok) {
+        const membersData = await membersRes.json()
+        setMembers(membersData.members || [])
+      }
+      if (userRes.ok) {
+        const userData = await userRes.json()
+        setUserProfile(userData.user)
+        
+        // sessionStorageに保存（リロード時の表示維持のため）
+        if (userData.user?.currentOrganization) {
+          sessionStorage.setItem('last-org-name', userData.user.currentOrganization.name)
+          sessionStorage.setItem('last-org-id', userData.user.currentOrganization.id)
+        }
+      }
+      setIsSwitchingOrg(false)
+    } catch (error) {
+      console.error('Failed to switch organization:', error)
+      // エラー時は元のuserProfileに戻す
+      if (previousUserProfile) {
+        setUserProfile(previousUserProfile)
+      }
+      setIsSwitchingOrg(false)
+    }
+  }, [isSwitchingOrg, userProfile])
+
   useEffect(() => {
-    const fetchMembers = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch('/api/organization/members')
-        if (res.ok) {
-          const data = await res.json()
-          setMembers(data.members || [])
+        // クライアントマウント後フラグ
+        if (!mounted) {
+          setMounted(true)
+          try {
+            const name = sessionStorage.getItem('last-org-name')
+            setSavedOrgName(name)
+          } catch {}
+        }
+
+        // sessionStorageから前回の組織情報を取得（表示を維持するため）
+        const savedOrgId = typeof window !== 'undefined' ? sessionStorage.getItem('last-org-id') : null
+        
+        // まずユーザープロフィールを取得（ヘッダー表示のため）
+        const userRes = await fetch('/api/auth/me')
+        if (userRes.ok) {
+          const userData = await userRes.json()
+          setUserProfile(userData.user)
+          
+          // 組織情報をsessionStorageに保存
+          if (userData.user?.currentOrganization) {
+            sessionStorage.setItem('last-org-name', userData.user.currentOrganization.name)
+            sessionStorage.setItem('last-org-id', userData.user.currentOrganization.id)
+          }
+        } else if (savedOrgName) {
+          // APIエラーでも、保存された組織名を一時的に表示
+          setUserProfile({
+            name: '',
+            id: '',
+            email: '',
+            avatarColor: '',
+            organizations: [],
+            currentOrganization: {
+              id: savedOrgId || '',
+              name: savedOrgName,
+              type: 'personal',
+            }
+          } as UserProfile)
+        }
+        
+        // その後メンバーリストを取得
+        const membersRes = await fetch('/api/organization/members')
+        if (membersRes.ok) {
+          const membersData = await membersRes.json()
+          setMembers(membersData.members || [])
         }
       } catch (error) {
-        console.error('Failed to fetch members:', error)
+        console.error('Failed to fetch data:', error)
       } finally {
         setLoading(false)
       }
     }
-    fetchMembers()
+    fetchData()
   }, [])
 
   const filteredMembers = filterStatus === 'all' 
@@ -137,16 +263,56 @@ export default function TeamPage() {
       </div>
 
       {/* ヘッダー */}
-      <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10">
+      <header className="relative p-4 flex items-center justify-between border-b border-white/10 sticky top-0 bg-white/5 backdrop-blur-sm z-10 min-h-[72px]">
         <button
           onClick={() => router.back()}
-          className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-sm font-medium border border-white/20"
+          className="px-3 sm:px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all text-xs sm:text-sm font-medium border border-white/20 flex items-center gap-1"
         >
-          <i className="ri-arrow-left-line mr-1"></i>
-          戻る
+          <i className="ri-arrow-left-line"></i>
+          <span className="hidden xs:inline">戻る</span>
         </button>
-        <h1 className="text-xl font-bold text-white">チーム状況</h1>
-        <div className="w-16" /> {/* スペーサー */}
+        <button
+          onClick={() => userProfile?.organizations && userProfile.organizations.length > 1 && !isSwitchingOrg && setShowOrgDropdown(!showOrgDropdown)}
+          className="text-center group"
+          disabled={!userProfile?.organizations || userProfile.organizations.length <= 1 || isSwitchingOrg}
+        >
+          <h1 className="text-lg sm:text-xl font-bold text-white">チーム状況</h1>
+          {/* サブラインの高さを固定してレイアウトシフトを防ぐ */}
+          <div className="h-5 sm:h-6 flex items-center justify-center">
+            {(() => {
+            // 表示用の組織名を取得（優先順位：userProfile → マウント後の保存値 → デフォルト）
+            const orgName = userProfile?.currentOrganization?.name || (mounted ? savedOrgName : null) || null
+              const hasMultipleOrgs = userProfile?.organizations && userProfile.organizations.length > 1
+              
+              if (hasMultipleOrgs) {
+                return (
+                  <div className={`flex items-center justify-center gap-1 text-xs sm:text-sm text-white/60 transition-colors ${
+                    isSwitchingOrg || loading ? '' : 'group-hover:text-ink-yellow'
+                  }`}>
+                    <span>{orgName || 'グループ未参加'}</span>
+                    {!isSwitchingOrg && !loading && <i className="ri-arrow-down-s-line"></i>}
+                    {(isSwitchingOrg || loading) && <i className="ri-loader-4-line animate-spin"></i>}
+                  </div>
+                )
+              } else if (orgName) {
+                return (
+                  <div className="text-xs sm:text-sm text-white/50">
+                    {orgName}
+                    {loading && <i className="ri-loader-4-line animate-spin ml-1 inline-block"></i>}
+                  </div>
+                )
+              } else if (loading) {
+                return (
+                  <div className="text-xs sm:text-sm text-white/50">
+                    読み込み中...
+                  </div>
+                )
+              }
+              return null
+            })()}
+          </div>
+        </button>
+        <div className="w-16 sm:w-16" /> {/* スペーサー */}
       </header>
 
       {/* フィルター - クリーン版 */}
@@ -154,11 +320,12 @@ export default function TeamPage() {
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => setFilterStatus('all')}
+            disabled={loading || isSwitchingOrg}
             className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
               filterStatus === 'all' 
                 ? 'bg-white/20 text-white border border-white/30' 
                 : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-            }`}
+            } ${loading || isSwitchingOrg ? 'opacity-50 cursor-not-allowed' : ''}`}
             style={{
               transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
               willChange: 'background-color, border-color, transform'
@@ -174,11 +341,12 @@ export default function TeamPage() {
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
+                disabled={loading || isSwitchingOrg}
                 className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
                   isActive
                     ? `${config.bgColor} text-splat-dark border border-splat-dark/20`
                     : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-                }`}
+                } ${loading || isSwitchingOrg ? 'opacity-50 cursor-not-allowed' : ''}`}
                 style={{
                   transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
                   willChange: 'background-color, border-color, transform'
@@ -193,7 +361,7 @@ export default function TeamPage() {
       </div>
 
       {/* メンバーリスト */}
-      <main className="p-4 overflow-visible">
+      <main className="p-4 overflow-visible space-y-4">
         {loading ? (
           <div className="text-center py-20">
             <div className="relative w-24 h-24 mx-auto mb-6">
@@ -272,38 +440,41 @@ export default function TeamPage() {
                   )}
                   
                   {/* 左上：名前と時間 */}
-                  <div className="absolute top-3 left-3 text-left">
-                    <div className={`font-medium text-xs sm:text-sm mb-0.5 truncate max-w-[calc(100%-1rem)] ${
+                  <div className="absolute top-3 left-3 right-12 text-left z-10">
+                    <div className={`font-medium text-xs sm:text-sm mb-0.5 break-words ${
                       updatedToday ? 'text-white' : 'text-gray-400'
                     }`}>
                       {member.name}
                     </div>
-                    <div className={`text-xs truncate ${
+                    <div className={`text-xs ${
                       updatedToday ? 'text-white/50' : 'text-gray-500'
                     }`}>
                       {formatLastUpdated(member.lastUpdated)}
                     </div>
                   </div>
                   
-                  {/* アバター（ステータスの色で表示） */}
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${config.bgColor} flex items-center justify-center mx-auto mb-3 shadow-lg transition-all ${
-                    !updatedToday ? 'opacity-50 grayscale' : 'shadow-xl'
-                  }`} style={{ marginTop: '2.5rem' }}>
-                    <span className="text-white font-bold text-xl sm:text-2xl drop-shadow-lg">
-                      {member.name.charAt(0)}
-                    </span>
-                  </div>
-                  
-                  {/* ステータス */}
-                  <div className="flex items-center justify-center gap-1.5">
-                    <i className={`${config.icon} text-base ${
-                      updatedToday ? config.color : 'text-gray-500'
-                    }`}></i>
-                    <span className={`text-xs sm:text-sm font-bold ${
-                      updatedToday ? config.color : 'text-gray-500'
+                  {/* アバターとステータスをカード中央に配置 */}
+                  <div className="flex flex-col items-center justify-center h-full pt-8 pb-2">
+                    {/* アバター（ステータスの色で表示） */}
+                    <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${config.bgColor} flex items-center justify-center mx-auto mb-3 shadow-lg transition-all ${
+                      !updatedToday ? 'opacity-50 grayscale' : 'shadow-xl'
                     }`}>
-                      {config.label}
-                    </span>
+                      <span className="text-white font-bold text-xl sm:text-2xl drop-shadow-lg">
+                        {member.name.charAt(0)}
+                      </span>
+                    </div>
+                    
+                    {/* ステータス */}
+                    <div className="flex items-center justify-center gap-1.5">
+                      <i className={`${config.icon} text-base ${
+                        updatedToday ? config.color : 'text-gray-500'
+                      }`}></i>
+                      <span className={`text-xs sm:text-sm font-bold ${
+                        updatedToday ? config.color : 'text-gray-500'
+                      }`}>
+                        {config.label}
+                      </span>
+                    </div>
                   </div>
                 </button>
               )
@@ -311,6 +482,68 @@ export default function TeamPage() {
           </div>
         )}
       </main>
+
+      {/* グループ切り替えドロップダウン */}
+      {showOrgDropdown && userProfile?.organizations && userProfile.organizations.length > 1 && (
+        <div 
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowOrgDropdown(false)}
+        >
+          <div 
+            className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-white">グループを切り替え</h2>
+              <button
+                onClick={() => setShowOrgDropdown(false)}
+                className="w-8 h-8 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              >
+                <i className="ri-close-line text-2xl"></i>
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              {userProfile.organizations.map((org) => (
+                <button
+                  key={org.id}
+                  onClick={() => {
+                    if (org.id !== userProfile.currentOrganization?.id) {
+                      setShowOrgDropdown(false)
+                      handleOrgSwitch(org.id)
+                    }
+                  }}
+                  disabled={isSwitchingOrg || org.id === userProfile.currentOrganization?.id}
+                  className={`w-full text-left px-5 py-3.5 rounded-xl transition-all ${
+                    org.id === userProfile.currentOrganization?.id
+                      ? 'bg-ink-yellow/20 text-white font-bold border-2 border-ink-yellow cursor-default'
+                      : 'bg-white/5 text-white/80 hover:bg-white/10 hover:text-white border border-white/20 cursor-pointer'
+                  } ${isSwitchingOrg ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{org.name}</div>
+                      <div className="text-xs text-white/50 mt-0.5">
+                        メンバー · {org.type === 'business' ? '法人' : '個人'}
+                      </div>
+                    </div>
+                    {org.id === userProfile.currentOrganization?.id && (
+                      <i className="ri-check-line text-2xl text-ink-yellow"></i>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <p className="text-white/50 text-xs text-center">
+                <i className="ri-information-line mr-1"></i>
+                グループの脱退は「アカウント設定」から行えます
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* メンバー詳細モーダル */}
       {selectedMember && (() => {

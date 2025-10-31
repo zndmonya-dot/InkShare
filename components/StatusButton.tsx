@@ -89,11 +89,11 @@ export const StatusButton = memo(function StatusButton({
             ? `${activeColor} shadow-2xl scale-105 border-2 border-splat-dark/20`
             : 'bg-white/5 shadow-lg hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98] border-2 border-white/15 hover:border-white/25 backdrop-blur-sm'
         }
-      `}
+      smooth-transition`}
     >
       {/* コンテンツ */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-3 h-full">
-        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? textColor : 'text-white/50'} flex-shrink-0`}></i>
+        <i className={`${icon} text-6xl sm:text-7xl md:text-8xl ${isActive ? textColor : 'text-white/50'} flex-shrink-0 leading-[0]`}></i>
         <span
           className={`
             text-sm sm:text-base md:text-lg font-bold text-center leading-tight px-2
