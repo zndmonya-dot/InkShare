@@ -68,12 +68,7 @@ export const StatusPanel = memo(function StatusPanel({
   // 画面サイズに応じた最適なグリッド列数を計算
   useEffect(() => {
     const calculateOptimalGrid = () => {
-      if (!containerRef.current) return
-
-      const container = containerRef.current.parentElement
-      if (!container) return
-
-      const containerWidth = container.clientWidth
+      const containerWidth = window.innerWidth
 
       // アイテム数（12個固定）
       const totalItems = 12
@@ -94,14 +89,13 @@ export const StatusPanel = memo(function StatusPanel({
       }
     }
 
-    // 初回計算
-    const timeoutId = setTimeout(calculateOptimalGrid, 0)
+    // 初回は即座に実行
+    calculateOptimalGrid()
 
     // リサイズ時に再計算
     window.addEventListener('resize', calculateOptimalGrid)
 
     return () => {
-      clearTimeout(timeoutId)
       window.removeEventListener('resize', calculateOptimalGrid)
     }
   }, [])

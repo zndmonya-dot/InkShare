@@ -36,12 +36,7 @@ export default function DemoPage() {
   // 画面サイズに応じた最適なグリッド列数を計算
   useEffect(() => {
     const calculateOptimalGrid = () => {
-      if (!containerRef.current) return
-
-      const container = containerRef.current.parentElement
-      if (!container) return
-
-      const containerWidth = container.clientWidth
+      const containerWidth = window.innerWidth
 
       // スマホ: 2列、タブレット: 3列、PC: 4列
       if (containerWidth <= 640) {
@@ -55,11 +50,13 @@ export default function DemoPage() {
       }
     }
 
-    const timeoutId = setTimeout(calculateOptimalGrid, 0)
+    // 初回は即座に実行
+    calculateOptimalGrid()
+
+    // リサイズ時に再計算
     window.addEventListener('resize', calculateOptimalGrid)
 
     return () => {
-      clearTimeout(timeoutId)
       window.removeEventListener('resize', calculateOptimalGrid)
     }
   }, [])
@@ -216,6 +213,36 @@ export default function DemoPage() {
                 isActive={currentStatus === 'custom2'}
                 activeColor={CUSTOM_STATUS_CONFIG.custom2.activeColor}
                 glowColor={CUSTOM_STATUS_CONFIG.custom2.glowColor}
+                onClick={() => setShowCustomModal(true)}
+              />
+              <div className="absolute top-2 right-2 bg-ink-yellow text-splat-dark text-xs font-bold px-2 py-1 rounded-md shadow-lg">
+                <i className="ri-lock-line mr-1"></i>登録後
+              </div>
+            </div>
+
+            {/* カスタムステータス3 */}
+            <div className="relative aspect-square">
+              <StatusButton
+                label={CUSTOM_STATUS_CONFIG.custom3.defaultLabel}
+                icon={CUSTOM_STATUS_CONFIG.custom3.defaultIcon}
+                isActive={currentStatus === 'custom3'}
+                activeColor={CUSTOM_STATUS_CONFIG.custom3.activeColor}
+                glowColor={CUSTOM_STATUS_CONFIG.custom3.glowColor}
+                onClick={() => setShowCustomModal(true)}
+              />
+              <div className="absolute top-2 right-2 bg-ink-yellow text-splat-dark text-xs font-bold px-2 py-1 rounded-md shadow-lg">
+                <i className="ri-lock-line mr-1"></i>登録後
+              </div>
+            </div>
+
+            {/* カスタムステータス4 */}
+            <div className="relative aspect-square">
+              <StatusButton
+                label={CUSTOM_STATUS_CONFIG.custom4.defaultLabel}
+                icon={CUSTOM_STATUS_CONFIG.custom4.defaultIcon}
+                isActive={currentStatus === 'custom4'}
+                activeColor={CUSTOM_STATUS_CONFIG.custom4.activeColor}
+                glowColor={CUSTOM_STATUS_CONFIG.custom4.glowColor}
                 onClick={() => setShowCustomModal(true)}
               />
               <div className="absolute top-2 right-2 bg-ink-yellow text-splat-dark text-xs font-bold px-2 py-1 rounded-md shadow-lg">
