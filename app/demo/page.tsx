@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { StatusButton } from '@/components/StatusButton'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
@@ -19,7 +19,6 @@ export default function DemoPage() {
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
   const [gridCols, setGridCols] = useState(2)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   // 初回読み込み時にlocalStorageから復元
   useEffect(() => {
@@ -174,7 +173,7 @@ export default function DemoPage() {
           </button>
         </div>
 
-        <div ref={containerRef} className="w-full pb-4">
+        <div className="w-full pb-4">
           {/* ステータスボタングリッド */}
           <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
             {STATUS_OPTIONS.map((option) => (
