@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { StatusButton } from '@/components/StatusButton'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
@@ -18,6 +18,8 @@ export default function DemoPage() {
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
+  const [gridCols, setGridCols] = useState(2)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // 初回読み込み時にlocalStorageから復元
   useEffect(() => {
@@ -28,6 +30,37 @@ export default function DemoPage() {
     const savedOrgId = localStorage.getItem('demo-org-id')
     if (savedOrgId) {
       setCurrentOrgId(savedOrgId)
+    }
+  }, [])
+
+  // 画面サイズに応じた最適なグリッド列数を計算
+  useEffect(() => {
+    const calculateOptimalGrid = () => {
+      if (!containerRef.current) return
+
+      const container = containerRef.current.parentElement
+      if (!container) return
+
+      const containerWidth = container.clientWidth
+
+      // スマホ: 2列、タブレット: 3列、PC: 4列
+      if (containerWidth <= 640) {
+        setGridCols(2)
+      } else if (containerWidth <= 768) {
+        setGridCols(3)
+      } else if (containerWidth <= 1024) {
+        setGridCols(4)
+      } else {
+        setGridCols(4)
+      }
+    }
+
+    const timeoutId = setTimeout(calculateOptimalGrid, 0)
+    window.addEventListener('resize', calculateOptimalGrid)
+
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('resize', calculateOptimalGrid)
     }
   }, [])
 
@@ -144,9 +177,9 @@ export default function DemoPage() {
           </button>
         </div>
 
-        <div className="w-full pb-4">
+        <div ref={containerRef} className="w-full pb-4">
           {/* ステータスボタングリッド */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
             {STATUS_OPTIONS.map((option) => (
               <div key={option.status} className="aspect-square">
                 <StatusButton
