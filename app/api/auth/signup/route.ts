@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     const supabaseAdmin = getSupabaseAdmin()
 
     // Admin権限で、メール確認済みとしてユーザーを作成
+    console.log('Creating user:', email)
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
         { status: 500 }
       )
     }
+    console.log('User created successfully:', authData.user.id)
 
     // アバターカラーをランダムに選択
     const { getRandomAvatarColor } = await import('@/lib/utils')
