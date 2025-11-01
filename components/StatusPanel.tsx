@@ -31,12 +31,22 @@ export const StatusPanel = memo(function StatusPanel({
   onStatusChange,
   onCustomClick,
 }: StatusPanelProps) {
+  // 初期グリッド列数を計算
+  const getInitialGridCols = () => {
+    if (typeof window === 'undefined') return 2
+    const containerWidth = window.innerWidth
+    if (containerWidth <= 640) return 2
+    if (containerWidth <= 768) return 3
+    if (containerWidth <= 1024) return 4
+    return 4
+  }
+
   // ステータスアイテムの順序を管理
   const [statusItems, setStatusItems] = useState<StatusItem[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [shouldAnimate, setShouldAnimate] = useState(false)
-  const [gridCols, setGridCols] = useState(2)
+  const [gridCols, setGridCols] = useState(getInitialGridCols)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // 初回マウント時のみアニメーションを表示

@@ -14,11 +14,22 @@ const DEMO_ORGANIZATIONS = [
 
 export default function DemoPage() {
   const router = useRouter()
+  
+  // 初期グリッド列数を計算
+  const getInitialGridCols = () => {
+    if (typeof window === 'undefined') return 2
+    const containerWidth = window.innerWidth
+    if (containerWidth <= 640) return 2
+    if (containerWidth <= 768) return 3
+    if (containerWidth <= 1024) return 4
+    return 4
+  }
+  
   const [currentStatus, setCurrentStatus] = useState<string>('available')
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
-  const [gridCols, setGridCols] = useState(2)
+  const [gridCols, setGridCols] = useState(getInitialGridCols)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // 初回読み込み時にlocalStorageから復元
