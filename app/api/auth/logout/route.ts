@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const cookieHeader = request.headers.get('cookie') || ''
     const supabase = createServerSupabaseClient(cookieHeader)
@@ -9,22 +9,21 @@ export async function POST(request: Request) {
     // Supabaseセッションをクリア
     const { error } = await supabase.auth.signOut()
 
+    // ログアウトは成功したとみなす（エラーがあってもCookieをクリア）
+    // サーバー側のログアウトが失敗しても、クライアント側でCookieをクリアできる
     if (error) {
-      console.error('Logout error:', error)
-      return NextResponse.json(
-        { error: 'ログアウトに失敗しました' },
-        { status: 500 }
-      )
+      console.error('Logout warning (ignored):', error)
     }
 
     // Cookieをクリアするレスポンスを返す
     const response = NextResponse.json({ success: true }, { status: 200 })
     
-    // すべてのSupabase認証Cookieを削除
+    // @supabase/ssrで使用されるCookie名を削除
     const cookiesToDelete = [
       'sb-access-token',
       'sb-refresh-token',
       'sb-auth-token',
+      'sb-auth-code-verifier',
     ]
 
     cookiesToDelete.forEach(cookieName => {
