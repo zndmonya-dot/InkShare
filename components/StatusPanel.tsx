@@ -36,7 +36,6 @@ export const StatusPanel = memo(function StatusPanel({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [shouldAnimate, setShouldAnimate] = useState(false)
-  const [gridCols, setGridCols] = useState(2)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // 初回マウント時のみアニメーションを表示
@@ -65,33 +64,6 @@ export const StatusPanel = memo(function StatusPanel({
     }
   }, [])
 
-  // 画面サイズに応じた最適なグリッド列数を計算
-  useEffect(() => {
-    const calculateOptimalGrid = () => {
-      const containerWidth = window.innerWidth
-
-      // スマホ: 2列、タブレット: 3列、PC: 4列
-      if (containerWidth <= 640) {
-        setGridCols(2)
-      } else if (containerWidth <= 768) {
-        setGridCols(3)
-      } else if (containerWidth <= 1024) {
-        setGridCols(4)
-      } else {
-        setGridCols(4)
-      }
-    }
-
-    // 初回マウント時に即座に実行
-    calculateOptimalGrid()
-
-    // リサイズ時に再計算
-    window.addEventListener('resize', calculateOptimalGrid)
-
-    return () => {
-      window.removeEventListener('resize', calculateOptimalGrid)
-    }
-  }, [])
 
   // デフォルトの順序を取得
   const getDefaultOrder = (): StatusItem[] => {
@@ -195,7 +167,7 @@ export const StatusPanel = memo(function StatusPanel({
       )}
       
       {/* ステータスボタングリッド */}
-      <div className="grid gap-3 sm:gap-4 md:gap-5 overflow-visible w-full auto-rows-auto" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 overflow-visible w-full auto-rows-auto">
         {statusItems.map((item, index) => {
           // プリセットステータス
           if (item.type === 'preset' && item.status) {
