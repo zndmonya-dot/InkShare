@@ -18,7 +18,6 @@ export default function DemoPage() {
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
-  const [gridCols, setGridCols] = useState(2)
 
   // 初回読み込み時にlocalStorageから復元
   useEffect(() => {
@@ -29,34 +28,6 @@ export default function DemoPage() {
     const savedOrgId = localStorage.getItem('demo-org-id')
     if (savedOrgId) {
       setCurrentOrgId(savedOrgId)
-    }
-  }, [])
-
-  // 画面サイズに応じた最適なグリッド列数を計算
-  useEffect(() => {
-    const calculateOptimalGrid = () => {
-      const containerWidth = window.innerWidth
-
-      // スマホ: 2列、タブレット: 3列、PC: 4列
-      if (containerWidth <= 640) {
-        setGridCols(2)
-      } else if (containerWidth <= 768) {
-        setGridCols(3)
-      } else if (containerWidth <= 1024) {
-        setGridCols(4)
-      } else {
-        setGridCols(4)
-      }
-    }
-
-    // 初回マウント時に即座に実行
-    calculateOptimalGrid()
-
-    // リサイズ時に再計算
-    window.addEventListener('resize', calculateOptimalGrid)
-
-    return () => {
-      window.removeEventListener('resize', calculateOptimalGrid)
     }
   }, [])
 
@@ -175,7 +146,7 @@ export default function DemoPage() {
 
         <div className="w-full pb-4">
           {/* ステータスボタングリッド */}
-          <div className="grid gap-3 sm:gap-4" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
             {STATUS_OPTIONS.map((option) => (
               <div key={option.status} className="aspect-square">
                 <StatusButton
