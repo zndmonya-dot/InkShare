@@ -146,7 +146,7 @@ export default function DemoPage() {
 
         <div className="w-full pb-4">
           {/* ステータスボタングリッド */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
             {STATUS_OPTIONS.map((option) => (
               <div key={option.status} className="aspect-square">
                 <StatusButton
