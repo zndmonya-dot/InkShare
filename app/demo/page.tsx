@@ -18,6 +18,7 @@ export default function DemoPage() {
   const [currentOrgId, setCurrentOrgId] = useState<string>('1')
   const [showOrgMenu, setShowOrgMenu] = useState(false)
   const [showCustomModal, setShowCustomModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // 初回読み込み時にlocalStorageから復元
   useEffect(() => {
@@ -29,6 +30,8 @@ export default function DemoPage() {
     if (savedOrgId) {
       setCurrentOrgId(savedOrgId)
     }
+    // ローディング終了
+    setIsLoading(false)
   }, [])
 
   // ステータス変更時にlocalStorageに保存
@@ -60,6 +63,29 @@ export default function DemoPage() {
         <div className="absolute top-[-100px] left-[-100px] w-[400px] h-[400px] bg-ink-yellow ink-blob blur-[100px]"></div>
         <div className="absolute bottom-[-100px] right-[-100px] w-[400px] h-[400px] bg-ink-cyan ink-blob blur-[100px]" style={{animationDelay: '1.5s'}}></div>
       </div>
+
+      {/* ローディング */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-splat-dark via-ink-blue to-splat-dark z-50">
+          <div className="text-center relative">
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              {/* 外側のリング */}
+              <div className="absolute inset-0 rounded-full border-4 border-ink-yellow/30"></div>
+              {/* 回転するインク */}
+              <div className="absolute inset-0 ink-spinner">
+                <div className="w-full h-full rounded-full border-4 border-transparent border-t-ink-yellow border-r-ink-yellow"></div>
+              </div>
+              {/* 中央のロゴ */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 bg-ink-yellow rounded-full flex items-center justify-center ink-pulse-ring">
+                  <i className="ri-paint-brush-fill text-2xl text-splat-dark"></i>
+                </div>
+              </div>
+            </div>
+            <p className="text-white/70 text-lg font-medium">読み込み中...</p>
+          </div>
+        </div>
+      )}
 
       {/* デモバナー - コンパクト版 */}
       <div className="relative bg-ink-yellow/90 text-splat-dark py-1.5 px-4 text-center text-xs sm:text-sm border-b-2 border-ink-yellow z-20">
