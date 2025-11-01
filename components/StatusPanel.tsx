@@ -9,21 +9,25 @@ interface StatusPanelProps {
   currentStatus: PresenceStatus
   customStatus1: CustomStatus
   customStatus2: CustomStatus
+  customStatus3: CustomStatus
+  customStatus4: CustomStatus
   onStatusChange: (status: PresenceStatus) => void
-  onCustomClick: (customId: 'custom1' | 'custom2') => void
+  onCustomClick: (customId: 'custom1' | 'custom2' | 'custom3' | 'custom4') => void
 }
 
 interface StatusItem {
   id: string
   type: 'preset' | 'custom'
   status?: PresenceStatus
-  customId?: 'custom1' | 'custom2'
+  customId?: 'custom1' | 'custom2' | 'custom3' | 'custom4'
 }
 
 export const StatusPanel = memo(function StatusPanel({
   currentStatus,
   customStatus1,
   customStatus2,
+  customStatus3,
+  customStatus4,
   onStatusChange,
   onCustomClick,
 }: StatusPanelProps) {
@@ -70,6 +74,8 @@ export const StatusPanel = memo(function StatusPanel({
       ...presetItems,
       { id: 'custom1', type: 'custom', customId: 'custom1' },
       { id: 'custom2', type: 'custom', customId: 'custom2' },
+      { id: 'custom3', type: 'custom', customId: 'custom3' },
+      { id: 'custom4', type: 'custom', customId: 'custom4' },
     ]
   }
 
@@ -80,7 +86,7 @@ export const StatusPanel = memo(function StatusPanel({
 
   // カスタムボタンのクリックハンドラーを生成
   const createCustomHandlers = useCallback(
-    (customId: 'custom1' | 'custom2') => ({
+    (customId: 'custom1' | 'custom2' | 'custom3' | 'custom4') => ({
       onClick: (e: React.MouseEvent) => {
         e.stopPropagation()
         onStatusChange(customId)
@@ -95,6 +101,8 @@ export const StatusPanel = memo(function StatusPanel({
 
   const custom1Handlers = useMemo(() => createCustomHandlers('custom1'), [createCustomHandlers])
   const custom2Handlers = useMemo(() => createCustomHandlers('custom2'), [createCustomHandlers])
+  const custom3Handlers = useMemo(() => createCustomHandlers('custom3'), [createCustomHandlers])
+  const custom4Handlers = useMemo(() => createCustomHandlers('custom4'), [createCustomHandlers])
 
   // ドラッグ開始
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -197,10 +205,27 @@ export const StatusPanel = memo(function StatusPanel({
 
           // カスタムステータス
           if (item.type === 'custom' && item.customId) {
-            const isCustom1 = item.customId === 'custom1'
-            const customStatus = isCustom1 ? customStatus1 : customStatus2
-            const config = isCustom1 ? CUSTOM_STATUS_CONFIG.custom1 : CUSTOM_STATUS_CONFIG.custom2
-            const handlers = isCustom1 ? custom1Handlers : custom2Handlers
+            let customStatus: CustomStatus & { color?: string }
+            let config
+            let handlers
+            
+            if (item.customId === 'custom1') {
+              customStatus = customStatus1
+              config = CUSTOM_STATUS_CONFIG.custom1
+              handlers = custom1Handlers
+            } else if (item.customId === 'custom2') {
+              customStatus = customStatus2
+              config = CUSTOM_STATUS_CONFIG.custom2
+              handlers = custom2Handlers
+            } else if (item.customId === 'custom3') {
+              customStatus = customStatus3
+              config = CUSTOM_STATUS_CONFIG.custom3
+              handlers = custom3Handlers
+            } else {
+              customStatus = customStatus4
+              config = CUSTOM_STATUS_CONFIG.custom4
+              handlers = custom4Handlers
+            }
             
             // カスタムの色が設定されていればそれを使用、なければデフォルト
             const activeColor = (customStatus as any).color || config.activeColor

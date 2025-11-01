@@ -97,6 +97,20 @@ export const CUSTOM_STATUS_CONFIG = {
     textColor: 'text-purple-400',
     glowColor: 'shadow-purple-400/50',
   },
+  custom3: {
+    defaultLabel: 'カスタム3',
+    defaultIcon: 'ri-star-smile-fill',
+    activeColor: 'bg-pink-400',
+    textColor: 'text-pink-400',
+    glowColor: 'shadow-pink-400/50',
+  },
+  custom4: {
+    defaultLabel: 'カスタム4',
+    defaultIcon: 'ri-star-smile-fill',
+    activeColor: 'bg-violet-400',
+    textColor: 'text-violet-400',
+    glowColor: 'shadow-violet-400/50',
+  },
 }
 
 // ========================================

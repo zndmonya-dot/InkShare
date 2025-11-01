@@ -17,7 +17,9 @@ export default function Home() {
   const [currentStatus, setCurrentStatus] = useState<PresenceStatus>('available')
   const [customStatus1, setCustomStatus1] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom1, color: 'bg-fuchsia-400' })
   const [customStatus2, setCustomStatus2] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom2, color: 'bg-purple-400' })
-  const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | null>(null)
+  const [customStatus3, setCustomStatus3] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom3, color: 'bg-pink-400' })
+  const [customStatus4, setCustomStatus4] = useState<CustomStatus & { color?: string }>({ ...DEFAULT_CUSTOM_STATUS.custom4, color: 'bg-violet-400' })
+  const [showCustomModal, setShowCustomModal] = useState<'custom1' | 'custom2' | 'custom3' | 'custom4' | null>(null)
   const [showOrgDropdown, setShowOrgDropdown] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [isSwitchingOrg, setIsSwitchingOrg] = useState(false)
@@ -70,6 +72,16 @@ export default function Home() {
               icon: statusData.status.custom2_icon || 'ri-star-smile-fill',
               color: statusData.status.custom2_color || 'bg-purple-400',
             })
+            setCustomStatus3({
+              label: statusData.status.custom3_label || 'カスタム3',
+              icon: statusData.status.custom3_icon || 'ri-star-smile-fill',
+              color: statusData.status.custom3_color || 'bg-pink-400',
+            })
+            setCustomStatus4({
+              label: statusData.status.custom4_label || 'カスタム4',
+              icon: statusData.status.custom4_icon || 'ri-star-smile-fill',
+              color: statusData.status.custom4_color || 'bg-violet-400',
+            })
             
             // 0時を過ぎてリセットされた場合、通知を表示
             if (statusData.wasReset) {
@@ -99,12 +111,16 @@ export default function Home() {
   }, [])
 
   // カスタムステータス保存
-  const handleCustomSave = useCallback(async (type: 'custom1' | 'custom2', label: string, icon: string, color: string) => {
+  const handleCustomSave = useCallback(async (type: 'custom1' | 'custom2' | 'custom3' | 'custom4', label: string, icon: string, color: string) => {
     const newCustomStatus = { label, icon, color }
     if (type === 'custom1') {
       setCustomStatus1(newCustomStatus)
-    } else {
+    } else if (type === 'custom2') {
       setCustomStatus2(newCustomStatus)
+    } else if (type === 'custom3') {
+      setCustomStatus3(newCustomStatus)
+    } else {
+      setCustomStatus4(newCustomStatus)
     }
     setShowCustomModal(null)
 
@@ -480,6 +496,8 @@ export default function Home() {
             onStatusChange={handleStatusChange}
             customStatus1={customStatus1}
             customStatus2={customStatus2}
+            customStatus3={customStatus3}
+            customStatus4={customStatus4}
             onCustomClick={(type) => setShowCustomModal(type)}
           />
         </div>
@@ -491,7 +509,12 @@ export default function Home() {
                     isOpen={!!showCustomModal}
                     onClose={() => setShowCustomModal(null)}
                     onSave={(label, icon, color) => handleCustomSave(showCustomModal, label, icon, color)}
-                    currentStatus={showCustomModal === 'custom1' ? customStatus1 : customStatus2}
+                    currentStatus={
+                      showCustomModal === 'custom1' ? customStatus1 :
+                      showCustomModal === 'custom2' ? customStatus2 :
+                      showCustomModal === 'custom3' ? customStatus3 :
+                      customStatus4
+                    }
                   />
                 </Suspense>
               )}

@@ -13,6 +13,8 @@ export type PresenceStatus =
   | 'out'            // 外出中
   | 'custom1'        // カスタム1
   | 'custom2'        // カスタム2
+  | 'custom3'        // カスタム3
+  | 'custom4'        // カスタム4
 
 export interface CustomStatus {
   label: string

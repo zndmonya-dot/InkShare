@@ -25,6 +25,14 @@ export const DEFAULT_CUSTOM_STATUS = {
     label: 'カスタム2',
     icon: 'ri-edit-line',
   },
+  custom3: {
+    label: 'カスタム3',
+    icon: 'ri-edit-line',
+  },
+  custom4: {
+    label: 'カスタム4',
+    icon: 'ri-edit-line',
+  },
 } as const
 
 /**
