@@ -326,7 +326,6 @@
               opacity var(--dur-smooth) var(--ease-smooth),
               background-color var(--dur-smooth) var(--ease-smooth),
               border-color var(--dur-smooth) var(--ease-smooth);
-  will-change: transform, opacity;
 }
 
 /* 動きを減らしたいユーザー設定に追従 */

@@ -181,7 +181,6 @@ export const StatusPanel = memo(function StatusPanel({
                 style={{ 
                   touchAction: 'pan-y',
                   transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
-                  willChange: 'transform, opacity'
                 }}
               >
                 <StatusButton
@@ -217,7 +216,6 @@ export const StatusPanel = memo(function StatusPanel({
                 }`}
                 style={{ 
                   transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
-                  willChange: 'opacity'
                 }}
                 onDragOver={(e) => {
                   e.preventDefault()
