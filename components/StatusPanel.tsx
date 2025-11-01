@@ -31,22 +31,12 @@ export const StatusPanel = memo(function StatusPanel({
   onStatusChange,
   onCustomClick,
 }: StatusPanelProps) {
-  // 初期グリッド列数を計算
-  const getInitialGridCols = () => {
-    if (typeof window === 'undefined') return 2
-    const containerWidth = window.innerWidth
-    if (containerWidth <= 640) return 2
-    if (containerWidth <= 768) return 3
-    if (containerWidth <= 1024) return 4
-    return 4
-  }
-
   // ステータスアイテムの順序を管理
   const [statusItems, setStatusItems] = useState<StatusItem[]>([])
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [shouldAnimate, setShouldAnimate] = useState(false)
-  const [gridCols, setGridCols] = useState(getInitialGridCols)
+  const [gridCols, setGridCols] = useState(2)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // 初回マウント時のみアニメーションを表示
@@ -80,26 +70,19 @@ export const StatusPanel = memo(function StatusPanel({
     const calculateOptimalGrid = () => {
       const containerWidth = window.innerWidth
 
-      // アイテム数（12個固定）
-      const totalItems = 12
-
       // スマホ: 2列、タブレット: 3列、PC: 4列
       if (containerWidth <= 640) {
-        // スマホ: 2列×6行
         setGridCols(2)
       } else if (containerWidth <= 768) {
-        // タブレット: 3列×4行
         setGridCols(3)
       } else if (containerWidth <= 1024) {
-        // PC小: 4列×3行
         setGridCols(4)
       } else {
-        // PC大: 4列×3行（最大4列で固定）
         setGridCols(4)
       }
     }
 
-    // 初回は即座に実行
+    // 初回マウント時に即座に実行
     calculateOptimalGrid()
 
     // リサイズ時に再計算
