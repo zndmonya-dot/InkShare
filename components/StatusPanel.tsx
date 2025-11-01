@@ -157,7 +157,7 @@ export const StatusPanel = memo(function StatusPanel({
       )}
       
       {/* ステータスボタングリッド */}
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 overflow-visible max-w-4xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 overflow-visible max-w-4xl mx-auto">
         {statusItems.map((item, index) => {
           // プリセットステータス
           if (item.type === 'preset' && item.status) {
