@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState, useEffect, useMemo, memo } from 'react'
+import { useCallback, useState, useEffect, useMemo, memo, useRef } from 'react'
 import type { PresenceStatus, CustomStatus } from '@/types'
 import { StatusButton } from './StatusButton'
 import { STATUS_OPTIONS, CUSTOM_STATUS_CONFIG } from '@/config/status'
@@ -36,6 +36,8 @@ export const StatusPanel = memo(function StatusPanel({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const [shouldAnimate, setShouldAnimate] = useState(false)
+  const [gridCols, setGridCols] = useState(2)
+  const containerRef = useRef<HTMLDivElement>(null)
   
   // 初回マウント時のみアニメーションを表示
   useEffect(() => {
@@ -60,6 +62,47 @@ export const StatusPanel = memo(function StatusPanel({
       }
     } else {
       setStatusItems(getDefaultOrder())
+    }
+  }, [])
+
+  // 画面サイズに応じた最適なグリッド列数を計算
+  useEffect(() => {
+    const calculateOptimalGrid = () => {
+      if (!containerRef.current) return
+
+      const container = containerRef.current.parentElement
+      if (!container) return
+
+      const containerWidth = container.clientWidth
+
+      // アイテム数（12個固定）
+      const totalItems = 12
+
+      // スマホ: 2列、タブレット: 3列、PC: 4列
+      if (containerWidth <= 640) {
+        // スマホ: 2列×6行
+        setGridCols(2)
+      } else if (containerWidth <= 768) {
+        // タブレット: 3列×4行
+        setGridCols(3)
+      } else if (containerWidth <= 1024) {
+        // PC小: 4列×3行
+        setGridCols(4)
+      } else {
+        // PC大: 4列×3行（最大4列で固定）
+        setGridCols(4)
+      }
+    }
+
+    // 初回計算
+    const timeoutId = setTimeout(calculateOptimalGrid, 0)
+
+    // リサイズ時に再計算
+    window.addEventListener('resize', calculateOptimalGrid)
+
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('resize', calculateOptimalGrid)
     }
   }, [])
 
@@ -155,7 +198,7 @@ export const StatusPanel = memo(function StatusPanel({
   }
 
   return (
-    <div className={`w-full overflow-visible relative ${shouldAnimate ? 'animate-fade-in-scale' : ''}`}>
+    <div ref={containerRef} className={`w-full overflow-visible relative ${shouldAnimate ? 'animate-fade-in-scale' : ''}`}>
       {/* ドラッグ中のヒント */}
       {draggedIndex !== null && (
         <div className="absolute top-0 left-0 right-0 text-center py-2 bg-ink-yellow/80 text-splat-dark text-sm font-bold rounded-lg shadow-lg z-50 animate-pulse">
@@ -165,7 +208,7 @@ export const StatusPanel = memo(function StatusPanel({
       )}
       
       {/* ステータスボタングリッド */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 overflow-visible max-w-4xl mx-auto">
+      <div className="grid gap-3 sm:gap-4 md:gap-5 overflow-visible w-full auto-rows-auto" style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}>
         {statusItems.map((item, index) => {
           // プリセットステータス
           if (item.type === 'preset' && item.status) {
