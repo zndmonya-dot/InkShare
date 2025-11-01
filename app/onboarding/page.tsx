@@ -52,10 +52,9 @@ export default function OnboardingPage() {
           {/* グループを作成 */}
           <Link
             href="/group/create"
-            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-3xl p-10 hover:border-ink-yellow hover:shadow-2xl hover:shadow-ink-yellow/30 transition-all duration-300 group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-yellow/40 rounded-3xl p-10 hover:border-ink-yellow hover:shadow-2xl hover:shadow-ink-yellow/30 group cursor-pointer"
             style={{ 
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              willChange: 'transform, box-shadow, border-color'
+              transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
             }}
           >
             {/* 光るエフェクト */}
@@ -65,13 +64,13 @@ export default function OnboardingPage() {
               {/* アイコン */}
               <div className="relative w-28 h-28 mx-auto mb-6">
                 <div className="absolute inset-0 bg-ink-yellow rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                <div className="relative w-full h-full bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50 group-hover:scale-110 group-hover:rotate-[5deg] transition-all duration-300">
+                <div className="relative w-full h-full bg-ink-yellow rounded-full flex items-center justify-center shadow-2xl shadow-ink-yellow/50">
                   <i className="ri-add-circle-fill text-6xl text-splat-dark"></i>
                 </div>
               </div>
               
               {/* テキスト */}
-              <h3 className="text-ink-yellow font-black text-3xl mb-3 group-hover:scale-105 transition-transform">
+              <h3 className="text-ink-yellow font-black text-3xl mb-3">
                 グループを作成
               </h3>
               <p className="text-white/60 text-base leading-relaxed">
@@ -90,10 +89,9 @@ export default function OnboardingPage() {
           {/* 招待コードで参加 */}
           <Link
             href="/join"
-            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-3xl p-10 hover:border-ink-cyan hover:shadow-2xl hover:shadow-ink-cyan/30 transition-all duration-300 group cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+            className="relative bg-white/10 backdrop-blur-sm border-2 border-ink-cyan/40 rounded-3xl p-10 hover:border-ink-cyan hover:shadow-2xl hover:shadow-ink-cyan/30 group cursor-pointer"
             style={{ 
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              willChange: 'transform, box-shadow, border-color'
+              transition: 'all 0.35s cubic-bezier(0.3, 0, 0.1, 1)',
             }}
           >
             {/* 光るエフェクト */}
@@ -103,13 +101,13 @@ export default function OnboardingPage() {
               {/* アイコン */}
               <div className="relative w-28 h-28 mx-auto mb-6">
                 <div className="absolute inset-0 bg-ink-cyan rounded-full blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-                <div className="relative w-full h-full bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50 group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-300">
+                <div className="relative w-full h-full bg-ink-cyan rounded-full flex items-center justify-center shadow-2xl shadow-ink-cyan/50">
                   <i className="ri-key-2-fill text-6xl text-splat-dark"></i>
                 </div>
               </div>
               
               {/* テキスト */}
-              <h3 className="text-ink-cyan font-black text-3xl mb-3 group-hover:scale-105 transition-transform">
+              <h3 className="text-ink-cyan font-black text-3xl mb-3">
                 招待で参加
               </h3>
               <p className="text-white/60 text-base leading-relaxed">
