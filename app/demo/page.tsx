@@ -125,7 +125,7 @@ export default function DemoPage() {
 
       <main className="relative flex-1 flex flex-col items-center p-4 gap-3 overflow-y-auto">
         {/* チーム画面へのリンク - コンパクト版 */}
-        <div className="w-full max-w-4xl bg-ink-cyan/20 border-2 border-ink-cyan/50 rounded-xl p-3 backdrop-blur-sm flex items-center justify-between gap-3">
+        <div className="w-full bg-ink-cyan/20 border-2 border-ink-cyan/50 rounded-xl p-3 backdrop-blur-sm flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-10 h-10 bg-ink-cyan rounded-full flex items-center justify-center flex-shrink-0">
               <i className="ri-group-line text-xl text-splat-dark"></i>
@@ -144,7 +144,7 @@ export default function DemoPage() {
           </button>
         </div>
 
-        <div className="w-full max-w-4xl pb-4">
+        <div className="w-full pb-4">
           {/* ステータスボタングリッド */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {STATUS_OPTIONS.map((option) => (
